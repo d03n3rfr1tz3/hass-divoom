@@ -1,0 +1,52 @@
+# turn off the display
+message: ''
+data:
+  mode: 'off'
+
+# activate channel 'clock' with specific components
+message: ''
+data:
+  mode: 'clock'
+  clock: 1
+  weather: 0
+  temp: 0
+  calendar: 1
+  color: [250, 0, 0]
+
+# activate light mode with specific color
+message: ''
+data:
+  mode: 'light'
+  brightness: 75
+  color: [250, 0, 0]
+
+# activate light mode with fading colors
+message: ''
+data:
+  mode: 'light'
+  brightness: 75
+
+# activate channel 'effects' with specific effect
+message: ''
+data:
+  mode: 'effects'
+  number: 2
+
+# activate channel 'visualization' with specific visualization
+message: ''
+data:
+  mode: 'visualization'
+  number: 2
+
+# activate scoreboard with some scores
+message: ''
+data:
+  mode: 'scoreboard'
+  player1: 2
+  player2: 1
+
+# activate an image or animation, depending of the number of frames found in the file
+message: ''
+data:
+  mode: 'image'
+  file: 'smiley.gif'
