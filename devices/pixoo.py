@@ -94,7 +94,6 @@ class Pixoo:
         """Send raw payload to the Pixoo. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
         msg = self.make_message(payload)
         try:
-            self.logger.debug("Pixoo PAYLOAD: {0}".format(' '.join([hex(b) for b in msg])))
             return self.socket.send(bytes(msg))
         except socket.error as error:
             self.socket_errno = error.errno
@@ -315,12 +314,9 @@ class Pixoo:
             frameParts = []
             framePartsSize = 0
             
-            test = ""
             for pair in frames:
                 frameParts += pair[0]
                 framePartsSize += pair[1]
-                test += " frameSize={0}".format(pair[1])
-            self.logger.debug("Pixoo frameParts={0} framePartsSize={1} {2}".format(len(frameParts), framePartsSize, test))
             
             index = 0
             for framePart in self.chunks(frameParts, 200):
