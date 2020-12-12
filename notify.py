@@ -34,7 +34,7 @@ PARAM_FILE = 'file'
 
 PARAM_RAW = 'raw'
 
-VALID_MODES = {'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image'}
+VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image'}
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MAC): cv.string,
@@ -78,8 +78,11 @@ class DivoomNotificationService(BaseNotificationService):
         data = kwargs.get(ATTR_DATA)
         mode = data.get(PARAM_MODE)
         
+        if mode == False or mode == 'on':
+            self._device.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
+        
         if mode == False or mode == 'off':
-            self._device.show_light(color=None, brightness=0, power=False)
+            self._device.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
 
         elif mode == "clock":
             clock = data.get(PARAM_CLOCK)
@@ -116,7 +119,7 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.show_image(image_path)
 
         else:
-            _LOGGER.error("Invalid mode '{0}', must be one of 'off', 'clock', 'light', 'weather', 'temp', 'calendar', 'effects', 'visualization', 'scoreboard', 'image'".format(mode))
+            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'weather', 'temp', 'calendar', 'effects', 'visualization', 'scoreboard', 'image'".format(mode))
             return False
         
         return True
