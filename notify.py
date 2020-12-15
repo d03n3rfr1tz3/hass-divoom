@@ -78,11 +78,11 @@ class DivoomNotificationService(BaseNotificationService):
         data = kwargs.get(ATTR_DATA)
         mode = data.get(PARAM_MODE)
         
-        if mode == False or mode == 'on':
-            self._device.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
-        
         if mode == False or mode == 'off':
             self._device.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
+        
+        elif mode == 'on':
+            self._device.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
 
         elif mode == "clock":
             clock = data.get(PARAM_CLOCK)
