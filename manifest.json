@@ -3,5 +3,6 @@
   "name": "Divoom",
   "documentation": "https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/README.md",
   "requirements": [ "pillow==7.2.0", "pybluez==0.22" ],
-  "codeowners": []
+  "codeowners": ["@d03n3rfr1tz3"],
+  "version": "1.0.0"
 }
