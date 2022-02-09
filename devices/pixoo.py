@@ -172,7 +172,7 @@ class Pixoo:
             palette = img.getpalette()
             try:
                 while True:
-                    if not img.getpalette():
+                    if img.mode in ("L", "LA", "P", "PA") and not img.getpalette():
                         img.putpalette(palette)
 
                     duration = img.info['duration']
