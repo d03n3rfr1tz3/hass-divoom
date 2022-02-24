@@ -172,8 +172,11 @@ class Pixoo:
             palette = img.getpalette()
             try:
                 while True:
-                    if img.mode in ("L", "LA", "P", "PA") and not img.getpalette():
-                        img.putpalette(palette)
+                    try:
+                        if img.mode in ("L", "LA", "P", "PA") and not img.getpalette():
+                            img.putpalette(palette)
+                    except ValueError as error:
+                        self.logger.warning("Pixoo encountered an error while trying to put palette into GIF frames. {0}".format(error))
 
                     duration = img.info['duration']
                     new_frame = Image.new('RGBA', img.size)
