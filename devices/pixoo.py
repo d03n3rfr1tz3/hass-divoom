@@ -64,7 +64,7 @@ class Pixoo:
         
         retries = 1
         while self.socket_errno > 0 and retries <= 5:
-            self.logger.warning("Pixoo connection lost (errno = {0}). Trying to reconnect for the {1} time.".format(self.socket_errno, retries))
+            self.logger.warning("Pixoo: connection lost (errno = {0}). Trying to reconnect for the {1} time.".format(self.socket_errno, retries))
             if retries > 1:
                 time.sleep(1 * retries)
             if not self.socket is None:
@@ -94,6 +94,7 @@ class Pixoo:
         """Send raw payload to the Pixoo. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
         msg = self.make_message(payload)
         try:
+            self.logger.debug("Pixoo PAYLOAD: {0}".format(' '.join([hex(b) for b in msg])))
             return self.socket.send(bytes(msg))
         except socket.error as error:
             self.socket_errno = error.errno
@@ -176,7 +177,7 @@ class Pixoo:
                         if img.mode in ("L", "LA", "P", "PA") and not img.getpalette():
                             img.putpalette(palette)
                     except ValueError as error:
-                        self.logger.warning("Pixoo encountered an error while trying to put palette into GIF frames. {0}".format(error))
+                        self.logger.warning("Pixoo: error while trying to put palette into GIF frames. {0}".format(error))
 
                     duration = img.info['duration']
                     new_frame = Image.new('RGBA', img.size)
