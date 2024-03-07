@@ -39,7 +39,7 @@ notify:
 
 * name (Optional): The name for the notifier.
 * mac (Required): The Bluetooth MAC address for the Divoom device.
-* device_type: The concrete type of your Divoom device. Currently only `pixoo` is supported.
+* device_type: The concrete type of your Divoom device. Currently `pixoo`, `pixoomax`, `pixoo64`, `timebox`, `ditoo` are supported.
 * media_directory (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
 
