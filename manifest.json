@@ -4,6 +4,17 @@
   "documentation": "https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/README.md",
   "requirements": [ "pillow>=7.2.0" ],
   "dependencies": [ "bluetooth_adapters" ],
+  "bluetooth": [
+    {
+      "local_name": "Ditoo*"
+    },
+    {
+      "local_name": "Pixoo*"
+    },
+    {
+      "local_name": "Timebox*"
+    }
+  ],
   "codeowners": ["@d03n3rfr1tz3"],
   "iot_class": "local_push",
   "version": "1.0.0"

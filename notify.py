@@ -20,7 +20,10 @@ CONF_MEDIA_DIR = 'media_directory'
 PARAM_MODE = 'mode'
 PARAM_BRIGHTNESS = 'brightness'
 PARAM_COLOR = 'color'
+PARAM_FREQUENCY = 'frequency'
 PARAM_NUMBER = 'number'
+PARAM_VOLUME = 'volume'
+PARAM_VALUE = 'value'
 
 PARAM_CLOCK = 'clock'
 PARAM_WEATHER = 'weather'
@@ -34,7 +37,24 @@ PARAM_FILE = 'file'
 
 PARAM_RAW = 'raw'
 
-VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image'}
+VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'playstate', 'radio', 'volume', 'weather'}
+WEATHER_MODES = {
+    'clear-night': 1, 
+    'cloudy': 3, 
+    'exceptional': 3, 
+    'fog': 9, 
+    'hail': 6, 
+    'lightning': 5, 
+    'lightning-rainy': 5, 
+    'partlycloudy': 3, 
+    'pouring': 6, 
+    'rainy': 6, 
+    'snowy': 8, 
+    'snowy-rainy': 8, 
+    'sunny': 1, 
+    'windy': 3, 
+    'windy-variant': 3
+}
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MAC): cv.string,
@@ -56,11 +76,32 @@ class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
 
     def __init__(self, mac, device_type, media_directory):
+        self._mac = mac
+        self._media_directory = media_directory
+
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
-            self._mac = mac
-            self._media_directory = media_directory
             self._device = Pixoo(host=mac, logger=_LOGGER)
+            self._device.connect()
+        
+        if device_type == 'pixoomax':
+            from .devices.pixoomax import PixooMax
+            self._device = PixooMax(host=mac, logger=_LOGGER)
+            self._device.connect()
+        
+        if device_type == 'pixoo64':
+            from .devices.pixoo64 import Pixoo64
+            self._device = Pixoo64(host=mac, logger=_LOGGER)
+            self._device.connect()
+        
+        if device_type == 'timebox':
+            from .devices.timebox import Timebox
+            self._device = Timebox(host=mac, logger=_LOGGER)
+            self._device.connect()
+        
+        if device_type == 'ditoo':
+            from .devices.ditoo import Ditoo
+            self._device = Ditoo(host=mac, logger=_LOGGER)
             self._device.connect()
         
         if self._device is None:
@@ -83,6 +124,36 @@ class DivoomNotificationService(BaseNotificationService):
         
         elif mode == 'on':
             self._device.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
+
+        elif mode == "brightness":
+            value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_VALUE)
+            self._device.send_brightness(value=value)
+
+        elif mode == "playstate":
+            value = data.get(PARAM_VALUE)
+            self._device.send_playstate(value=value)
+
+        elif mode == "volume":
+            value = data.get(PARAM_VOLUME) or data.get(PARAM_VALUE)
+            self._device.send_volume(value=value)
+
+        elif mode == "datetime":
+            value = data.get(PARAM_VALUE)
+            self._device.send_datetime(value=value)
+
+        elif mode == "weather":
+            value = data.get(PARAM_VALUE)
+            weather = data.get(PARAM_WEATHER)
+
+            weathernum = None
+            if isinstance(weather, int):
+                weathernum = weather
+            elif isinstance(weather, float):
+                weathernum = round(weather)
+            elif isinstance(weather, str):
+                weathernum = WEATHER_MODES.get(weather) or None
+
+            self._device.send_weather(value=value, weather=weathernum)
 
         elif mode == "clock":
             clock = data.get(PARAM_CLOCK)
@@ -118,8 +189,13 @@ class DivoomNotificationService(BaseNotificationService):
             image_path = os.path.join(self._media_directory, image_file)
             self._device.show_image(image_path)
 
+        elif mode == "radio":
+            value = data.get(PARAM_VALUE)
+            frequency = data.get(PARAM_FREQUENCY)
+            self._device.show_radio(value=value, frequency=frequency)
+
         else:
-            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'weather', 'temp', 'calendar', 'effects', 'visualization', 'scoreboard', 'image'".format(mode))
+            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'playstate', 'radio', 'volume', 'weather'".format(mode))
             return False
         
         return True
