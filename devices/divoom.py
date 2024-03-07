@@ -7,6 +7,9 @@ class Divoom:
     """Class Divoom encapsulates the Divoom Bluetooth communication."""
     
     COMMANDS = {
+        "set radio": 0x05,
+        "set volume": 0x08,
+        "set playstate": 0x0a,
         "set date time": 0x18,
         "set temp type": 0x2b,
         "set time type": 0x2c,
@@ -15,6 +18,7 @@ class Divoom:
         "get view": 0x46,
         "set animation frame": 0x49,
         "set temp": 0x5f,
+        "set radio frequency": 0x61,
         "set brightness": 0x74
     }
 
@@ -265,6 +269,20 @@ class Divoom:
         args += value.to_bytes(1, byteorder='big')
         self.send_command("set brightness", args)
 
+    def send_volume(self, value=None):
+        """Send volume to the Divoom device"""
+        if value == None: value = 0
+
+        args = []
+        args += (value / 100 * 15).to_bytes(1, byteorder='big')
+        self.send_command("set volume", args)
+
+    def send_playstate(self, value=None):
+        """Send play/pause state to the Divoom device"""
+        args = []
+        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+        self.send_command("set playstate", args)
+
     def send_weather(self, value=None, weather=None):
         """Send weather to the Divoom device"""
         if value == None: return
@@ -390,6 +408,21 @@ class Divoom:
             pair = frames[0]
             frame = [0x00, 0x0A, 0x0A, 0x04] + pair[0]
             self.send_command("set image", frame)
+
+    def show_radio(self, value=None, frequency=None):
+        """Show radio on the Divoom device and optionally changes to the given frequency"""
+        args = []
+        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+        self.send_command("set radio", args)
+
+        if (value == True or value == 1) and frequency != None:
+            args = []
+            frequency = frequency * 10
+            if frequency > 1000:
+                args += [int(frequency - 1000), int(frequency / 100)]
+            else:
+                args += [int(frequency % 100), int(frequency / 100)]
+            self.send_command("set radio frequency", args)
 
     def clear_input_buffer(self):
         """Read all input from Divoom device and remove from buffer. """
