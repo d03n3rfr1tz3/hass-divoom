@@ -61,13 +61,14 @@ information in the data parameter of the Service Data payload.
 }
 ```
 
-`MODE` can be one of:
+`MODE` on all currently supported Divoom devices can be one of:
 
 * `clock`: Display the built-in clock channel. You can specify the style in the `clock` parameter.
   This mode also accepts the boolean-like parameters `weather`, `temp` and `calendar` for activating the corresponding features.
   It's also possible to specify the `color` of the clock.
-  * `clock` parameter accepts a number between 0 and 9. The actual supported clock styles depend on your device.
-    0 = Fullscreen, 1 = Rainbow, 2 = Boxed, 3 = Analog square, 4 = Fullscreen negative, 5 = Analog round, 6 = Widescreen
+  * `clock` parameter accepts a number between 0 and 9. The actual supported clock styles depend on your device.\
+    0 = Fullscreen, 1 = Rainbow, 2 = Boxed, 3 = Analog square,\
+    4 = Fullscreen negative, 5 = Analog round, 6 = Widescreen
 * `light`: Display the built-in light channel.
   It's also possible to specify the `brightness` and `color` of the clock.
 * `effects`: Display the built-in effects channel. With the parameter `number` you can
@@ -80,9 +81,15 @@ information in the data parameter of the Service Data payload.
   to the configured media_directory, that will be displayed.
 * `brightness`: Sets the brightness using the `brightness` or `value` parameter.
 * `datetime`: Sets the date and time using the `value` parameter in the typical ISO datetime format.
-* `weather`: Sets the weather information. Set the temperature using the `value` parameter and the weather type using the `weather` parameter.
+* `weather`: Sets the weather. Set the temperature using the `value` parameter and the weather type using the `weather` parameter.\
   1 = clear, 3 = cloudy sky, 5 = thunderstorm, 6 = rain, 8 = snow, 9 = fog
 * `off`: Turn the display off.
+
+`MODE` on timebox, ditoo and similar Divoom devices additionally support:
+
+* `playstate`: Sets the play/pause state using the `value` parameter.
+* `radio`: Shows the radio using the `value` parameter. Additionally the `frequency` can be set.
+* `volume`: Sets the volume using the `volume` or `value` parameter.
 
 #### Bluetooth interface
 
