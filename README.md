@@ -62,10 +62,16 @@ information in the data parameter of the Service Data payload.
 ```
 
 `MODE` on all currently supported Divoom devices can be one of:
+`MODE` on all currently supported Divoom devices can be one of:
 
 * `clock`: Display the built-in clock channel. You can specify the style in the `clock` parameter.
   This mode also accepts the boolean-like parameters `weather`, `temp` and `calendar` for activating the corresponding features.
+* `clock`: Display the built-in clock channel. You can specify the style in the `clock` parameter.
+  This mode also accepts the boolean-like parameters `weather`, `temp` and `calendar` for activating the corresponding features.
   It's also possible to specify the `color` of the clock.
+  * `clock` parameter accepts a number between 0 and 9. The actual supported clock styles depend on your device.\
+    0 = Fullscreen, 1 = Rainbow, 2 = Boxed, 3 = Analog square,\
+    4 = Fullscreen negative, 5 = Analog round, 6 = Widescreen
   * `clock` parameter accepts a number between 0 and 9. The actual supported clock styles depend on your device.\
     0 = Fullscreen, 1 = Rainbow, 2 = Boxed, 3 = Analog square,\
     4 = Fullscreen negative, 5 = Analog round, 6 = Widescreen
@@ -83,7 +89,46 @@ information in the data parameter of the Service Data payload.
 * `datetime`: Sets the date and time using the `value` parameter in the typical ISO datetime format.
 * `weather`: Sets the weather. Set the temperature using the `value` parameter and the weather type using the `weather` parameter.\
   1 = clear, 3 = cloudy sky, 5 = thunderstorm, 6 = rain, 8 = snow, 9 = fog
+* `brightness`: Sets the brightness using the `brightness` or `value` parameter.
+* `datetime`: Sets the date and time using the `value` parameter in the typical ISO datetime format.
+* `weather`: Sets the weather. Set the temperature using the `value` parameter and the weather type using the `weather` parameter.\
+  1 = clear, 3 = cloudy sky, 5 = thunderstorm, 6 = rain, 8 = snow, 9 = fog
 * `off`: Turn the display off.
+
+`MODE` on timebox, ditoo and similar Divoom devices additionally support:
+
+* `playstate`: Sets the play/pause state using the `value` parameter.
+* `radio`: Shows the radio using the `value` parameter. Additionally the `frequency` can be set.
+* `volume`: Sets the volume using the `volume` or `value` parameter.
+
+#### Bluetooth interface
+
+This component automatically connects to your Divoom device based on the configured MAC address. The only thing you typically have to prepare, is pairing it once to your Home Assistant device (for example your raspberry pi). Depending on your setup, that might be an easy or quite complicated task. After the pairing is done, this component can connect to your Divoom device anytime it's needed, even after restarting your Home Assistant. Newer versions of Home Assistant very likely already have Bluetooth enabled and configured somehow. Older versions needed more manual steps to make it work.
+
+You can get the MAC address using your Phones Bluetooth settings or from your Divoom app. When trying to pair the devices, you will probably use tools, that are also capable of scanning. Therefore you can also get the MAC address that way.
+
+##### Bluetooth preparation
+
+**Short version**: With the Divoom device turned on and looking for a Bluetooth connection, run the following through SSH to the host system (supervised installation). If your are using hass.io, I'm not sure how to pair the device.
+
+```
+sudo hciconfig hci0 up
+sudo hcitool scan
+```
+
+This should eventually find the device, and print its MAC address.
+Keep a note of this address, because you need to replace `MAC_ADDRESS` with it now.
+If you already know the MAC address, you can directly skip to the next command.
+
+```
+sudo rfcomm connect hci0 MAC_ADDRESS 1
+```
+
+This should connect your Home Assistant device to your Divoom device including an initial pairing. This is only needed once.
+
+**Long version**: I followed [this guide](https://www.pcsuggest.com/linux-bluetooth-setup-hcitool-bluez/) to get Bluetooth up and
+running on my hardware. Your mileage may vary, especially if you're trying to use the Raspberry Pi built-in interface
+(contributions to this guide very welcome!)
 
 `MODE` on timebox, ditoo and similar Divoom devices additionally support:
 
