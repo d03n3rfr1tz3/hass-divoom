@@ -79,3 +79,22 @@ data:
   mode: 'weather'
   value: '25°C'
   weather: 6
+
+# change the play/pause state
+message: ''
+data:
+  mode: 'playstate'
+  value: 1
+
+# change the volume
+message: ''
+data:
+  mode: 'volume'
+  volume: 75
+
+# activates the radio and sets the frequency to 100.3
+message: ''
+data:
+  mode: 'radio'
+  value: 1
+  frequency: 100.3
