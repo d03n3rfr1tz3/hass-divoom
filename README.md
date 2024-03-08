@@ -1,7 +1,9 @@
 # hass-divoom
-## Divoom Integration for Home Assistant
+**Divoom Integration for Home Assistant**
 
-### Credits
+Allows you to send commands to your Divoom device through a Home Assistant notification service. It allows you to control your Divoom device in your automations and scripts however you want. Currently no reading commands or sensors are implemented as well as no GUI configuration.
+
+## Credits
 First of, the whole communication with the Divoom device (only tested on my Pixoo for now) is based on gathering information from multiple sources,
 that already reverse engineered an older or different Divoom device. Therefore credit goes to the following owners and git repos (you are the heroes here):
 
@@ -10,20 +12,21 @@ https://github.com/mumpitzstuff/fhem-Divoom
 https://github.com/ScR4tCh/timebox/  
 https://bitbucket.org/pjhardy/homeassistant-timebox/src/master/
 
-### Documentation
+## Documentation
 Further documentation besides the steps below and possibly a HACS integration may follow. For now I'm happy that it works! :D
 
-#### Install the custom component
+### Install the custom component
 
 * Download the repository. If you know git, a clone is fine. If not,
   just download https://github.com/d03n3rfr1tz3/hass-divoom/archive/main.zip
-  to get the most recent code in a zip file.
-* Copy the content of that zip file into `custom_components\divoom` in your Home Assistant
+  to get the most recent code in a ZIP file.
+* Copy the content of the ZIP file into `custom_components\divoom` in your Home Assistant
   configuration directory.
 * Create a directory named `pixelart` in your Home Assistant configuration directory,
   for images that you may want to display on your device.
+* Optionally copy the content of the `pixelart` directory from the ZIP file
 
-#### Enable the custom component
+### Enable the custom component
 
 This custom component adds a new platform to the Notifications
 component. It can be enabled by adding this to your `configuration.yaml`:
@@ -43,22 +46,21 @@ notify:
 * media_directory (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
 
-#### Usage
+### Usage
 
-This custom component acts as a notify platform. This means that the
+This custom component acts as a notify service. This means that the
 Service Data requires a message parameter, even though we're not using
 it. Leave the message parameter blank, and specify mode and other
 information in the data parameter of the Service Data payload.
 
-### Basic display modes
+#### Basic display modes
 
-```json
-{
-  "message": "",
-  "data": {
-    "mode": "MODE"
-  }
-}
+```yaml
+service: notify.NOTIFIER_NAME
+data:
+  message: ""
+  data:
+    mode: "MODE"
 ```
 
 `MODE` on all currently supported Divoom devices can be one of:
@@ -92,13 +94,33 @@ information in the data parameter of the Service Data payload.
 * `radio`: Shows the radio using the `value` parameter. Additionally the `frequency` can be set.
 * `volume`: Sets the volume using the `volume` or `number` or `value` parameter.
 
+### Examples
+
+An example from my own automation:
+```yaml
+service: notify.divoom_pixoo
+data:
+  message: ""
+  data:
+    mode: "brightness"
+    brightness: 75
+```
+
+You can find more examples for each mode and all supported devices in separate files: \
+Examples for Pixoo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoo.txt \
+Examples for Pixoo Max: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoomax.txt \
+Examples for Pixoo 64: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoo64.txt \
+Examples for Timebox / Timebox Evo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/timebox.txt \
+Examples for Ditoo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/ditoo.txt
+
+### Bluetooth
 #### Bluetooth interface
 
 This component automatically connects to your Divoom device based on the configured MAC address. The only thing you typically have to prepare, is pairing it once to your Home Assistant device (for example your raspberry pi). Depending on your setup, that might be an easy or quite complicated task. After the pairing is done, this component can connect to your Divoom device anytime it's needed, even after restarting your Home Assistant. Newer versions of Home Assistant very likely already have Bluetooth enabled and configured somehow. Older versions needed more manual steps to make it work.
 
 You can get the MAC address using your Phones Bluetooth settings or from your Divoom app. When trying to pair the devices, you will probably use tools, that are also capable of scanning. Therefore you can also get the MAC address that way.
 
-##### Bluetooth preparation
+#### Bluetooth preparation
 
 **Short version**: With the Divoom device turned on and looking for a Bluetooth connection, run the following through SSH to the host system (supervised installation). If your are using hass.io, I'm not sure how to pair the device.
 
@@ -120,13 +142,6 @@ This should connect your Home Assistant device to your Divoom device including a
 **Long version**: I followed [this guide](https://www.pcsuggest.com/linux-bluetooth-setup-hcitool-bluez/) to get Bluetooth up and
 running on my hardware. Your mileage may vary, especially if you're trying to use the Raspberry Pi built-in interface
 (contributions to this guide very welcome!)
-
-### Examples
-Examples for Pixoo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoo.txt \
-Examples for Pixoo Max: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoomax.txt \
-Examples for Pixoo 64: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoo64.txt \
-Examples for Timebox / Timebox Evo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/timebox.txt \
-Examples for Ditoo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/ditoo.txt
 
 ## Troubleshooting
 ### GIF does not work
