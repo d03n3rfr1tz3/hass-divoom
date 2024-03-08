@@ -79,17 +79,18 @@ information in the data parameter of the Service Data payload.
   you can specify the displayed score.
 * `image`: Display an animated or static image. The parameter `file` specifes the image file relative
   to the configured media_directory, that will be displayed.
-* `brightness`: Sets the brightness using the `brightness` or `value` parameter.
+* `brightness`: Sets the brightness using the `brightness` or `number` or `value` parameter.
 * `datetime`: Sets the date and time using the `value` parameter in the typical ISO datetime format.
 * `weather`: Sets the weather. Set the temperature using the `value` parameter and the weather type using the `weather` parameter.\
   1 = clear, 3 = cloudy sky, 5 = thunderstorm, 6 = rain, 8 = snow, 9 = fog
+* `raw`: Send a raw command using the `raw` parameter to the Divoom device. Might be useful, if a certain mode/feature is not implemented by this component yet.
 * `off`: Turn the display off.
 
 `MODE` on timebox, ditoo and similar Divoom devices additionally support:
 
 * `playstate`: Sets the play/pause state using the `value` parameter.
 * `radio`: Shows the radio using the `value` parameter. Additionally the `frequency` can be set.
-* `volume`: Sets the volume using the `volume` or `value` parameter.
+* `volume`: Sets the volume using the `volume` or `number` or `value` parameter.
 
 #### Bluetooth interface
 

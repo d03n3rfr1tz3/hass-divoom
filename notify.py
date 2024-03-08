@@ -37,7 +37,7 @@ PARAM_FILE = 'file'
 
 PARAM_RAW = 'raw'
 
-VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'playstate', 'radio', 'volume', 'weather'}
+VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'playstate', 'radio', 'volume', 'weather', 'raw'}
 WEATHER_MODES = {
     'clear-night': 1, 
     'cloudy': 3, 
@@ -126,7 +126,7 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
 
         elif mode == "brightness":
-            value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_VALUE)
+            value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
             self._device.send_brightness(value=value)
 
         elif mode == "playstate":
@@ -134,7 +134,7 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.send_playstate(value=value)
 
         elif mode == "volume":
-            value = data.get(PARAM_VOLUME) or data.get(PARAM_VALUE)
+            value = data.get(PARAM_VOLUME) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
             self._device.send_volume(value=value)
 
         elif mode == "datetime":
@@ -194,8 +194,12 @@ class DivoomNotificationService(BaseNotificationService):
             frequency = data.get(PARAM_FREQUENCY)
             self._device.show_radio(value=value, frequency=frequency)
 
+        elif mode == "raw":
+            raw = data.get(PARAM_RAW)
+            self._device.send_command(command=raw[0], args=raw[1:])
+
         else:
-            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'playstate', 'radio', 'volume', 'weather'".format(mode))
+            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'playstate', 'radio', 'volume', 'weather', 'raw'".format(mode))
             return False
         
         return True

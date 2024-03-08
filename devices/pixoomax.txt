@@ -65,7 +65,7 @@ data:
 message: ''
 data:
   mode: 'image'
-  file: 'smiley.gif'
+  file: 'ha32.gif'
 
 # update date and time
 message: ''
@@ -79,3 +79,9 @@ data:
   mode: 'weather'
   value: '25°C'
   weather: 6
+
+# sends a raw command which sets brightness to 100%
+message: ''
+data:
+  mode: 'raw'
+  raw: [0x74, 0x64]

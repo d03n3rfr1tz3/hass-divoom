@@ -264,6 +264,7 @@ class Divoom:
     def send_brightness(self, value=None):
         """Send brightness to the Divoom device"""
         if value == None: return
+        if isinstance(value, str): value = int(value)
         
         args = []
         args += value.to_bytes(1, byteorder='big')
@@ -272,6 +273,7 @@ class Divoom:
     def send_volume(self, value=None):
         """Send volume to the Divoom device"""
         if value == None: value = 0
+        if isinstance(value, str): value = int(value)
 
         args = []
         args += (value / 100 * 15).to_bytes(1, byteorder='big')
@@ -287,6 +289,7 @@ class Divoom:
         """Send weather to the Divoom device"""
         if value == None: return
         if weather == None: weather = 0
+        if isinstance(weather, str): weather = int(weather)
 
         args = []
         args += int(round(float(value[0:-2]))).to_bytes(1, byteorder='big', signed=True)
@@ -337,8 +340,9 @@ class Divoom:
 
     def show_light(self, color, brightness=None, power=None):
         """Show light on the Divoom device in the color"""
+        if power == None: power = True
         if brightness == None: brightness = 100
-        if power == None: power = 1
+        if isinstance(brightness, str): brightness = int(brightness)
 
         args = [0x01]
         if color is None:
@@ -349,12 +353,13 @@ class Divoom:
             args += self.convert_color(color)
             args += brightness.to_bytes(1, byteorder='big')
             args += [0x00]
-        args += [0x01 if power == True else 0x00, 0x00, 0x00, 0x00]
+        args += [0x01 if power == True or power == 1 else 0x00, 0x00, 0x00, 0x00]
         self.send_command("set view", args)
 
     def show_effects(self, number):
         """Show effects on the Divoom device"""
         if number == None: return
+        if isinstance(number, str): number = int(number)
 
         args = [0x03]
         args += number.to_bytes(1, byteorder='big')
@@ -363,6 +368,7 @@ class Divoom:
     def show_visualization(self, number):
         """Show visualization on the Divoom device"""
         if number == None: return
+        if isinstance(number, str): number = int(number)
 
         args = [0x04]
         args += number.to_bytes(1, byteorder='big')
@@ -376,7 +382,9 @@ class Divoom:
     def show_scoreboard(self, blue=None, red=None):
         """Show scoreboard on the Divoom device with specific score"""
         if blue == None: blue = 0
+        if isinstance(blue, str): blue = int(blue)
         if red == None: red = 0
+        if isinstance(red, str): red = int(red)
 
         args = [0x06, 0x00]
         args += red.to_bytes(2, byteorder='little')
@@ -416,6 +424,8 @@ class Divoom:
         self.send_command("set radio", args)
 
         if (value == True or value == 1) and frequency != None:
+            if isinstance(frequency, str): frequency = float(frequency)
+
             args = []
             frequency = frequency * 10
             if frequency > 1000:
