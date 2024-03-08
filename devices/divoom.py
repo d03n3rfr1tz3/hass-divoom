@@ -11,6 +11,7 @@ class Divoom:
         "set volume": 0x08,
         "set playstate": 0x0a,
         "set date time": 0x18,
+        "set keyboard": 0x23,
         "set temp type": 0x2b,
         "set time type": 0x2c,
         "set image": 0x44,
@@ -19,20 +20,24 @@ class Divoom:
         "set animation frame": 0x49,
         "set temp": 0x5f,
         "set radio frequency": 0x61,
-        "set brightness": 0x74
+        "set tool": 0x72,
+        "set brightness": 0x74,
+        "set design": 0xbd
     }
 
     logger = None
     socket = None
     socket_errno = 0
     message_buf = []
+    escapePayload = False
     
     host = None
     port = 1
 
-    def __init__(self, host=None, port=1, logger=None):
+    def __init__(self, host=None, port=1, escapePayload=False, logger=None):
         self.host = host
         self.port = port
+        self.escapePayload = escapePayload
         
         if logger is None:
             logger = logging.getLogger(self.type)
@@ -48,6 +53,7 @@ class Divoom:
         try:
             self.socket.connect((self.host, self.port))
             self.socket.setblocking(0)
+            self.socket.settimeout(2)
             self.socket_errno = 0
         except socket.error as error:
             self.socket_errno = error.errno
@@ -82,9 +88,12 @@ class Divoom:
         """Receive n bytes of data from the Divoom device and put it in the input buffer. Returns the number of bytes received."""
         ready = select.select([self.socket], [], [], 0.1)
         if ready[0]:
-            data = self.socket.recv(num_bytes)
-            self.message_buf += data
-            return len(data)
+            try:
+                data = self.socket.recv(num_bytes)
+                self.message_buf += data
+                return len(data)
+            except socket.timeout:
+                pass
         else:
             return 0
 
@@ -98,10 +107,19 @@ class Divoom:
 
     def send_payload(self, payload):
         """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
-        msg = self.make_message(payload)
+        request = self.make_message(payload)
         try:
-            self.logger.debug("{0} PAYLOAD: {1}".format(self.type, ' '.join([hex(b) for b in msg])))
-            return self.socket.send(bytes(msg))
+            self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
+            result = self.socket.send(bytes(request))
+
+            try:
+                response = self.socket.recv(1024)
+                self.logger.debug("{0} PAYLOAD IN: {1}".format(self.type, ' '.join([hex(b) for b in response])))
+                return response
+            except socket.timeout:
+                pass
+
+            return result
         except socket.error as error:
             self.socket_errno = error.errno
             raise
@@ -137,7 +155,7 @@ class Divoom:
 
     def escape_payload(self, payload):
         """Escaping is not needed anymore as some smarter guys found out"""
-        if self.type == "Pixoo" or self.type == "PixooMax" or self.type == "Pixoo64":
+        if self.escapePayload == None or self.escapePayload == False:
             return payload
         
         """Escape the payload. It is not allowed to have occurrences of the codes
@@ -279,6 +297,24 @@ class Divoom:
         args += (value / 100 * 15).to_bytes(1, byteorder='big')
         self.send_command("set volume", args)
 
+    def send_keyboard(self, value=None):
+        """Send keyboard command on the Divoom device"""
+        if value == None: return
+        if isinstance(value, str): value = int(value)
+
+        if value == 0: # toggle keyboard
+            args = [0x02]
+            args += (29).to_bytes(1, byteorder='big')
+            self.send_command("set keyboard", args)
+        elif value >= 1: # switch to next keyboard effect
+            args = [0x01]
+            args += (28).to_bytes(1, byteorder='big')
+            self.send_command("set keyboard", args)
+        elif value <= -1: # switch to prev keyboard effect
+            args = [0x00]
+            args += (27).to_bytes(1, byteorder='big')
+            self.send_command("set keyboard", args)
+
     def send_playstate(self, value=None):
         """Send play/pause state to the Divoom device"""
         args = []
@@ -374,10 +410,17 @@ class Divoom:
         args += number.to_bytes(1, byteorder='big')
         self.send_command("set view", args)
 
-    def show_design(self):
+    def show_design(self, number=None):
         """Show design on the Divoom device"""
         args = [0x05]
         self.send_command("set view", args)
+
+        if number != None: # additionally change design tab
+            if isinstance(number, str): number = int(number)
+
+            args = [0x17]
+            args += number.to_bytes(1, byteorder='big')
+            self.send_command("set design", args)
 
     def show_scoreboard(self, blue=None, red=None):
         """Show scoreboard on the Divoom device with specific score"""
@@ -416,6 +459,36 @@ class Divoom:
             pair = frames[0]
             frame = [0x00, 0x0A, 0x0A, 0x04] + pair[0]
             self.send_command("set image", frame)
+
+    def show_countdown(self, value=None, countdown=None):
+        """Show countdown tool on the Divoom device"""
+        if value == None: value = 0
+        if isinstance(value, str): value = int(value)
+
+        args = [0x03]
+        args += (value + 1).to_bytes(1, byteorder='big')
+        if countdown != None:
+            args += int(countdown[0:2]).to_bytes(1, byteorder='big')
+            args += int(countdown[3]).to_bytes(1, byteorder='big')
+        self.send_command("set tool", args)
+
+    def show_noise(self, value=None):
+        """Show noise tool on the Divoom device"""
+        if value == None: return
+        if isinstance(value, str): value = int(value)
+
+        args = [0x02]
+        args += value.to_bytes(1, byteorder='big')
+        self.send_command("set tool", args)
+
+    def show_timer(self, value=None):
+        """Show timer tool on the Divoom device"""
+        if value == None: value = 2
+        if isinstance(value, str): value = int(value)
+
+        args = [0x00]
+        args += value.to_bytes(1, byteorder='big')
+        self.send_command("set tool", args)
 
     def show_radio(self, value=None, frequency=None):
         """Show radio on the Divoom device and optionally changes to the given frequency"""

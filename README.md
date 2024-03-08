@@ -38,13 +38,15 @@ notify:
     mac: "DIVOOM_DEVICE_MAC_ADDRESS"
     device_type: "DIVOOM_DEVICE_TYPE"
     media_directory: "pixelart"
+    escape_payload: false
 ```
 
 * name (Optional): The name for the notifier.
 * mac (Required): The Bluetooth MAC address for the Divoom device.
-* device_type: The concrete type of your Divoom device. Currently `pixoo`, `pixoomax`, `pixoo64`, `timebox`, `ditoo` are supported.
+* device_type: The concrete type of your Divoom device. Currently `pixoo`, `pixoomax`, `pixoo64`, `timebox`, `timeboxevo`, `tivoo`, `ditoo` are supported.
 * media_directory (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
+* escape_payload (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with older firmware (afaik some old Timebox versions). Deactivated by default, because newer versions don't need that.
 
 ### Usage
 
@@ -81,11 +83,13 @@ data:
     0 = Fullscreen, 1 = Rainbow, 2 = Boxed, 3 = Analog square,\
     4 = Fullscreen negative, 5 = Analog round, 6 = Widescreen
 * `light`: Display the built-in light channel.
-  It's also possible to specify the `brightness` and `color` of the clock.
+  It's also possible to specify the `brightness` and `color` of the light.
 * `effects`: Display the built-in effects channel. With the parameter `number` you can
   specify the concrete effect. Look into your phone app and count them.
 * `visualization`: Display the built-in visualization channel. With the parameter `number` you can
   specify the concrete effect. Look into your phone app and count them.
+* `design`: Display the custom design channel. With the parameter `number` (ranging from 0-2) you can
+  specify the concrete design 1-3.
 * `scoreboard`: Display the built-in scoreboard channel. With the parameters `player1` and `player2`
   you can specify the displayed score.
 * `image`: Display an animated or static image. The parameter `file` specifes the image file relative
@@ -94,14 +98,23 @@ data:
 * `datetime`: Sets the date and time using the `value` parameter in the typical ISO datetime format.
 * `weather`: Sets the weather. Set the temperature using the `value` parameter and the weather type using the `weather` parameter.\
   1 = clear, 3 = cloudy sky, 5 = thunderstorm, 6 = rain, 8 = snow, 9 = fog
-* `raw`: Send a raw command using the `raw` parameter to the Divoom device. Might be useful, if a certain mode/feature is not implemented by this component yet.
+* `raw`: Send a raw command using the `raw` parameter to the Divoom device.
+  Might be useful, if a certain mode/feature is not implemented by this component yet.
 * `off`: Turn the display off.
 
-`MODE` on timebox, ditoo and similar Divoom devices additionally support:
+`MODE` on some Divoom devices like TimeboxEvo, Tivoo and Ditoo additionally support:
 
+* `countdown`: Shows the countdown using the `countdown` parameter (format mm:ss). You can control the start/stop state using the `value` parameter.
+* `noise`: Shows the noise meter. You can control the start/stop state using the `value` parameter.
+* `timer`: Shows the timer. You can control the start/stop state using the `value` parameter.
 * `playstate`: Sets the play/pause state using the `value` parameter.
 * `radio`: Shows the radio using the `value` parameter. Additionally the `frequency` can be set.
 * `volume`: Sets the volume using the `volume` or `number` or `value` parameter.
+
+`MODE` on Ditoo additionally support:
+
+* `keyboard`: Changes the keyboard effects using the `value` parameter. \
+  -1 = previous effect, 0 = toggle on/off, 1 = next effect
 
 ### Examples
 
