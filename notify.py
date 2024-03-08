@@ -117,7 +117,7 @@ class DivoomNotificationService(BaseNotificationService):
         
         self._device.reconnect()
         data = kwargs.get(ATTR_DATA)
-        mode = data.get(PARAM_MODE)
+        mode = data.get(PARAM_MODE) or message
         
         if mode == False or mode == 'off':
             self._device.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
