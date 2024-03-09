@@ -15,15 +15,6 @@ class Pixoo(Divoom):
     def send_playstate(self, value=None):
         self.logger.warning("{0}: this device does not support sending the play/pause state.".format(self.type))
 
-    def show_countdown(self, value=None, countdown=None):
-        self.logger.warning("{0}: this device does not support showing the countdown.".format(self.type))
-
-    def show_noise(self, value=None):
-        self.logger.warning("{0}: this device does not support showing the noise meter.".format(self.type))
-
-    def show_timer(self, value=None):
-        self.logger.warning("{0}: this device does not support showing the timer.".format(self.type))
-
     def show_radio(self, value=None, frequency=None):
         self.logger.warning("{0}: this device does not support showing the radio.".format(self.type))
 

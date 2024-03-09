@@ -80,6 +80,24 @@ data:
   value: '25°C'
   weather: 6
 
+# activates the countdown with 1 minute and 30 seconds
+message: ''
+data:
+  mode: 'countdown'
+  countdown: '01:30'
+
+# activates the noise meter
+message: ''
+data:
+  mode: 'noise'
+  value: 1
+
+# activates the timer
+message: ''
+data:
+  mode: 'timer'
+  value: 1
+
 # sends a raw command which sets brightness to 100%
 message: ''
 data:

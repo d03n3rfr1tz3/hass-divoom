@@ -93,19 +93,9 @@ class DivoomNotificationService(BaseNotificationService):
             self._device = PixooMax(host=mac, escapePayload=escape_payload, logger=_LOGGER)
             self._device.connect()
         
-        if device_type == 'pixoo64':
-            from .devices.pixoo64 import Pixoo64
-            self._device = Pixoo64(host=mac, escapePayload=escape_payload, logger=_LOGGER)
-            self._device.connect()
-        
         if device_type == 'timebox':
             from .devices.timebox import Timebox
             self._device = Timebox(host=mac, escapePayload=escape_payload, logger=_LOGGER)
-            self._device.connect()
-        
-        if device_type == 'timeboxevo':
-            from .devices.timeboxevo import TimeboxEvo
-            self._device = TimeboxEvo(host=mac, escapePayload=escape_payload, logger=_LOGGER)
             self._device.connect()
         
         if device_type == 'tivoo':

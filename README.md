@@ -43,7 +43,7 @@ notify:
 
 * name (Optional): The name for the notifier.
 * mac (Required): The Bluetooth MAC address for the Divoom device.
-* device_type: The concrete type of your Divoom device. Currently `pixoo`, `pixoomax`, `pixoo64`, `timebox`, `timeboxevo`, `tivoo`, `ditoo` are supported.
+* device_type: The concrete type of your Divoom device. Currently `pixoo`, `pixoomax`, `timebox`, `tivoo`, `ditoo` are supported.
 * media_directory (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
 * escape_payload (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with older firmware (afaik some old Timebox versions). Deactivated by default, because newer versions don't need that.
@@ -142,8 +142,8 @@ data:
 You can find more examples for each mode and all supported devices in separate files: \
 Examples for Pixoo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoo.txt \
 Examples for Pixoo Max: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoomax.txt \
-Examples for Pixoo 64: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/pixoo64.txt \
-Examples for Timebox / Timebox Evo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/timebox.txt \
+Examples for Timebox: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/timebox.txt \
+Examples for Tivoo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/tivoo.txt \
 Examples for Ditoo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devices/ditoo.txt
 
 ### Bluetooth
