@@ -460,14 +460,16 @@ class Divoom:
 
     def show_countdown(self, value=None, countdown=None):
         """Show countdown tool on the Divoom device"""
-        if countdown == None: return
         if value == None: value = 1
         if isinstance(value, str): value = int(value)
 
         args = [0x03]
         args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
-        args += int(countdown[0:2]).to_bytes(1, byteorder='big')
-        args += int(countdown[3:]).to_bytes(1, byteorder='big')
+        if countdown != None:
+            args += int(countdown[0:2]).to_bytes(1, byteorder='big')
+            args += int(countdown[3:]).to_bytes(1, byteorder='big')
+        else:
+            args += [0x00, 0x00]
         self.send_command("set tool", args)
 
     def show_noise(self, value=None):
