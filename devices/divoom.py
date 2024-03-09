@@ -86,7 +86,7 @@ class Divoom:
 
     def receive(self, num_bytes=1024):
         """Receive n bytes of data from the Divoom device and put it in the input buffer. Returns the number of bytes received."""
-        ready = select.select([self.socket], [], [], 0.1)
+        ready = select.select([self.socket], [], [], 0.2)
         if ready[0]:
             try:
                 data = self.socket.recv(num_bytes)
@@ -112,13 +112,11 @@ class Divoom:
             self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
             result = self.socket.send(bytes(request))
 
-            try:
+            if self.logger.isEnabledFor(logging.DEBUG):
                 response = self.socket.recv(1024)
                 self.logger.debug("{0} PAYLOAD IN: {1}".format(self.type, ' '.join([hex(b) for b in response])))
-                return response
-            except socket.timeout:
-                pass
-
+                return response or result
+        
             return result
         except socket.error as error:
             self.socket_errno = error.errno
