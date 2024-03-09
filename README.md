@@ -104,7 +104,7 @@ data:
 
 `MODE` on some Divoom devices like TimeboxEvo, Tivoo and Ditoo additionally support:
 
-* `countdown`: Shows the countdown using the `countdown` parameter (format mm:ss).
+* `countdown`: Shows the countdown using the `countdown` or `value` parameter (format mm:ss).
 * `noise`: Shows the noise meter. You can control the start/stop state using the `value` parameter. \
   0 = stop, 1 = start
 * `timer`: Shows the timer. You can control the start/stop state using the `value` parameter. \

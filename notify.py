@@ -199,8 +199,8 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.show_image(image_path)
 
         elif mode == "countdown":
-            countdown = data.get(PARAM_COUNTDOWN)
-            self._device.show_countdown(value=value, countdown=countdown)
+            countdown = data.get(PARAM_COUNTDOWN) or data.get(PARAM_VALUE)
+            self._device.show_countdown(countdown=countdown)
 
         elif mode == "noise":
             value = data.get(PARAM_VALUE)
