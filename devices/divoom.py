@@ -75,7 +75,7 @@ class Divoom:
             self.socket_errno = error.errno
         
         retries = 1
-        while self.socket_errno > 0 and retries <= 5:
+        while self.socket_errno != None and self.socket_errno > 0 and retries <= 5:
             self.logger.warning("{0}: connection lost (errno = {1}). Trying to reconnect for the {2} time.".format(self.type, self.socket_errno, retries))
             if retries > 1:
                 time.sleep(1 * retries)
@@ -92,8 +92,8 @@ class Divoom:
                 data = self.socket.recv(num_bytes)
                 self.message_buf += data
                 return len(data)
-            except socket.timeout:
-                pass
+            except socket.error as error:
+                self.socket_errno = error.errno
         else:
             return 0
 
