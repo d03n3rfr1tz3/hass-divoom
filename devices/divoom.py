@@ -458,11 +458,14 @@ class Divoom:
             frame = [0x00, 0x0A, 0x0A, 0x04] + pair[0]
             self.send_command("set image", frame)
 
-    def show_countdown(self, countdown=None):
+    def show_countdown(self, value=None, countdown=None):
         """Show countdown tool on the Divoom device"""
         if countdown == None: return
+        if value == None: value = 1
+        if isinstance(value, str): value = int(value)
 
-        args = [0x03, 0x00]
+        args = [0x03]
+        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
         args += int(countdown[0:2]).to_bytes(1, byteorder='big')
         args += int(countdown[3:]).to_bytes(1, byteorder='big')
         self.send_command("set tool", args)
