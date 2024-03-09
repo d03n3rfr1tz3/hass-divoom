@@ -458,25 +458,22 @@ class Divoom:
             frame = [0x00, 0x0A, 0x0A, 0x04] + pair[0]
             self.send_command("set image", frame)
 
-    def show_countdown(self, value=None, countdown=None):
+    def show_countdown(self, countdown=None):
         """Show countdown tool on the Divoom device"""
-        if value == None: value = 0
-        if isinstance(value, str): value = int(value)
+        if countdown == None: return
 
-        args = [0x03]
-        args += (value + 1).to_bytes(1, byteorder='big')
-        if countdown != None:
-            args += int(countdown[0:2]).to_bytes(1, byteorder='big')
-            args += int(countdown[3]).to_bytes(1, byteorder='big')
+        args = [0x03, 0x00]
+        args += int(countdown[0:2]).to_bytes(1, byteorder='big')
+        args += int(countdown[3:]).to_bytes(1, byteorder='big')
         self.send_command("set tool", args)
 
     def show_noise(self, value=None):
         """Show noise tool on the Divoom device"""
-        if value == None: return
+        if value == None: value = 0
         if isinstance(value, str): value = int(value)
 
         args = [0x02]
-        args += value.to_bytes(1, byteorder='big')
+        args += (0x01 if value == True or value == 1 else 0x02).to_bytes(1, byteorder='big')
         self.send_command("set tool", args)
 
     def show_timer(self, value=None):

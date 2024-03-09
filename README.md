@@ -104,9 +104,11 @@ data:
 
 `MODE` on some Divoom devices like TimeboxEvo, Tivoo and Ditoo additionally support:
 
-* `countdown`: Shows the countdown using the `countdown` parameter (format mm:ss). You can control the start/stop state using the `value` parameter.
-* `noise`: Shows the noise meter. You can control the start/stop state using the `value` parameter.
-* `timer`: Shows the timer. You can control the start/stop state using the `value` parameter.
+* `countdown`: Shows the countdown using the `countdown` parameter (format mm:ss).
+* `noise`: Shows the noise meter. You can control the start/stop state using the `value` parameter. \
+  0 = stop, 1 = start
+* `timer`: Shows the timer. You can control the start/stop state using the `value` parameter. \
+  0 = pause, 1 = start, 2 or empty = reset
 * `playstate`: Sets the play/pause state using the `value` parameter.
 * `radio`: Shows the radio using the `value` parameter. Additionally the `frequency` can be set.
 * `volume`: Sets the volume using the `volume` or `number` or `value` parameter.
