@@ -19,11 +19,14 @@ CONF_MEDIA_DIR = 'media_directory'
 CONF_ESCAPE_PAYLOAD = 'escape_payload'
 
 PARAM_MODE = 'mode'
+PARAM_ALARMMODE = 'alarmmode'
+PARAM_TRIGGERMODE = 'triggermode'
 PARAM_BRIGHTNESS = 'brightness'
 PARAM_COLOR = 'color'
 PARAM_COUNTDOWN = 'countdown'
 PARAM_FREQUENCY = 'frequency'
 PARAM_NUMBER = 'number'
+PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
 PARAM_VALUE = 'value'
 
@@ -214,6 +217,16 @@ class DivoomNotificationService(BaseNotificationService):
         elif mode == "timer":
             value = data.get(PARAM_VALUE)
             self._device.show_timer(value=value)
+
+        elif mode == "alarm":
+            number = data.get(PARAM_NUMBER)
+            time = data.get(PARAM_VALUE)
+            weekdays = data.get(PARAM_WEEKDAY)
+            alarm_mode = data.get(PARAM_ALARMMODE)
+            trigger_mode = data.get(PARAM_TRIGGERMODE)
+            frequency = data.get(PARAM_FREQUENCY)
+            volume = data.get(PARAM_VOLUME)
+            self._device.show_alarm(number=number, time=time, weekdays=weekdays, alarmMode=alarm_mode, triggerMode=trigger_mode, frequency=frequency, volume=volume)
 
         elif mode == "radio":
             value = data.get(PARAM_VALUE)

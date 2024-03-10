@@ -17,6 +17,7 @@ class Divoom:
         "set hot": 0x26,
         "set temp type": 0x2b,
         "set time type": 0x2c,
+        "set alarm": 0x43,
         "set image": 0x44,
         "set view": 0x45,
         "get view": 0x46,
@@ -458,14 +459,14 @@ class Divoom:
             index = 0
             for framePart in self.chunks(frameParts, 200):
                 frame = self.make_framepart(framePartsSize, index, framePart)
-                self.send_command("set animation frame", frame)
+                self.send_command("set animation frame", frame, skipRead=True)
                 index += 1
         
         elif framesCount == 1:
             """Sending as Image"""
             pair = frames[0]
             frame = [0x00, 0x0A, 0x0A, 0x04] + pair[0]
-            self.send_command("set image", frame)
+            self.send_command("set image", frame, skipRead=True)
 
     def show_countdown(self, value=None, countdown=None):
         """Show countdown tool on the Divoom device"""
@@ -498,6 +499,53 @@ class Divoom:
         args = [0x00]
         args += value.to_bytes(1, byteorder='big')
         self.send_command("set tool", args)
+
+    def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
+        """Show alarm tool on the Divoom device"""
+        if number == None: number = 0
+        if volume == None: volume = 100
+        if alarmMode == None: alarmMode = 0
+        if triggerMode == None: triggerMode = 0
+        if isinstance(number, str): number = int(number)
+        if isinstance(volume, str): volume = int(volume)
+        if isinstance(alarmMode, str): alarmMode = int(alarmMode)
+        if isinstance(triggerMode, str): triggerMode = int(triggerMode)
+
+        args = []
+        args += number.to_bytes(1, byteorder='big')
+        args += (0x01 if time != None else 0x00).to_bytes(1, byteorder='big')
+
+        if time != None:
+            args += int(time[0:2]).to_bytes(1, byteorder='big')
+            args += int(time[3:]).to_bytes(1, byteorder='big')
+        else:
+            args += [0x00, 0x00]
+        if weekdays != None:
+            weekbits = 0
+            if 'sun' in weekdays: weekbits += 1
+            if 'mon' in weekdays: weekbits += 2
+            if 'tue' in weekdays: weekbits += 4
+            if 'wed' in weekdays: weekbits += 8
+            if 'thu' in weekdays: weekbits += 16
+            if 'fri' in weekdays: weekbits += 32
+            if 'sat' in weekdays: weekbits += 64
+            args += weekbits.to_bytes(1, byteorder='big')
+        else:
+            args += [0x00]
+        args += alarmMode.to_bytes(1, byteorder='big')
+        args += triggerMode.to_bytes(1, byteorder='big')
+        if frequency != None:
+            if isinstance(frequency, str): frequency = float(frequency)
+
+            frequency = frequency * 10
+            if frequency > 1000:
+                args += [int(frequency - 1000), int(frequency / 100)]
+            else:
+                args += [int(frequency % 100), int(frequency / 100)]
+        else:
+            args += [0x00, 0x00]
+        args += volume.to_bytes(1, byteorder='big')
+        self.send_command("set alarm", args)
 
     def show_radio(self, value=None, frequency=None):
         """Show radio on the Divoom device and optionally changes to the given frequency"""

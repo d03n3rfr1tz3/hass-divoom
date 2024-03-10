@@ -117,7 +117,20 @@ data:
   mode: 'timer'
   value: 1
 
-# activates the third game
+# activates the alarm in the first slot for 7:30 in the morning on monday-friday
+message: ''
+data:
+  mode: 'alarm'
+  number: 0
+  value: '07:30'
+  weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+
+# activates the third game, which should be the magic 8 ball
 message: ''
 data:
   mode: 'game'

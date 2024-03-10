@@ -102,18 +102,21 @@ data:
 * `datetime`: Sets the date and time using the `value` parameter in the typical ISO datetime format.
 * `weather`: Sets the weather. Set the temperature using the `value` parameter and the weather type using the `weather` parameter.\
   1 = clear, 3 = cloudy sky, 5 = thunderstorm, 6 = rain, 8 = snow, 9 = fog
-* `raw`: Send a raw command using the `raw` parameter to the Divoom device.
-  Might be useful, if a certain mode/feature is not implemented by this component yet.
-* `off`: Turn the display off.
-
-`MODE` on some Divoom devices like TimeboxEvo, Tivoo and Ditoo additionally support:
-
 * `countdown`: Shows the countdown using the `countdown` parameter (format mm:ss). You can control the start/stop state using the `value` parameter. \
   0 = stop, 1 = start
 * `noise`: Shows the noise meter. You can control the start/stop state using the `value` parameter. \
   0 = stop, 1 = start
 * `timer`: Shows the timer. You can control the start/stop state using the `value` parameter. \
   0 = pause, 1 = start, 2 = reset
+* `alarm`: Sets an alarm in the slot specified by the `number` parameter. With the `value` and `weekday` parameters you set when the alarm should go off and if it should repeat or just do it once. \
+  With `alarmmode`, `triggermode`, `frequency` and `volume` you can set additional options on your alarm corresponding to what the Divoom app supports on your device. You might have to experiment
+  with the options your Divoom device supports and what it actually changes. Unsupported values will be ignored or if possible directly zeroed by this component, to prevent strange behavior.
+* `raw`: Send a raw command using the `raw` parameter to the Divoom device.
+  Might be useful, if a certain mode/feature is not implemented by this component yet.
+* `off`: Turn the display off.
+
+`MODE` on some Divoom devices like TimeboxEvo, Tivoo and Ditoo additionally support:
+
 * `playstate`: Sets the play/pause state using the `value` parameter.
 * `radio`: Shows the radio using the `value` parameter. Additionally the `frequency` can be set.
 * `volume`: Sets the volume using the `volume` or `number` or `value` parameter.
