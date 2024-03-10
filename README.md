@@ -77,7 +77,8 @@ data:
 `MODE` on all currently supported Divoom devices can be one of:
 
 * `clock`: Display the built-in clock channel. You can specify the style in the `clock` parameter.
-  This mode also accepts the boolean-like parameters `weather`, `temp` and `calendar` for activating the corresponding features.
+  This mode also accepts the boolean-like parameters `weather`, `temp`, `calendar` and `hot` for activating the corresponding features.
+  The `hot` parameter controls the slideshow of the best images, which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol.
   It's also possible to specify the `color` of the clock.
   * `clock` parameter accepts a number between 0 and 9. The actual supported clock styles depend on your device.\
     0 = Fullscreen, 1 = Rainbow, 2 = Boxed, 3 = Analog square,\
@@ -92,6 +93,9 @@ data:
   specify the concrete design 1-3.
 * `scoreboard`: Display the built-in scoreboard channel. With the parameters `player1` and `player2`
   you can specify the displayed score.
+* `game`: Display one of the built-in games. With the `value` parameter you can choose which game you want to open. Depending on your device you may have different amount of games.
+* `gamecontrol`: Sends controls specified with the `value` parameter to the currently open game. \
+  0 or 'go' = go, 1 or 'left' = left, 2 or 'right' = right, 3 or 'up' = up, 4 or 'bottom' = bottom, 5 or 'ok' = ok
 * `image`: Display an animated or static image. The parameter `file` specifes the image file relative
   to the configured media_directory, that will be displayed.
 * `brightness`: Sets the brightness using the `brightness` or `number` or `value` parameter.

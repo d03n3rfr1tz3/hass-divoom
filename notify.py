@@ -31,6 +31,7 @@ PARAM_CLOCK = 'clock'
 PARAM_WEATHER = 'weather'
 PARAM_TEMP = 'temp'
 PARAM_CALENDAR = 'calendar'
+PARAM_HOT = 'hot'
 
 PARAM_PLAYER1 = 'player1'
 PARAM_PLAYER2 = 'player2'
@@ -39,7 +40,7 @@ PARAM_FILE = 'file'
 
 PARAM_RAW = 'raw'
 
-VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'raw'}
+VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'raw'}
 WEATHER_MODES = {
     'clear-night': 1, 
     'cloudy': 3, 
@@ -119,10 +120,12 @@ class DivoomNotificationService(BaseNotificationService):
             _LOGGER.error("Service call needs a message type")
             return False
         
-        self._device.reconnect()
         data = kwargs.get(ATTR_DATA) or {}
         mode = data.get(PARAM_MODE) or message
         
+        skipPing = True if mode == "gamecontrol" or mode == "raw" else False
+        self._device.reconnect(skipPing=skipPing)
+
         if mode == False or mode == 'off':
             self._device.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
         
@@ -169,7 +172,8 @@ class DivoomNotificationService(BaseNotificationService):
             temp = data.get(PARAM_TEMP)
             calendar = data.get(PARAM_CALENDAR)
             color = data.get(PARAM_COLOR)
-            self._device.show_clock(clock=clock, weather=weather, temp=temp, calendar=calendar, color=color)
+            hot = data.get(PARAM_HOT)
+            self._device.show_clock(clock=clock, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
 
         elif mode == "light":
             brightness = data.get(PARAM_BRIGHTNESS)
@@ -216,12 +220,20 @@ class DivoomNotificationService(BaseNotificationService):
             frequency = data.get(PARAM_FREQUENCY)
             self._device.show_radio(value=value, frequency=frequency)
 
+        elif mode == "game":
+            value = data.get(PARAM_VALUE)
+            self._device.show_game(value=value)
+
+        elif mode == "gamecontrol":
+            value = data.get(PARAM_VALUE)
+            self._device.send_gamecontrol(value=value)
+
         elif mode == "raw":
             raw = data.get(PARAM_RAW)
             self._device.send_command(command=raw[0], args=raw[1:])
 
         else:
-            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'raw'".format(mode))
+            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'raw'".format(mode))
             return False
         
         return True

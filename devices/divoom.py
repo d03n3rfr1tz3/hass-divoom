@@ -10,8 +10,11 @@ class Divoom:
         "set radio": 0x05,
         "set volume": 0x08,
         "set playstate": 0x0a,
+        "set game keydown": 0x17,
         "set date time": 0x18,
+        "set game keyup": 0x21,
         "set keyboard": 0x23,
+        "set hot": 0x26,
         "set temp type": 0x2b,
         "set time type": 0x2c,
         "set image": 0x44,
@@ -22,6 +25,8 @@ class Divoom:
         "set radio frequency": 0x61,
         "set tool": 0x72,
         "set brightness": 0x74,
+        "set game keypress": 0x88,
+        "set game": 0xa0,
         "set design": 0xbd
     }
 
@@ -67,10 +72,10 @@ class Divoom:
         self.socket.close()
         self.socket = None
 
-    def reconnect(self):
+    def reconnect(self, skipPing=None):
         """Reconnects the connection to the Divoom device, if needed."""
         try:
-            self.send_ping()
+            if skipPing != True: self.send_ping()
         except socket.error as error:
             self.socket_errno = error.errno
         
@@ -105,14 +110,14 @@ class Divoom:
             self.socket_errno = error.errno
             raise
 
-    def send_payload(self, payload):
+    def send_payload(self, payload, skipRead=False):
         """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
         request = self.make_message(payload)
         try:
             self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
             result = self.socket.send(bytes(request))
 
-            if self.logger.isEnabledFor(logging.DEBUG):
+            if skipRead == False and self.logger.isEnabledFor(logging.DEBUG):
                 response = self.socket.recv(1024)
                 self.logger.debug("{0} PAYLOAD IN: {1}".format(self.type, ' '.join([hex(b) for b in response])))
                 return response or result
@@ -122,7 +127,7 @@ class Divoom:
             self.socket_errno = error.errno
             raise
 
-    def send_command(self, command, args=None):
+    def send_command(self, command, args=None, skipRead=False):
         """Send command with optional arguments"""
         if args is None:
             args = []
@@ -133,7 +138,7 @@ class Divoom:
         payload += length.to_bytes(2, byteorder='little')
         payload += [command]
         payload += args
-        self.send_payload(payload)
+        self.send_payload(payload, skipRead=skipRead)
 
     def drop_message_buffer(self):
         """Drop all dat currently in the message buffer,"""
@@ -284,7 +289,7 @@ class Divoom:
         
         args = []
         args += value.to_bytes(1, byteorder='big')
-        self.send_command("set brightness", args)
+        self.send_command("set brightness", args, skipRead=True)
 
     def send_volume(self, value=None):
         """Send volume to the Divoom device"""
@@ -293,7 +298,7 @@ class Divoom:
 
         args = []
         args += (value / 100 * 15).to_bytes(1, byteorder='big')
-        self.send_command("set volume", args)
+        self.send_command("set volume", args, skipRead=True)
 
     def send_keyboard(self, value=None):
         """Send keyboard command on the Divoom device"""
@@ -352,7 +357,7 @@ class Divoom:
         args += clock.second.to_bytes(1, byteorder='big')
         self.send_command("set date time", args)
 
-    def show_clock(self, clock=None, weather=None, temp=None, calendar=None, color=None):
+    def show_clock(self, clock=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""
         if clock == None: clock = 0
         if weather == None: weather = 0
@@ -371,6 +376,10 @@ class Divoom:
         if not color is None:
             args += self.convert_color(color)
         self.send_command("set view", args)
+
+        if hot != None:
+            args = [0x01 if hot == True or hot == 1 else 0x00]
+            self.send_command("set hot", args, skipRead=True)
 
     def show_light(self, color, brightness=None, power=None):
         """Show light on the Divoom device in the color"""
@@ -506,6 +515,34 @@ class Divoom:
             else:
                 args += [int(frequency % 100), int(frequency / 100)]
             self.send_command("set radio frequency", args)
+
+    def show_game(self, value=None):
+        """Show game on the Divoom device"""
+        if isinstance(value, str): value = int(value)
+
+        args = [0x00 if value == None else 0x01]
+        args += (0 if value == None else value).to_bytes(1, byteorder='big')
+        self.send_command("set game", args)
+
+    def send_gamecontrol(self, value=None):
+        """Send game control to the Divoom device"""
+        if value == None: value = 0
+        if isinstance(value, str):
+            if value == "go": value = 0
+            elif value == "ok": value = 5
+            elif value == "left": value = 1
+            elif value == "right": value = 2
+            elif value == "up": value = 3
+            elif value == "down": value = 4
+
+        args = []
+        if value == 0:
+            self.send_command("set game keypress", args, skipRead=True)
+        elif value > 0:
+            args += value.to_bytes(1, byteorder='big')
+            self.send_command("set game keydown", args, skipRead=True)
+            time.sleep(0.1)
+            self.send_command("set game keyup", args, skipRead=True)
 
     def clear_input_buffer(self):
         """Read all input from Divoom device and remove from buffer. """

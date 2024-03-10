@@ -98,6 +98,18 @@ data:
   mode: 'timer'
   value: 1
 
+# activates the third game
+message: ''
+data:
+  mode: 'game'
+  value: 2
+
+# sends the GO control to the current game
+message: ''
+data:
+  mode: 'gamecontrol'
+  value: 'go'
+
 # sends a raw command which sets brightness to 100%
 message: ''
 data:

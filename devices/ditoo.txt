@@ -117,6 +117,18 @@ data:
   mode: 'timer'
   value: 1
 
+# activates the third game
+message: ''
+data:
+  mode: 'game'
+  value: 2
+
+# sends the GO control to the current game
+message: ''
+data:
+  mode: 'gamecontrol'
+  value: 'go'
+
 # changes keyboard light to next effect
 message: ''
 data:
