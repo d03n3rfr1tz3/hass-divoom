@@ -108,9 +108,11 @@ data:
   0 = stop, 1 = start
 * `timer`: Shows the timer. You can control the start/stop state using the `value` parameter. \
   0 = pause, 1 = start, 2 = reset
-* `alarm`: Sets an alarm in the slot specified by the `number` parameter. With the `value` and `weekday` parameters you set when the alarm should go off and if it should repeat or just do it once. \
+* `alarm`: Sets an alarm in the slot specified by the `number` parameter. With the `value` (format hh:mm) and `weekday` parameters you set when the alarm should go off and if it should repeat or just do it once. \
   With `alarmmode`, `triggermode`, `frequency` and `volume` you can set additional options on your alarm corresponding to what the Divoom app supports on your device. You might have to experiment
   with the options your Divoom device supports and what it actually changes. Unsupported values will be ignored or if possible directly zeroed by this component, to prevent strange behavior.
+* `memorial`: Sets a memorial in the slot specified by the `number` parameter. With the `value` parameter in the typical ISO datetime format (year will be ignored) you set when the memorial should go off. \
+  With the `text` parameter you can specify the name of your memorial, as it will appear in the app (default: Home Assistant).
 * `raw`: Send a raw command using the `raw` parameter to the Divoom device.
   Might be useful, if a certain mode/feature is not implemented by this component yet.
 * `off`: Turn the display off.

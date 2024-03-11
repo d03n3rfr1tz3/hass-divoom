@@ -22,6 +22,7 @@ class Divoom:
         "set view": 0x45,
         "get view": 0x46,
         "set animation frame": 0x49,
+        "set memorial": 0x54,
         "set temp": 0x5f,
         "set radio frequency": 0x61,
         "set tool": 0x72,
@@ -532,8 +533,10 @@ class Divoom:
             args += weekbits.to_bytes(1, byteorder='big')
         else:
             args += [0x00]
+
         args += alarmMode.to_bytes(1, byteorder='big')
         args += triggerMode.to_bytes(1, byteorder='big')
+
         if frequency != None:
             if isinstance(frequency, str): frequency = float(frequency)
 
@@ -544,8 +547,35 @@ class Divoom:
                 args += [int(frequency % 100), int(frequency / 100)]
         else:
             args += [0x00, 0x00]
+
         args += volume.to_bytes(1, byteorder='big')
         self.send_command("set alarm", args)
+
+    def show_memorial(self, number=None, value=None, text=None, animate=True):
+        """Show memorial tool on the Divoom device"""
+        if number == None: number = 0
+        if text == None: text = "Home Assistant"
+        if isinstance(number, str): number = int(number)
+        if not isinstance(text, str): text = str(text)
+
+        args = []
+        args += number.to_bytes(1, byteorder='big')
+        args += (0x01 if value != None else 0x00).to_bytes(1, byteorder='big')
+
+        if value != None:
+            clock = datetime.datetime.fromisoformat(value)
+            args += clock.month.to_bytes(1, byteorder='big')
+            args += clock.day.to_bytes(1, byteorder='big')
+            args += clock.hour.to_bytes(1, byteorder='big')
+            args += clock.minute.to_bytes(1, byteorder='big')
+        else:
+            args += [0x00, 0x00, 0x00, 0x00]
+        
+        args += (0x01 if animate == True else 0x00).to_bytes(1, byteorder='big')
+        for char in text[0:15].ljust(16, '\n').encode('utf-8'):
+            args += (0x00 if char == 0x0a else char).to_bytes(2, byteorder='big')
+        
+        self.send_command("set memorial", args)
 
     def show_radio(self, value=None, frequency=None):
         """Show radio on the Divoom device and optionally changes to the given frequency"""

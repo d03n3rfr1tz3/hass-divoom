@@ -19,6 +19,15 @@ CONF_MEDIA_DIR = 'media_directory'
 CONF_ESCAPE_PAYLOAD = 'escape_payload'
 
 PARAM_MODE = 'mode'
+PARAM_TEXT = 'text'
+PARAM_VALUE = 'value'
+
+PARAM_CLOCK = 'clock'
+PARAM_WEATHER = 'weather'
+PARAM_TEMP = 'temp'
+PARAM_CALENDAR = 'calendar'
+PARAM_HOT = 'hot'
+
 PARAM_ALARMMODE = 'alarmmode'
 PARAM_TRIGGERMODE = 'triggermode'
 PARAM_BRIGHTNESS = 'brightness'
@@ -28,13 +37,6 @@ PARAM_FREQUENCY = 'frequency'
 PARAM_NUMBER = 'number'
 PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
-PARAM_VALUE = 'value'
-
-PARAM_CLOCK = 'clock'
-PARAM_WEATHER = 'weather'
-PARAM_TEMP = 'temp'
-PARAM_CALENDAR = 'calendar'
-PARAM_HOT = 'hot'
 
 PARAM_PLAYER1 = 'player1'
 PARAM_PLAYER2 = 'player2'
@@ -43,7 +45,7 @@ PARAM_FILE = 'file'
 
 PARAM_RAW = 'raw'
 
-VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'raw'}
+VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'}
 WEATHER_MODES = {
     'clear-night': 1, 
     'cloudy': 3, 
@@ -228,6 +230,12 @@ class DivoomNotificationService(BaseNotificationService):
             volume = data.get(PARAM_VOLUME)
             self._device.show_alarm(number=number, time=time, weekdays=weekdays, alarmMode=alarm_mode, triggerMode=trigger_mode, frequency=frequency, volume=volume)
 
+        elif mode == "memorial":
+            number = data.get(PARAM_NUMBER)
+            value = data.get(PARAM_VALUE)
+            text = data.get(PARAM_TEXT)
+            self._device.show_memorial(number=number, value=value, text=text, animate=True)
+
         elif mode == "radio":
             value = data.get(PARAM_VALUE)
             frequency = data.get(PARAM_FREQUENCY)
@@ -246,7 +254,7 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.send_command(command=raw[0], args=raw[1:])
 
         else:
-            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'raw'".format(mode))
+            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'".format(mode))
             return False
         
         return True
