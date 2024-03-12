@@ -10,7 +10,7 @@ from homeassistant.components.notify import (
     PLATFORM_SCHEMA,
     BaseNotificationService
 )
-from homeassistant.const import CONF_MAC
+from homeassistant.const import CONF_MAC, CONF_PORT
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -66,6 +66,7 @@ WEATHER_MODES = {
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MAC): cv.string,
+    vol.Optional(CONF_PORT, default=1): cv.port,
     vol.Required(CONF_DEVICE_TYPE): cv.string,
     vol.Required(CONF_MEDIA_DIR, default="pixelart"): cv.string,
     vol.Optional(CONF_ESCAPE_PAYLOAD, default=False): cv.boolean
@@ -75,50 +76,52 @@ def get_service(hass, config, discovery_info=None):
     """Get the Divoom notification service."""
     
     mac = config[CONF_MAC]
+    port = config[CONF_PORT]
     device_type = config[CONF_DEVICE_TYPE]
     media_directory = hass.config.path(config[CONF_MEDIA_DIR])
     escape_payload = config[CONF_ESCAPE_PAYLOAD]
     
-    return DivoomNotificationService(mac, device_type, media_directory, escape_payload)
+    return DivoomNotificationService(mac, port, device_type, media_directory, escape_payload)
 
 
 class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
 
-    def __init__(self, mac, device_type, media_directory, escape_payload):
-        self._mac = mac
+    def __init__(self, mac, port, device_type, media_directory, escape_payload):
         self._media_directory = media_directory
 
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
-            self._device = Pixoo(host=mac, escapePayload=escape_payload, logger=_LOGGER)
-            self._device.connect()
+            self._device = Pixoo(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'pixoomax':
             from .devices.pixoomax import PixooMax
-            self._device = PixooMax(host=mac, escapePayload=escape_payload, logger=_LOGGER)
-            self._device.connect()
+            self._device = PixooMax(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'timebox':
             from .devices.timebox import Timebox
-            self._device = Timebox(host=mac, escapePayload=escape_payload, logger=_LOGGER)
-            self._device.connect()
+            self._device = Timebox(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'tivoo':
             from .devices.tivoo import Tivoo
-            self._device = Tivoo(host=mac, escapePayload=escape_payload, logger=_LOGGER)
-            self._device.connect()
+            self._device = Tivoo(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'ditoo':
             from .devices.ditoo import Ditoo
-            self._device = Ditoo(host=mac, escapePayload=escape_payload, logger=_LOGGER)
-            self._device.connect()
+            self._device = Ditoo(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if self._device is None:
             _LOGGER.error("device_type {0} does not exist, divoom will not work".format(media_directory))
         elif not os.path.isdir(media_directory):
             _LOGGER.error("media_directory {0} does not exist, divoom may not work properly".format(media_directory))
+        
+        self._device.connect()
 
+    def __del__(self):
+        self._device.disconnect()
+
+    def __exit__(self, type, value, traceback):
+        self._device.disconnect()
 
     def send_message(self, message="", **kwargs):
         if kwargs.get(ATTR_MESSAGE) is None and kwargs.get(ATTR_DATA) is None:
@@ -131,12 +134,12 @@ class DivoomNotificationService(BaseNotificationService):
         skipPing = True if mode == "gamecontrol" or mode == "raw" else False
         self._device.reconnect(skipPing=skipPing)
 
-        if mode == False or mode == 'off':
-            self._device.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
-        
-        elif mode == 'on':
+        if mode == 'on':
             self._device.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
 
+        elif mode == 'off':
+            self._device.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
+        
         elif mode == "brightness":
             value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
             self._device.send_brightness(value=value)

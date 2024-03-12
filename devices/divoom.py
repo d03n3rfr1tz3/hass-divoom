@@ -50,14 +50,18 @@ class Divoom:
             logger = logging.getLogger(self.type)
         self.logger = logger
 
+    def __del__(self):
+        self.disconnect()
+
     def __exit__(self, type, value, traceback):
-        self.close()
+        self.disconnect()
 
     def connect(self):
         """Open a connection to the Divoom device."""
-        self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-        
+        if (self.socket != None): return
+
         try:
+            self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
             self.socket.connect((self.host, self.port))
             self.socket.setblocking(0)
             self.socket.settimeout(2)
@@ -65,14 +69,17 @@ class Divoom:
         except socket.error as error:
             self.socket_errno = error.errno
 
-    def close(self):
+    def disconnect(self):
         """Closes the connection to the Divoom device."""
+        if (self.socket == None): return
+
         try:
             self.socket.shutdown(socket.SHUT_RDWR)
         except:
             pass
-        self.socket.close()
-        self.socket = None
+        finally:
+            self.socket.close()
+            self.socket = None
 
     def reconnect(self, skipPing=None):
         """Reconnects the connection to the Divoom device, if needed."""
@@ -86,8 +93,8 @@ class Divoom:
             self.logger.warning("{0}: connection lost (errno = {1}). Trying to reconnect for the {2} time.".format(self.type, self.socket_errno, retries))
             if retries > 1:
                 time.sleep(1 * retries)
-            if not self.socket is None:
-                self.close()
+            
+            self.disconnect()
             self.connect()
             retries += 1
 
