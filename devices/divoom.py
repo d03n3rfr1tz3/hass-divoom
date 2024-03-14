@@ -315,17 +315,14 @@ class Divoom:
         if isinstance(value, str): value = int(value)
 
         if value == 0: # toggle keyboard
-            args = [0x02]
-            args += (29).to_bytes(1, byteorder='big')
-            self.send_command("set keyboard", args)
+            args = [0x02, 0x29]
+            self.send_command("set keyboard", args, skipRead=True)
         elif value >= 1: # switch to next keyboard effect
-            args = [0x01]
-            args += (28).to_bytes(1, byteorder='big')
-            self.send_command("set keyboard", args)
+            args = [0x01, 0x28]
+            self.send_command("set keyboard", args, skipRead=True)
         elif value <= -1: # switch to prev keyboard effect
-            args = [0x00]
-            args += (27).to_bytes(1, byteorder='big')
-            self.send_command("set keyboard", args)
+            args = [0x00, 0x27]
+            self.send_command("set keyboard", args, skipRead=True)
 
     def send_playstate(self, value=None):
         """Send play/pause state to the Divoom device"""
@@ -439,16 +436,10 @@ class Divoom:
             self.send_command("set design", args)
 
     def show_scoreboard(self, blue=None, red=None):
-        """Show scoreboard on the Divoom device with specific score"""
-        if blue == None: blue = 0
-        if isinstance(blue, str): blue = int(blue)
-        if red == None: red = 0
-        if isinstance(red, str): red = int(red)
+        self.logger.warning("{0}: the implementation is missing. it needs a decision, in which way the scoreboard can be accessed (set view or set tool).".format(self.type))
 
-        args = [0x06, 0x00]
-        args += red.to_bytes(2, byteorder='little')
-        args += blue.to_bytes(2, byteorder='little')
-        self.send_command("set view", args)
+    def show_lyrics(self):
+        self.logger.warning("{0}: the implementation is missing.".format(self.type))
 
     def show_image(self, file):
         """Show image or animation on the Divoom device"""

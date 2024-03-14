@@ -61,6 +61,11 @@ data:
   player1: 2
   player2: 1
 
+# activate channel 'lyrics'
+message: ''
+data:
+  mode: 'lyrics'
+
 # activate an image or animation, depending of the number of frames found in the file
 message: ''
 data:

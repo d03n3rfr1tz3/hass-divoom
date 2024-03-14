@@ -45,7 +45,7 @@ PARAM_FILE = 'file'
 
 PARAM_RAW = 'raw'
 
-VALID_MODES = {'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'}
+VALID_MODES = {'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'}
 WEATHER_MODES = {
     'clear-night': 1, 
     'cloudy': 3, 
@@ -131,8 +131,9 @@ class DivoomNotificationService(BaseNotificationService):
         data = kwargs.get(ATTR_DATA) or {}
         mode = data.get(PARAM_MODE) or message
         
-        skipPing = True if mode == "gamecontrol" or mode == "raw" else False
-        self._device.reconnect(skipPing=skipPing)
+        if mode != "connect" and mode != "disconnect":
+            skipPing = True if mode == "gamecontrol" or mode == "raw" else False
+            self._device.reconnect(skipPing=skipPing)
 
         if mode == 'on':
             self._device.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
@@ -140,6 +141,12 @@ class DivoomNotificationService(BaseNotificationService):
         elif mode == 'off':
             self._device.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
         
+        elif mode == "connect":
+            self._device.connect()
+
+        elif mode == "disconnect":
+            self._device.disconnect()
+
         elif mode == "brightness":
             value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
             self._device.send_brightness(value=value)
@@ -201,6 +208,9 @@ class DivoomNotificationService(BaseNotificationService):
             player2 = data.get(PARAM_PLAYER2)
             self._device.show_scoreboard(blue=player1, red=player2)
 
+        elif mode == "lyrics":
+            self._device.show_lyrics()
+
         elif mode == "design":
             number = data.get(PARAM_NUMBER)
             self._device.show_design(number=number)
@@ -257,7 +267,7 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.send_command(command=raw[0], args=raw[1:])
 
         else:
-            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'".format(mode))
+            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'".format(mode))
             return False
         
         return True
