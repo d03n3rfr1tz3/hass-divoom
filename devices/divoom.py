@@ -83,8 +83,13 @@ class Divoom:
 
     def reconnect(self, skipPing=None):
         """Reconnects the connection to the Divoom device, if needed."""
+
+        if (self.socket == None):
+            self.connect()
+            time.sleep(0.5)
+
         try:
-            if skipPing != True and self.socket != None: self.send_ping()
+            if skipPing != True: self.send_ping()
         except socket.error as error:
             self.socket_errno = error.errno
         
@@ -100,6 +105,8 @@ class Divoom:
 
     def receive(self, num_bytes=1024):
         """Receive n bytes of data from the Divoom device and put it in the input buffer. Returns the number of bytes received."""
+        if (self.socket == None): return
+
         ready = select.select([self.socket], [], [], 0.2)
         if ready[0]:
             try:
@@ -113,6 +120,8 @@ class Divoom:
 
     def send_raw(self, data):
         """Send raw data to the Divoom device."""
+        if (self.socket == None): return
+
         try:
             return self.socket.send(data)
         except socket.error as error:
@@ -121,6 +130,8 @@ class Divoom:
 
     def send_payload(self, payload, skipRead=False):
         """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
+        if (self.socket == None): return
+
         request = self.make_message(payload)
         try:
             self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
@@ -138,6 +149,8 @@ class Divoom:
 
     def send_command(self, command, args=None, skipRead=False):
         """Send command with optional arguments"""
+        if (self.socket == None): return
+
         if args is None:
             args = []
         if isinstance(command, str):
