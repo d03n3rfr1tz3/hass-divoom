@@ -84,7 +84,7 @@ class Divoom:
     def reconnect(self, skipPing=None):
         """Reconnects the connection to the Divoom device, if needed."""
         try:
-            if skipPing != True: self.send_ping()
+            if skipPing != True and self.socket != None: self.send_ping()
         except socket.error as error:
             self.socket_errno = error.errno
         
