@@ -61,6 +61,11 @@ data:
   player1: 2
   player2: 1
 
+# activate channel 'lyrics'
+message: ''
+data:
+  mode: 'lyrics'
+
 # activate an image or animation, depending of the number of frames found in the file
 message: ''
 data:
@@ -98,6 +103,63 @@ data:
   mode: 'radio'
   value: 1
   frequency: 100.3
+
+# activates the countdown with 1 minute and 30 seconds
+message: ''
+data:
+  mode: 'countdown'
+  countdown: '01:30'
+
+# activates the noise meter
+message: ''
+data:
+  mode: 'noise'
+  value: 1
+
+# activates the timer
+message: ''
+data:
+  mode: 'timer'
+  value: 1
+
+# activates the alarm in the first slot for 7:30 in the morning on monday-friday
+message: ''
+data:
+  mode: 'alarm'
+  number: 0
+  value: '07:30'
+  weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+
+# activates the memorial in the first slot for 0:00 new year
+message: ''
+data:
+  mode: 'memorial'
+  number: 0
+  value: '2000-12-31 00:00:00'
+  text: 'Happy New Year!'
+
+# activates the third game, which should be the magic 8 ball
+message: ''
+data:
+  mode: 'game'
+  value: 2
+
+# sends the GO control to the current game
+message: ''
+data:
+  mode: 'gamecontrol'
+  value: 'go'
+
+# changes keyboard light to next effect
+message: ''
+data:
+  mode: 'keyboard'
+  value: 1
 
 # sends a raw command which sets brightness to 100%
 message: ''
