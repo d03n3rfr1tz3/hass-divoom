@@ -1,4 +1,6 @@
 # hass-divoom
+[![HACS Validation](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hacs.yml/badge.svg)](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hacs.yml)
+[![Hassfest Validation](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hassfest.yml/badge.svg)](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hassfest.yml) \
 **Divoom Integration for Home Assistant**
 
 Allows you to send commands to your Divoom device through a Home Assistant notification service. It allows you to control your Divoom device
