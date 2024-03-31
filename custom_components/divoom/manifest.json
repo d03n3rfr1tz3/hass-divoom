@@ -1,9 +1,6 @@
 {
   "domain": "divoom",
   "name": "Divoom",
-  "documentation": "https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/README.md",
-  "requirements": [ "pillow>=7.2.0" ],
-  "dependencies": [ "bluetooth_adapters" ],
   "bluetooth": [
     {
       "local_name": "Ditoo*"
@@ -16,6 +13,9 @@
     }
   ],
   "codeowners": ["@d03n3rfr1tz3"],
+  "dependencies": [ "bluetooth_adapters" ],
+  "documentation": "https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/README.md",
   "iot_class": "local_push",
+  "requirements": [ "pillow>=7.2.0" ],
   "version": "1.0.0"
 }
