@@ -10,13 +10,11 @@ from homeassistant.components.notify import (
     PLATFORM_SCHEMA,
     BaseNotificationService
 )
+
 from homeassistant.const import CONF_MAC, CONF_PORT
+from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD  # pylint:disable=unused-import
 
 _LOGGER = logging.getLogger(__package__)
-
-CONF_DEVICE_TYPE = 'device_type'
-CONF_MEDIA_DIR = 'media_directory'
-CONF_ESCAPE_PAYLOAD = 'escape_payload'
 
 PARAM_MODE = 'mode'
 PARAM_TEXT = 'text'
@@ -68,7 +66,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MAC): cv.string,
     vol.Optional(CONF_PORT, default=1): cv.port,
     vol.Required(CONF_DEVICE_TYPE): cv.string,
-    vol.Required(CONF_MEDIA_DIR, default="pixelart"): cv.string,
+    vol.Required(CONF_MEDIA_DIR, default=CONF_MEDIA_DIR_DEFAULT): cv.string,
     vol.Optional(CONF_ESCAPE_PAYLOAD, default=False): cv.boolean
 })
 

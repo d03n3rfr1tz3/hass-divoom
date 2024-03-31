@@ -1,0 +1,40 @@
+{
+    "config": {
+      "flow_title": "{name} ({mac})",
+      "title": "Divoom (BT)",
+      "step": {
+        "user": {
+          "description": "Select your Divoom device.",
+          "data": {
+            "mac": "Divoom device",
+            "port": "Port"
+          },
+          "data_description": {
+            "mac": "Your Divoom device",
+            "port": "The Bluetooth channel/port"
+          }
+        },
+        "device_port": {
+            "description": "Select the channel/port of your Divoom device.",
+            "data": {
+              "port": "Port"
+            },
+            "data_description": {
+              "port": "The Bluetooth channel/port"
+            }
+        },
+        "device_type": {
+            "description": "Select the type of your Divoom device.",
+            "data": {
+              "type": "Type"
+            },
+            "data_description": {
+              "type": "The concrete Type of your Divoom device"
+            }
+        },
+        "confirm": {
+            "description": "Your Divoom device is configured."
+        }
+      }
+    }
+  }
