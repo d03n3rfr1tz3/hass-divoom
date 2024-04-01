@@ -79,29 +79,46 @@ def get_service(
 ):
     """Get the Divoom notification service."""
     
+    mac = None
+    port = 1
+    device_type = "pixoo"
+    media_directory = "pixelart"
+    escape_payload = False
+
     if discovery_info is not None:
-        mac = config[CONF_MAC]
-        port = config[CONF_PORT]
-        device_type = config[CONF_DEVICE_TYPE]
-        media_directory = hass.config.path(config[CONF_MEDIA_DIR])
-        escape_payload = config[CONF_ESCAPE_PAYLOAD]
+        if CONF_MAC in discovery_info: mac = discovery_info[CONF_MAC]
+        if CONF_PORT in discovery_info: port = discovery_info[CONF_PORT]
+        if CONF_DEVICE_TYPE in discovery_info: device_type = discovery_info[CONF_DEVICE_TYPE]
+        if CONF_MEDIA_DIR in discovery_info: media_directory = hass.config.path(discovery_info[CONF_MEDIA_DIR])
+        if CONF_ESCAPE_PAYLOAD in discovery_info: escape_payload = discovery_info[CONF_ESCAPE_PAYLOAD]
     
     if config is not None:
-        mac = config[CONF_MAC]
-        port = config[CONF_PORT]
-        device_type = config[CONF_DEVICE_TYPE]
-        media_directory = hass.config.path(config[CONF_MEDIA_DIR])
-        escape_payload = config[CONF_ESCAPE_PAYLOAD]
+        if CONF_MAC in config: mac = config[CONF_MAC]
+        if CONF_PORT in config: port = config[CONF_PORT]
+        if CONF_DEVICE_TYPE in config: device_type = config[CONF_DEVICE_TYPE]
+        if CONF_MEDIA_DIR in config: media_directory = hass.config.path(config[CONF_MEDIA_DIR])
+        if CONF_ESCAPE_PAYLOAD in config: escape_payload = config[CONF_ESCAPE_PAYLOAD]
     
-    return DivoomNotificationService(mac, port, device_type, media_directory, escape_payload)
+    hass.data.setdefault(DOMAIN, {})
+    domainConfig = hass.data.get(DOMAIN)
+    domainConfig.setdefault('loaded', [])
+
+    loadedMacs = domainConfig.get('loaded')
+    return DivoomNotificationService(loadedMacs, mac, port, device_type, media_directory, escape_payload)
 
 
 class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
 
-    def __init__(self, mac, port, device_type, media_directory, escape_payload):
+    def __init__(self, loadedMacs, mac, port, device_type, media_directory, escape_payload):
+        assert mac is not None
+        assert port is not None
+        assert device_type is not None
+        assert media_directory is not None
+
         self._device = None
         self._media_directory = media_directory
+        self._loadedMacs = loadedMacs
 
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
@@ -128,13 +145,16 @@ class DivoomNotificationService(BaseNotificationService):
         elif not os.path.isdir(media_directory):
             _LOGGER.error("media_directory {0} does not exist, divoom may not work properly".format(media_directory))
         
+        self._loadedMacs.append(self._device.host)
         self._device.connect()
 
     def __del__(self):
         self._device.disconnect()
+        self._loadedMacs.remove(self._device.host)
 
     def __exit__(self, type, value, traceback):
         self._device.disconnect()
+        self._loadedMacs.remove(self._device.host)
 
     def send_message(self, message="", **kwargs):
         if kwargs.get(ATTR_MESSAGE) is None and kwargs.get(ATTR_DATA) is None:

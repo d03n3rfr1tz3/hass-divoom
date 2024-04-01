@@ -5,7 +5,7 @@ import voluptuous as vol
 from typing import Any
 from homeassistant import config_entries
 from homeassistant.helpers import config_validation as cv
-from homeassistant.data_entry_flow import FlowResult
+from homeassistant.data_entry_flow import AbortFlow, FlowResult
 
 from homeassistant.components.bluetooth import (
     BluetoothServiceInfo,
@@ -175,4 +175,15 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_check_uniqueness(self) -> bool:
         self._abort_if_unique_id_configured()
         self._async_abort_entries_match({ CONF_MAC: self._device_mac })
-        _LOGGER.debug("Divoom: checked uniqueness of {} ({}) successfully".format(self._device_name, self._device_mac))
+        _LOGGER.debug("Divoom: checked uniqueness of {} ({}) successfully via configs from the UI configuration".format(self._device_name, self._device_mac))
+
+        self.hass.data.setdefault(DOMAIN, {})
+        domainConfig = self.hass.data.get(DOMAIN)
+        domainConfig.setdefault('loaded', [])
+
+        loadedMacs = domainConfig.get('loaded')
+        if self._device_mac in loadedMacs:
+            _LOGGER.debug("Divoom: checked uniqueness of {} ({}) unsuccessfully via configs from the configuration.yaml".format(self._device_name, self._device_mac))
+            raise AbortFlow("already_configured")
+
+        _LOGGER.debug("Divoom: checked uniqueness of {} ({}) successfully via configs from the configuration.yaml".format(self._device_name, self._device_mac))

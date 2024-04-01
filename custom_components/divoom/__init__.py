@@ -23,7 +23,7 @@ async def async_setup_entry(hass: HomeAssistant, config: ConfigEntry) -> bool:
     """Set the config entry up."""
 
     for platform in PLATFORMS:
-        hass.async_create_task(async_load_platform(hass, platform, DOMAIN, {}, config))
+        hass.async_create_task(async_load_platform(hass, platform, DOMAIN, config.data, config.data))
     
     await hass.config_entries.async_forward_entry_setups(
         config, [platform for platform in PLATFORMS if platform != Platform.NOTIFY]
