@@ -4,9 +4,9 @@ import voluptuous as vol
 
 from typing import Any
 from homeassistant import config_entries
+from homeassistant.helpers import config_validation as cv
 from homeassistant.data_entry_flow import FlowResult
 
-import homeassistant.helpers.config_validation as cv
 from homeassistant.components.bluetooth import (
     BluetoothServiceInfo,
     BluetoothServiceInfoBleak,
@@ -17,10 +17,6 @@ from homeassistant.const import CONF_MAC, CONF_PORT
 from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
 
 _LOGGER = logging.getLogger(__package__)
-
-def format_unique_id(address: str) -> str:
-    """Format the unique ID."""
-    return address.replace(":", "").lower()
 
 @config_entries.HANDLERS.register(DOMAIN)
 class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
@@ -49,7 +45,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self._discovered_devices[discovery_info.address] = discovery_info
 
             discovered_titles = {
-                address: discovery.name
+                address: "{} ({})".format(discovery.name, discovery.address)
                 for (address, discovery) in self._discovered_devices.items()
             }
             return self.async_show_form(
@@ -68,7 +64,10 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         if CONF_PORT in user_input:
             self._device_port = user_input[CONF_PORT]
-        
+
+        await self.async_set_unique_id(self._device_mac)
+        await self.async_check_uniqueness()
+
         self.context["title_placeholders"] = {
             "name": self._device_name,
             "mac": self._device_mac,
@@ -80,11 +79,12 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle a flow initialized by bluetooth discovery."""
 
-        #TODO: Look for already existing configurations based on MAC!
-
         self._device_name = discovery_info.name
         self._device_mac = discovery_info.address
-        
+
+        await self.async_set_unique_id(self._device_mac)
+        await self.async_check_uniqueness()
+
         self.context["title_placeholders"] = {
             "name": self._device_name,
             "mac": self._device_mac,
@@ -160,15 +160,19 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_create_entry(
                 title="Divoom {}".format(self._device_name),
                 data={
-                    **user_input,
                     CONF_MAC: self._device_mac,
                     CONF_PORT: self._device_port,
                     CONF_DEVICE_TYPE: self._device_type,
                     CONF_MEDIA_DIR: CONF_MEDIA_DIR_DEFAULT,
-                    CONF_ESCAPE_PAYLOAD: False #TODO: Let the user decide
+                    CONF_ESCAPE_PAYLOAD: False
                 },
             )
 
         return self.async_show_form(
             step_id="confirm",
         )
+    
+    async def async_check_uniqueness(self) -> bool:
+        self._abort_if_unique_id_configured()
+        self._async_abort_entries_match({ CONF_MAC: self._device_mac })
+        _LOGGER.debug("Divoom: checked uniqueness of {} ({}) successfully".format(self._device_name, self._device_mac))

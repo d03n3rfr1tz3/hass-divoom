@@ -2,17 +2,19 @@
 import logging, os
 import voluptuous as vol
 
-import homeassistant.helpers.config_validation as cv
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+
 from homeassistant.components.notify import (
     ATTR_DATA,
     ATTR_MESSAGE,
-    ATTR_TITLE,
     PLATFORM_SCHEMA,
     BaseNotificationService
 )
 
 from homeassistant.const import CONF_MAC, CONF_PORT
-from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD  # pylint:disable=unused-import
+from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -70,14 +72,26 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_ESCAPE_PAYLOAD, default=False): cv.boolean
 })
 
-def get_service(hass, config, discovery_info=None):
+def get_service(
+    hass: HomeAssistant,
+    config: ConfigType,
+    discovery_info: DiscoveryInfoType | None = None,
+):
     """Get the Divoom notification service."""
     
-    mac = config[CONF_MAC]
-    port = config[CONF_PORT]
-    device_type = config[CONF_DEVICE_TYPE]
-    media_directory = hass.config.path(config[CONF_MEDIA_DIR])
-    escape_payload = config[CONF_ESCAPE_PAYLOAD]
+    if discovery_info is not None:
+        mac = config[CONF_MAC]
+        port = config[CONF_PORT]
+        device_type = config[CONF_DEVICE_TYPE]
+        media_directory = hass.config.path(config[CONF_MEDIA_DIR])
+        escape_payload = config[CONF_ESCAPE_PAYLOAD]
+    
+    if config is not None:
+        mac = config[CONF_MAC]
+        port = config[CONF_PORT]
+        device_type = config[CONF_DEVICE_TYPE]
+        media_directory = hass.config.path(config[CONF_MEDIA_DIR])
+        escape_payload = config[CONF_ESCAPE_PAYLOAD]
     
     return DivoomNotificationService(mac, port, device_type, media_directory, escape_payload)
 
@@ -86,6 +100,7 @@ class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
 
     def __init__(self, mac, port, device_type, media_directory, escape_payload):
+        self._device = None
         self._media_directory = media_directory
 
         if device_type == 'pixoo':
