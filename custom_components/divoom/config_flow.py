@@ -13,7 +13,7 @@ from homeassistant.components.bluetooth import (
     async_discovered_service_info,
 )
 
-from homeassistant.const import CONF_MAC, CONF_PORT
+from homeassistant.const import CONF_NAME, CONF_MAC, CONF_PORT
 from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
 
 _LOGGER = logging.getLogger(__package__)
@@ -160,6 +160,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return self.async_create_entry(
                 title="Divoom {}".format(self._device_name),
                 data={
+                    CONF_NAME: "Divoom {}".format(self._device_name),
                     CONF_MAC: self._device_mac,
                     CONF_PORT: self._device_port,
                     CONF_DEVICE_TYPE: self._device_type,
