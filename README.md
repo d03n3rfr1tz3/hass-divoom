@@ -51,7 +51,9 @@ Second we need to configure the component. Again that can be done in two ways: E
 * Click Send and then Finish
 
 #### Manual Configuration
-This can be done by manually adding the following snippet to your `configuration.yaml`:
+This can be done by manually adding the following snippet to your `configuration.yaml`
+and filling in the capitalized placeholders. You can create a notify service for every
+Divoom device you have, therefore allowing you to add multiple of these snippets.
 
 ```yaml
 notify:
@@ -64,7 +66,7 @@ notify:
     escape_payload: false
 ```
 
-* name (Optional): The name for the notifier.
+* name (Recommended): The name for the notify service.
 * mac (Required): The Bluetooth MAC address for the Divoom device.
 * port (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
 * device_type: The concrete type of your Divoom device. Currently `pixoo`, `pixoomax`, `timebox`, `tivoo`, `ditoo` are supported.
@@ -72,6 +74,18 @@ notify:
   files in GIF format. The component will use these to display static or animated images on the device.
 * escape_payload (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with
   older firmware (afaik some old Timebox versions). Deactivated by default, because newer versions don't need that.
+
+Here is an example how it could look like.
+```yaml
+notify:
+  - name: Divoom Pixoo
+    platform: divoom
+    mac: "12:34:56:78:9A"
+    port: 1
+    device_type: "pixoo"
+    media_directory: "pixelart"
+    escape_payload: false
+```
 
 ### Usage
 
