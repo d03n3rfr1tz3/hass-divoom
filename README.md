@@ -8,13 +8,18 @@ in your automations and scripts however you want. Currently no reading commands 
 a Notification Service. Just send controls/animations to your Divoom device through that Notification Service.
 
 ## Credits
-First of, the whole communication with the Divoom device (only tested on my Pixoo for now) is based on gathering information from multiple sources,
-that already reverse engineered an older or different Divoom device. Therefore credit goes to the following owners and git repos (you are the heroes here):
+First of, a lot of the bluetooth communication with the Divoom device (only tested on my Pixoo and Ditoo for now) is based on gathering information from multiple sources,
+that already reverse engineered an older or different Divoom device. Only because of this, I could reverse engineer more commands myself. Therefore credit
+goes to the following owners and git repos (you are the heroes here):
 
 https://github.com/RomRider/node-divoom-timebox-evo/ (especially for the [protocol documentation](https://github.com/RomRider/node-divoom-timebox-evo/blob/master/PROTOCOL.md))  
 https://github.com/mumpitzstuff/fhem-Divoom  
 https://github.com/ScR4tCh/timebox/  
 https://bitbucket.org/pjhardy/homeassistant-timebox/src/master/
+
+Also thanks to whoever made the following (official?) documentation of most of the Divoom protocol. Even while it does not have the latest
+commands available in the Ditoo, it still helped a lot in refining and completing stuff. \
+https://docin.divoom-gz.com/web/#/5/146
 
 ## Documentation
 Further documentation besides the steps and examples below may follow. For now I'm happy that it works and that the HACS integration might be quite close! 😁
@@ -31,7 +36,7 @@ First we need to install the component. That can be done in two ways: Easy or Ma
 * Download the repository. If you know git, a clone is fine. If not,
   just download https://github.com/d03n3rfr1tz3/hass-divoom/archive/main.zip
   to get the most recent code in a ZIP file.
-* Copy the content of the ZIP file into `custom_components\divoom` in your Home Assistant
+* Copy the corresponding content of the ZIP file into `custom_components\divoom` in your Home Assistant
   configuration directory.
 * Create a directory named `pixelart` in your Home Assistant configuration directory,
   for images that you may want to display on your device.
