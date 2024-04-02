@@ -1,0 +1,38 @@
+{
+    "config": {
+      "flow_title": "{name} ({mac})",
+      "title": "Divoom (BT)",
+      "step": {
+        "user": {
+          "title": "Divoom Gerät",
+          "description": "Wähle dein Divoom Gerät aus.",
+          "data": {
+            "mac": "Divoom Gerät",
+            "port": "Bluetooth Kanal/Port"
+          }
+        },
+        "device_port": {
+          "title": "Divoom Gerät: Port",
+          "description": "Wähle den Kanal/Port deines Divoom Geräts aus.",
+          "data": {
+            "port": "Port"
+          }
+        },
+        "device_type": {
+          "title": "Divoom Gerät: Typ",
+          "description": "Wähle den Typ deines Divoom Geräts aus.",
+          "data": {
+            "type": "Typ"
+          }
+        },
+        "confirm": {
+          "title": "Zustimmung",
+          "description": "Dein Divoom Gerät ist nun konfiguriert."
+        }
+      },
+      "abort": {
+        "already_in_progress": "Es ist bereits ein Divoom Gerät mit dieser MAC-Adresse erkannt.",
+        "already_configured": "Es ist bereits ein Divoom Gerät mit dieser MAC-Adresse konfiguriert."
+      }
+    }
+  }

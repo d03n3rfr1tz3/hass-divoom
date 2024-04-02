@@ -63,6 +63,14 @@ information in the data parameter of the Service Data payload.
 
 #### Basic display modes
 
+Modern:
+```yaml
+service: notify.NOTIFIER_NAME
+data:
+  message: "MODE"
+  data:
+```
+
 Classic:
 ```yaml
 service: notify.NOTIFIER_NAME
@@ -70,14 +78,6 @@ data:
   message: ""
   data:
     mode: "MODE"
-```
-
-Modern:
-```yaml
-service: notify.NOTIFIER_NAME
-data:
-  message: "MODE"
-  data:
 ```
 
 `MODE` on all currently supported Divoom devices can be one of:
@@ -148,6 +148,15 @@ data:
 
 An example from my own automation.
 
+Modern:
+```yaml
+service: notify.divoom_pixoo
+data:
+  message: "brightness"
+  data:
+    brightness: 75
+```
+
 Classic:
 ```yaml
 service: notify.divoom_pixoo
@@ -155,15 +164,6 @@ data:
   message: ""
   data:
     mode: "brightness"
-    brightness: 75
-```
-
-Modern:
-```yaml
-service: notify.divoom_pixoo
-data:
-  message: "brightness"
-  data:
     brightness: 75
 ```
 

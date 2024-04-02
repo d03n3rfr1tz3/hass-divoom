@@ -2,21 +2,20 @@
 import logging, os
 import voluptuous as vol
 
-import homeassistant.helpers.config_validation as cv
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+
 from homeassistant.components.notify import (
     ATTR_DATA,
-    ATTR_MESSAGE,
-    ATTR_TITLE,
     PLATFORM_SCHEMA,
     BaseNotificationService
 )
+
 from homeassistant.const import CONF_MAC, CONF_PORT
+from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
 
 _LOGGER = logging.getLogger(__package__)
-
-CONF_DEVICE_TYPE = 'device_type'
-CONF_MEDIA_DIR = 'media_directory'
-CONF_ESCAPE_PAYLOAD = 'escape_payload'
 
 PARAM_MODE = 'mode'
 PARAM_TEXT = 'text'
@@ -68,26 +67,58 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Required(CONF_MAC): cv.string,
     vol.Optional(CONF_PORT, default=1): cv.port,
     vol.Required(CONF_DEVICE_TYPE): cv.string,
-    vol.Required(CONF_MEDIA_DIR, default="pixelart"): cv.string,
+    vol.Required(CONF_MEDIA_DIR, default=CONF_MEDIA_DIR_DEFAULT): cv.string,
     vol.Optional(CONF_ESCAPE_PAYLOAD, default=False): cv.boolean
 })
 
-def get_service(hass, config, discovery_info=None):
+async def async_get_service(
+    hass: HomeAssistant,
+    config: ConfigType,
+    discovery_info: DiscoveryInfoType | None = None,
+):
     """Get the Divoom notification service."""
     
-    mac = config[CONF_MAC]
-    port = config[CONF_PORT]
-    device_type = config[CONF_DEVICE_TYPE]
-    media_directory = hass.config.path(config[CONF_MEDIA_DIR])
-    escape_payload = config[CONF_ESCAPE_PAYLOAD]
-    
-    return DivoomNotificationService(mac, port, device_type, media_directory, escape_payload)
+    mac = None
+    port = 1
+    device_type = "pixoo"
+    media_directory = "pixelart"
+    escape_payload = False
 
+    if discovery_info is not None:
+        if CONF_MAC in discovery_info: mac = discovery_info[CONF_MAC]
+        if CONF_PORT in discovery_info: port = discovery_info[CONF_PORT]
+        if CONF_DEVICE_TYPE in discovery_info: device_type = discovery_info[CONF_DEVICE_TYPE]
+        if CONF_MEDIA_DIR in discovery_info: media_directory = hass.config.path(discovery_info[CONF_MEDIA_DIR])
+        if CONF_ESCAPE_PAYLOAD in discovery_info: escape_payload = discovery_info[CONF_ESCAPE_PAYLOAD]
+    
+    if config is not None:
+        if CONF_MAC in config: mac = config[CONF_MAC]
+        if CONF_PORT in config: port = config[CONF_PORT]
+        if CONF_DEVICE_TYPE in config: device_type = config[CONF_DEVICE_TYPE]
+        if CONF_MEDIA_DIR in config: media_directory = hass.config.path(config[CONF_MEDIA_DIR])
+        if CONF_ESCAPE_PAYLOAD in config: escape_payload = config[CONF_ESCAPE_PAYLOAD]
+    
+    notificationService = DivoomNotificationService(mac, port, device_type, media_directory, escape_payload)
+
+    hass.data.setdefault(DOMAIN, {})
+    domainConfig = hass.data.get(DOMAIN)
+    domainConfig.setdefault('loaded', {})
+
+    loadedServices = domainConfig.get('loaded')
+    loadedServices[mac] = notificationService
+    
+    return notificationService
 
 class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
 
     def __init__(self, mac, port, device_type, media_directory, escape_payload):
+        assert mac is not None
+        assert port is not None
+        assert device_type is not None
+        assert media_directory is not None
+
+        self._device = None
         self._media_directory = media_directory
 
         if device_type == 'pixoo':
@@ -123,9 +154,12 @@ class DivoomNotificationService(BaseNotificationService):
     def __exit__(self, type, value, traceback):
         self._device.disconnect()
 
+    def disconnect(self):
+        self._device.disconnect()
+
     def send_message(self, message="", **kwargs):
-        if kwargs.get(ATTR_MESSAGE) is None and kwargs.get(ATTR_DATA) is None:
-            _LOGGER.error("Service call needs a message type")
+        if message == "" and kwargs.get(ATTR_DATA) is None:
+            _LOGGER.error("Service call needs more information")
             return False
         
         data = kwargs.get(ATTR_DATA) or {}

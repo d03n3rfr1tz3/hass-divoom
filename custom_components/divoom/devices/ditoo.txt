@@ -1,18 +1,15 @@
 # turn off the display
-message: ''
+message: 'off'
 data:
-  mode: 'off'
 
 # change brightness of the display
-message: ''
+message: 'brightness'
 data:
-  mode: 'brightness'
   brightness: 75
 
 # activate channel 'clock' in rainbow style with specific components
-message: ''
+message: 'clock'
 data:
-  mode: 'clock'
   clock: 1
   weather: 0
   temp: 0
@@ -20,9 +17,8 @@ data:
   color: [250, 0, 0]
 
 # activate channel 'clock' in analog style with specific components
-message: ''
+message: 'clock'
 data:
-  mode: 'clock'
   clock: 5
   weather: 1
   temp: 1
@@ -30,102 +26,86 @@ data:
   color: [0, 250, 0]
 
 # activate light mode with specific color
-message: ''
+message: 'light'
 data:
-  mode: 'light'
   brightness: 75
   color: [250, 0, 0]
 
 # activate light mode with fading colors
-message: ''
+message: 'light'
 data:
-  mode: 'light'
   brightness: 75
 
 # activate channel 'effects' with specific effect
-message: ''
+message: 'effects'
 data:
-  mode: 'effects'
   number: 2
 
 # activate channel 'visualization' with specific visualization
-message: ''
+message: 'visualization'
 data:
-  mode: 'visualization'
   number: 2
 
 # activate scoreboard with some scores
-message: ''
+message: 'scoreboard'
 data:
-  mode: 'scoreboard'
   player1: 2
   player2: 1
 
 # activate channel 'lyrics'
-message: ''
+message: 'lyrics'
 data:
-  mode: 'lyrics'
 
 # activate an image or animation, depending of the number of frames found in the file
-message: ''
+message: 'image'
 data:
-  mode: 'image'
   file: 'ha16.gif'
 
 # update date and time
-message: ''
+message: 'datetime'
 data:
-  mode: 'datetime'
   value: '2024-12-31 18:30:00'
 
 # update weather by setting 25°C and rainy weather
-message: ''
+message: 'weather'
 data:
-  mode: 'weather'
   value: '25°C'
   weather: 6
 
 # change the play/pause state
-message: ''
+message: 'playstate'
 data:
-  mode: 'playstate'
   value: 1
 
 # change the volume
-message: ''
+message: 'volume'
 data:
-  mode: 'volume'
   volume: 75
 
 # activates the radio and sets the frequency to 100.3
-message: ''
+message: 'radio'
 data:
-  mode: 'radio'
   value: 1
   frequency: 100.3
 
 # activates the countdown with 1 minute and 30 seconds
-message: ''
+message: 'countdown'
 data:
-  mode: 'countdown'
   countdown: '01:30'
 
 # activates the noise meter
-message: ''
+message: 'noise'
 data:
-  mode: 'noise'
   value: 1
 
 # activates the timer
-message: ''
+message: 'timer'
 data:
-  mode: 'timer'
   value: 1
 
 # activates the alarm in the first slot for 7:30 in the morning on monday-friday
-message: ''
+message: 'alarm'
 data:
-  mode: 'alarm'
   number: 0
   value: '07:30'
   weekday:
@@ -136,33 +116,28 @@ data:
     - fri
 
 # activates the memorial in the first slot for 0:00 new year
-message: ''
+message: 'memorial'
 data:
-  mode: 'memorial'
   number: 0
   value: '2000-12-31 00:00:00'
   text: 'Happy New Year!'
 
 # activates the third game, which should be the magic 8 ball
-message: ''
+message: 'game'
 data:
-  mode: 'game'
   value: 2
 
 # sends the GO control to the current game
-message: ''
+message: 'gamecontrol'
 data:
-  mode: 'gamecontrol'
   value: 'go'
 
 # changes keyboard light to next effect
-message: ''
+message: 'keyboard'
 data:
-  mode: 'keyboard'
   value: 1
 
 # sends a raw command which sets brightness to 100%
-message: ''
+message: 'raw'
 data:
-  mode: 'raw'
   raw: [0x74, 0x64]
