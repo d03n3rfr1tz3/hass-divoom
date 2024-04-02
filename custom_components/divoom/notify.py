@@ -8,7 +8,6 @@ from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 
 from homeassistant.components.notify import (
     ATTR_DATA,
-    ATTR_MESSAGE,
     PLATFORM_SCHEMA,
     BaseNotificationService
 )
@@ -159,8 +158,8 @@ class DivoomNotificationService(BaseNotificationService):
         self._device.disconnect()
 
     def send_message(self, message="", **kwargs):
-        if kwargs.get(ATTR_MESSAGE) is None and kwargs.get(ATTR_DATA) is None:
-            _LOGGER.error("Service call needs a message type")
+        if message == "" and kwargs.get(ATTR_DATA) is None:
+            _LOGGER.error("Service call needs more information")
             return False
         
         data = kwargs.get(ATTR_DATA) or {}
