@@ -72,7 +72,7 @@ PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
     vol.Optional(CONF_ESCAPE_PAYLOAD, default=False): cv.boolean
 })
 
-def get_service(
+async def async_get_service(
     hass: HomeAssistant,
     config: ConfigType,
     discovery_info: DiscoveryInfoType | None = None,
@@ -99,18 +99,21 @@ def get_service(
         if CONF_MEDIA_DIR in config: media_directory = hass.config.path(config[CONF_MEDIA_DIR])
         if CONF_ESCAPE_PAYLOAD in config: escape_payload = config[CONF_ESCAPE_PAYLOAD]
     
+    notificationService = DivoomNotificationService(mac, port, device_type, media_directory, escape_payload)
+
     hass.data.setdefault(DOMAIN, {})
     domainConfig = hass.data.get(DOMAIN)
-    domainConfig.setdefault('loaded', [])
+    domainConfig.setdefault('loaded', {})
 
-    loadedMacs = domainConfig.get('loaded')
-    return DivoomNotificationService(loadedMacs, mac, port, device_type, media_directory, escape_payload)
-
+    loadedServices = domainConfig.get('loaded')
+    loadedServices[mac] = notificationService
+    
+    return notificationService
 
 class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
 
-    def __init__(self, loadedMacs, mac, port, device_type, media_directory, escape_payload):
+    def __init__(self, mac, port, device_type, media_directory, escape_payload):
         assert mac is not None
         assert port is not None
         assert device_type is not None
@@ -118,7 +121,6 @@ class DivoomNotificationService(BaseNotificationService):
 
         self._device = None
         self._media_directory = media_directory
-        self._loadedMacs = loadedMacs
 
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
@@ -145,16 +147,16 @@ class DivoomNotificationService(BaseNotificationService):
         elif not os.path.isdir(media_directory):
             _LOGGER.error("media_directory {0} does not exist, divoom may not work properly".format(media_directory))
         
-        self._loadedMacs.append(self._device.host)
         self._device.connect()
 
     def __del__(self):
         self._device.disconnect()
-        self._loadedMacs.remove(self._device.host)
 
     def __exit__(self, type, value, traceback):
         self._device.disconnect()
-        self._loadedMacs.remove(self._device.host)
+
+    def disconnect(self):
+        self._device.disconnect()
 
     def send_message(self, message="", **kwargs):
         if kwargs.get(ATTR_MESSAGE) is None and kwargs.get(ATTR_DATA) is None:

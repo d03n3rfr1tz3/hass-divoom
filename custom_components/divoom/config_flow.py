@@ -180,10 +180,10 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         self.hass.data.setdefault(DOMAIN, {})
         domainConfig = self.hass.data.get(DOMAIN)
-        domainConfig.setdefault('loaded', [])
+        domainConfig.setdefault('loaded', {})
 
-        loadedMacs = domainConfig.get('loaded')
-        if self._device_mac in loadedMacs:
+        loadedServices = domainConfig.get('loaded')
+        if self._device_mac in loadedServices:
             _LOGGER.debug("Divoom: checked uniqueness of {} ({}) unsuccessfully via configs from the configuration.yaml".format(self._device_name, self._device_mac))
             raise AbortFlow("already_configured")
 
