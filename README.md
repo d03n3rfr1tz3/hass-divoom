@@ -1,6 +1,8 @@
 # hass-divoom
 [![HACS Validation](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hacs.yml/badge.svg)](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hacs.yml)
-[![Hassfest Validation](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hassfest.yml/badge.svg)](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hassfest.yml) \
+[![Hassfest Validation](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hassfest.yml/badge.svg)](https://github.com/d03n3rfr1tz3/hass-divoom/actions/workflows/hassfest.yml)
+[![version](https://img.shields.io/github/manifest-json/v/d03n3rfr1tz3/hass-divoom?filename=custom_components%2Fdivoom%2Fmanifest.json)](https://github.com/d03n3rfr1tz3/hass-divoom/releases/latest)
+
 **Divoom Integration for Home Assistant**
 
 Allows you to send commands to your Divoom device through a Home Assistant notification service. It allows you to control your Divoom device
@@ -29,7 +31,11 @@ First we need to install the component. That can be done in two ways: Easy or Ma
 
 #### Easy Installation
 
-* Use HACS, as soon as this component is available there
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=d03n3rfr1tz3&repository=hass-divoom&category=integration)
+
+* Use HACS
+* ...
+* Profit
 
 #### Manual Installation
 
