@@ -4,7 +4,8 @@
 **Divoom Integration for Home Assistant**
 
 Allows you to send commands to your Divoom device through a Home Assistant notification service. It allows you to control your Divoom device
-in your automations and scripts however you want. Currently no reading commands or sensors are implemented as well as no GUI configuration.
+in your automations and scripts however you want. Currently no reading commands or sensors are implemented, because everything works through
+a Notification Service. Just send controls/animations to your Divoom device through that Notification Service.
 
 ## Credits
 First of, the whole communication with the Divoom device (only tested on my Pixoo for now) is based on gathering information from multiple sources,
@@ -16,9 +17,16 @@ https://github.com/ScR4tCh/timebox/
 https://bitbucket.org/pjhardy/homeassistant-timebox/src/master/
 
 ## Documentation
-Further documentation besides the steps below and possibly a HACS integration may follow. For now I'm happy that it works! :D
+Further documentation besides the steps and examples below may follow. For now I'm happy that it works and that the HACS integration might be quite close! 😁
 
 ### Install the custom component
+First we need to install the component. That can be done in two ways: Easy or Manual
+
+#### Easy Installation
+
+* Use HACS, as soon as this component is available there
+
+#### Manual Installation
 
 * Download the repository. If you know git, a clone is fine. If not,
   just download https://github.com/d03n3rfr1tz3/hass-divoom/archive/main.zip
@@ -30,9 +38,20 @@ Further documentation besides the steps below and possibly a HACS integration ma
 * Optionally copy the content of the `pixelart` directory from the ZIP file
 
 ### Enable the custom component
+Second we need to configure the component. Again that can be done in two ways: Easy or Manual
 
-This custom component adds a new platform to the Notifications
-component. It can be enabled by adding this to your `configuration.yaml`:
+#### Easy Configuration
+
+* Go to Integrations
+* If there is an auto-discovered entry, you are lucky and can skip two steps
+* Use `Add Integration` and Search for `Divoom`
+* Choose your Divoom device from the list of discovered bluetooth devices
+* Choose a `port`. If you are unsure, first try `1`. If that doesn't work, try `2`.
+* Select your device type (e.g. `pixoo`, `ditoo` and such)
+* Click Send and then Finish
+
+#### Manual Configuration
+This can be done by manually adding the following snippet to your `configuration.yaml`:
 
 ```yaml
 notify:
@@ -57,9 +76,15 @@ notify:
 ### Usage
 
 This custom component acts as a notify service. This means that the
-Service Data requires a message parameter, even though we're not using
-it. Leave the message parameter blank, and specify mode and other
-information in the data parameter of the Service Data payload.
+Service Data requires a message parameter, which basically is the
+command/mode we are sending to the device. Some commands/modes need
+additional parameters, which should be provided in the service data
+payload.
+
+There was also an older style, where the message would be left empty
+and the mode also passed in through the service data. It is still
+supported as of today, but because it looks odd and confuses people,
+it's not the preferred way anymore.
 
 #### Basic display modes
 
@@ -177,7 +202,7 @@ Examples for Ditoo: https://github.com/d03n3rfr1tz3/hass-divoom/blob/master/devi
 ### Bluetooth
 #### Bluetooth interface
 
-This component automatically connects to your Divoom device based on the configured MAC address. The only thing you typically have to prepare, is pairing it once to your Home Assistant device (for example your raspberry pi). Depending on your setup, that might be an easy or quite complicated task. After the pairing is done, this component can connect to your Divoom device anytime it's needed, even after restarting your Home Assistant. Newer versions of Home Assistant very likely already have Bluetooth enabled and configured somehow. Older versions needed more manual steps to make it work.
+This component automatically connects to your Divoom device based on the configured MAC address. The only thing you sometimes have to prepare, is pairing it once to your Home Assistant device (for example your raspberry pi). Depending on your setup, that might be an easy or quite complicated task. After the pairing is done, this component can connect to your Divoom device anytime it's needed, even after restarting your Home Assistant. Newer versions of Home Assistant very likely already have Bluetooth enabled and configured somehow, so you might be lucky and skip a bunch of these steps. Older versions needed more manual steps to make it work.
 
 You can get the MAC address using your Phones Bluetooth settings or from your Divoom app. When trying to pair the devices, you will probably use tools, that are also capable of scanning. Therefore you can also get the MAC address that way.
 
@@ -206,11 +231,11 @@ running on my hardware. Your mileage may vary, especially if you're trying to us
 
 ## Troubleshooting
 ### Cannot connect
-Make sure you at least paired your Home Assistant device once to your Divoom device. Also make sure, that you have the correct MAC address.
-Also make sure, that you Phone is not currently connected to your Divoom device, because some don't allow that many connections.
+Make sure, that you at least paired your Home Assistant device once to your Divoom device. Also make sure, that you have the correct MAC address.
+Also make sure, that your Phone is not currently connected to your Divoom device, because some don't allow that many connections.
 
 If it seems to connect, but looses connection the moment you use any mode, you might have chosen the wrong port. On Pixoo and other non-audio
-devices, the it's typically `port: 1`. But on audio devices, like the Ditoo, it might be `port: 2`.
+devices, it's typically `port: 1`. But on audio devices, like the Tivoo or Ditoo, it might be `port: 2`.
 
 ### GIF does not work
 
