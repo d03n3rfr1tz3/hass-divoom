@@ -1,0 +1,138 @@
+# turn off the display
+message: 'off'
+data:
+
+# change brightness of the display
+message: 'brightness'
+data:
+  brightness: 75
+
+# activate channel 'clock' in rainbow style with specific components
+message: 'clock'
+data:
+  clock: 1
+  weather: 0
+  temp: 0
+  calendar: 1
+  color: [250, 0, 0]
+
+# activate channel 'clock' in analog style with specific components
+message: 'clock'
+data:
+  clock: 5
+  weather: 1
+  temp: 1
+  calendar: 1
+  color: [0, 250, 0]
+
+# activate light mode with specific color
+message: 'light'
+data:
+  brightness: 75
+  color: [250, 0, 0]
+
+# activate light mode with fading colors
+message: 'light'
+data:
+  brightness: 75
+
+# activate channel 'effects' with specific effect
+message: 'effects'
+data:
+  number: 2
+
+# activate channel 'visualization' with specific visualization
+message: 'visualization'
+data:
+  number: 2
+
+# activate scoreboard with some scores
+message: 'scoreboard'
+data:
+  player1: 2
+  player2: 1
+
+# activate channel 'lyrics'
+message: 'lyrics'
+data:
+
+# activate an image or animation, depending of the number of frames found in the file
+message: 'image'
+data:
+  file: 'ha16.gif'
+
+# update date and time
+message: 'datetime'
+data:
+  value: '2024-12-31 18:30:00'
+
+# update weather by setting 25°C and rainy weather
+message: 'weather'
+data:
+  value: '25°C'
+  weather: 6
+
+# change the play/pause state
+message: 'playstate'
+data:
+  value: 1
+
+# change the volume
+message: 'volume'
+data:
+  volume: 75
+
+# activates the radio and sets the frequency to 100.3
+message: 'radio'
+data:
+  value: 1
+  frequency: 100.3
+
+# activates the countdown with 1 minute and 30 seconds
+message: 'countdown'
+data:
+  countdown: '01:30'
+
+# activates the noise meter
+message: 'noise'
+data:
+  value: 1
+
+# activates the timer
+message: 'timer'
+data:
+  value: 1
+
+# activates the alarm in the first slot for 7:30 in the morning on monday-friday
+message: 'alarm'
+data:
+  number: 0
+  value: '07:30'
+  weekday:
+    - mon
+    - tue
+    - wed
+    - thu
+    - fri
+
+# activates the memorial in the first slot for 0:00 new year
+message: 'memorial'
+data:
+  number: 0
+  value: '2000-12-31 00:00:00'
+  text: 'Happy New Year!'
+
+# activates the third game, which should be the magic 8 ball
+message: 'game'
+data:
+  value: 2
+
+# sends the GO control to the current game
+message: 'gamecontrol'
+data:
+  value: 'go'
+
+# sends a raw command which sets brightness to 100%
+message: 'raw'
+data:
+  raw: [0x74, 0x64]

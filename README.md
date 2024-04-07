@@ -9,22 +9,37 @@ Allows you to send commands to your Divoom device through a Home Assistant notif
 in your automations and scripts however you want. Currently no reading commands or sensors are implemented, because everything works through
 a Notification Service. Just send controls/animations to your Divoom device through that Notification Service.
 
-## Credits
-First of, a lot of the bluetooth communication with the Divoom device (only tested on my Pixoo and Ditoo for now) is based on gathering information from multiple sources,
-that already reverse engineered an older or different Divoom device. Only because of this, I could reverse engineer more commands myself. Therefore credit
-goes to the following owners and git repos (you are the heroes here):
-
-https://github.com/RomRider/node-divoom-timebox-evo/ (especially for the [protocol documentation](https://github.com/RomRider/node-divoom-timebox-evo/blob/master/PROTOCOL.md))  
-https://github.com/mumpitzstuff/fhem-Divoom  
-https://github.com/ScR4tCh/timebox/  
-https://bitbucket.org/pjhardy/homeassistant-timebox/src/master/
-
-Also thanks to whoever made the following (official?) documentation of most of the Divoom protocol. Even while it does not have the latest
-commands available in the Ditoo, it still helped a lot in refining and completing stuff. \
-https://docin.divoom-gz.com/web/#/5/146
-
 ## Documentation
 Further documentation besides the steps and examples below may follow. For now I'm happy that it works and that the HACS integration might be quite close! 😁
+
+### Requirements
+For this component to actually have chance to work, it needs a Bluetooth Classic connection. Unlike Bluetooth Low Energy (BLE), Bluetooth Classic,
+as the name already indicates, is a bit older. Therefore it brings some difficulties with it, which you might not expect, when you only know BLE
+devices. One for example is that the Bluetooth Proxies from Home Assistant/ ESPHome do only support BLE and therefore cannot be used with this
+component. Another one is the support in Python itself. While a Bluetooth Classic connection is supported natively by Python, the pairing process
+is not. That's why you very likely have to do some manual work, if you somehow did not do it already.
+
+#### Bluetooth Hardware
+Of course you need Bluetooth hardware for that. It does not matter if you use the integrated Bluetooth controller of a Raspberry Pi 3/4/5 or an
+additional dongle. As long as it supports a classic Bluetooth connection via RFCOMM, you are good to go. When in doubt, just try it or have a
+look at the following part of the Home Assistant documentation: https://www.home-assistant.io/integrations/bluetooth/
+
+#### Bluetooth Pairing
+As described above, you need to pair your Divoom device at least once to your Home Assistant device. After the pairing is done, this component
+can connect to your Divoom device anytime it's needed, even after restarting your Home Assistant. You have multiple possibilities to pair your
+Home Assistant to your Divoom device. The following commands can be used to pair your devices. Use them via SSH.
+
+* `bluetoothctl` and then `pair DIVOOM_DEVICE_MAC` and optionally also `connect DIVOOM_DEVICE_MAC`
+OR
+* `rfcomm connect HCI_DEVICE DIVOOM_DEVICE_MAC DIVOOM_DEVICE_PORT`
+
+Choose what fits your Home Assistant installation or host system best. `bluetoothctl` is the more modern way and should be available even on
+very basic HASS.io installations. `rfcomm` and maybe even `hciconfig hci0 up` beforehand is an older way. Obviously you have to fill in
+some placeholders above.
+
+* `HCI_DEVICE`: The id of your Bluetooth controller. Typically just `hci0`, especially if you are using the integrated Raspberry Pi Bluetooth controller.
+* `DIVOOM_DEVICE_MAC`: The MAC address of your Divoom device. You can either get it via the Divoom App or by scanning for it.
+* `DIVOOM_DEVICE_PORT`: The port of your Divoom device. Typically its just `1`, but on some audio-supported devices it might be `2`.
 
 ### Install the custom component
 First we need to install the component. That can be done in two ways: Easy or Manual
@@ -80,7 +95,7 @@ notify:
 * name (Recommended): The name for the notify service.
 * mac (Required): The Bluetooth MAC address for the Divoom device.
 * port (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
-* device_type: The concrete type of your Divoom device. Currently `pixoo`, `pixoomax`, `timebox`, `tivoo`, `ditoo` are supported.
+* device_type: The concrete type of your Divoom device. Currently `ditoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `tivoo` are supported.
 * media_directory (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
 * escape_payload (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with
@@ -224,36 +239,6 @@ Examples for Timebox: [devices/timebox.txt](https://github.com/d03n3rfr1tz3/hass
 Examples for Tivoo: [devices/tivoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/tivoo.txt) \
 Examples for Ditoo: [devices/ditoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/ditoo.txt)
 
-### Bluetooth
-#### Bluetooth interface
-
-This component automatically connects to your Divoom device based on the configured MAC address. The only thing you sometimes have to prepare, is pairing it once to your Home Assistant device (for example your raspberry pi). Depending on your setup, that might be an easy or quite complicated task. After the pairing is done, this component can connect to your Divoom device anytime it's needed, even after restarting your Home Assistant. Newer versions of Home Assistant very likely already have Bluetooth enabled and configured somehow, so you might be lucky and skip a bunch of these steps. Older versions needed more manual steps to make it work.
-
-You can get the MAC address using your Phones Bluetooth settings or from your Divoom app. When trying to pair the devices, you will probably use tools, that are also capable of scanning. Therefore you can also get the MAC address that way.
-
-#### Bluetooth preparation
-
-**Short version**: With the Divoom device turned on and looking for a Bluetooth connection, run the following through SSH to the host system (supervised installation). If your are using hass.io, I'm not sure how to pair the device.
-
-```
-sudo hciconfig hci0 up
-sudo hcitool scan
-```
-
-This should eventually find the device, and print its MAC address.
-Keep a note of this address, because you need to replace `MAC_ADDRESS` with it now.
-If you already know the MAC address, you can directly skip to the next command.
-
-```
-sudo rfcomm connect hci0 MAC_ADDRESS 1
-```
-
-This should connect your Home Assistant device to your Divoom device including an initial pairing. This is only needed once.
-
-**Long version**: I followed [this guide](https://www.pcsuggest.com/linux-bluetooth-setup-hcitool-bluez/) to get Bluetooth up and
-running on my hardware. Your mileage may vary, especially if you're trying to use the Raspberry Pi built-in interface
-(contributions to this guide very welcome!)
-
 ## Troubleshooting
 ### Cannot connect
 Make sure, that you at least paired your Home Assistant device once to your Divoom device. Also make sure, that you have the correct MAC address.
@@ -268,3 +253,17 @@ The most common problem is, that the GIF does not have the correct size or forma
 Your GIF needs to be exactly the size of your Divoom screen (*16x16* in case of a Pixoo or similar sized device), *non-interlaced* and with a *global color palette*.
 
 I can recommend resizing and converting your GIFs with GIMP. Of course other software might also work, depending on the export/format options. When resizing a GIF downloaded from the Divoom app with GIMP, you better choose no interpolation to not blur your GIF. When exporting with GIMP, make sure to mark the animation checkbox and don't mark the interlace checkbox. For a few more details and an example look into the following comment: https://github.com/d03n3rfr1tz3/hass-divoom/issues/19#issuecomment-1982059358
+
+## Credits
+A lot of the bluetooth communication with the Divoom device is based on gathering information from multiple sources, that already
+reverse engineered an older or different Divoom device. Only because of this, I could reverse engineer more commands myself. Therefore
+credit goes to the following owners and git repos (you are the heroes here):
+
+https://github.com/RomRider/node-divoom-timebox-evo/ (especially for the [protocol documentation](https://github.com/RomRider/node-divoom-timebox-evo/blob/master/PROTOCOL.md))  
+https://github.com/mumpitzstuff/fhem-Divoom  
+https://github.com/ScR4tCh/timebox/  
+https://bitbucket.org/pjhardy/homeassistant-timebox/src/master/
+
+Also thanks to whoever made the following (official?) documentation of most of the Divoom protocol. Even while it does not have the latest
+commands available in the Ditoo, it still helped a lot in refining and completing stuff. \
+https://docin.divoom-gz.com/web/#/5/146
