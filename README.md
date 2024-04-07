@@ -9,6 +9,25 @@ Allows you to send commands to your Divoom device through a Home Assistant notif
 in your automations and scripts however you want. Currently no reading commands or sensors are implemented, because everything works through
 a Notification Service. Just send controls/animations to your Divoom device through that Notification Service.
 
+## Table of Contents
+* [Documentation](#documentation)
+  + [Requirements](#requirements)
+    - [Bluetooth Hardware](#bluetooth-hardware)
+    - [Bluetooth Pairing](#bluetooth-pairing)
+  + [Installation](#installation)
+    - [Easy Installation](#easy-installation)
+    - [Manual Installation](#manual-installation)
+  + [Configuration](#configuration)
+    - [Easy Configuration](#easy-configuration)
+    - [Manual Configuration](#manual-configuration)
+  + [Usage](#usage)
+    - [Basic modes](#basic-modes)
+    - [Examples](#examples)
+* [Troubleshooting](#troubleshooting)
+  + [Cannot connect](#cannot-connect)
+  + [GIF does not work](#gif-does-not-work)
+* [Credits](#credits)
+
 ## Documentation
 Further documentation besides the steps and examples below may follow. For now I'm happy that it works and that the HACS integration might be quite close! 😁
 
@@ -29,7 +48,7 @@ As described above, you need to pair your Divoom device at least once to your Ho
 can connect to your Divoom device anytime it's needed, even after restarting your Home Assistant. You have multiple possibilities to pair your
 Home Assistant to your Divoom device. The following commands can be used to pair your devices. Use them via SSH.
 
-* `bluetoothctl` and then `pair DIVOOM_DEVICE_MAC` and optionally also `connect DIVOOM_DEVICE_MAC`
+* `bluetoothctl` and then `pair DIVOOM_DEVICE_MAC` and optionally also `connect DIVOOM_DEVICE_MAC` \
 OR
 * `rfcomm connect HCI_DEVICE DIVOOM_DEVICE_MAC DIVOOM_DEVICE_PORT`
 
@@ -37,11 +56,11 @@ Choose what fits your Home Assistant installation or host system best. `bluetoot
 very basic HASS.io installations. `rfcomm` and maybe even `hciconfig hci0 up` beforehand is an older way. Obviously you have to fill in
 some placeholders above.
 
-* `HCI_DEVICE`: The id of your Bluetooth controller. Typically just `hci0`, especially if you are using the integrated Raspberry Pi Bluetooth controller.
+* `HCI_DEVICE`: The id of your Bluetooth controller. Typically just `hci0`, especially if you are using integrated Raspberry Pi Bluetooth.
 * `DIVOOM_DEVICE_MAC`: The MAC address of your Divoom device. You can either get it via the Divoom App or by scanning for it.
 * `DIVOOM_DEVICE_PORT`: The port of your Divoom device. Typically its just `1`, but on some audio-supported devices it might be `2`.
 
-### Install the custom component
+### Installation
 First we need to install the component. That can be done in two ways: Easy or Manual
 
 #### Easy Installation
@@ -63,8 +82,8 @@ First we need to install the component. That can be done in two ways: Easy or Ma
   for images that you may want to display on your device.
 * Optionally copy the content of the `pixelart` directory from the ZIP file
 
-### Enable the custom component
-Second we need to configure the component. Again that can be done in two ways: Easy or Manual
+### Configuration
+Second we need to enable/ configure the component. Again that can be done in two ways: Easy or Manual
 
 #### Easy Configuration
 
@@ -126,7 +145,7 @@ and the mode also passed in through the service data. It is still
 supported as of today, but because it looks odd and confuses people,
 it's not the preferred way anymore.
 
-#### Basic display modes
+#### Basic modes
 
 Modern:
 ```yaml
@@ -209,7 +228,7 @@ data:
 * `keyboard`: Changes the keyboard effects using the `value` parameter. \
   -1 = previous effect, 0 = toggle on/off, 1 = next effect
 
-### Examples
+#### Examples
 
 An example from my own automation.
 
