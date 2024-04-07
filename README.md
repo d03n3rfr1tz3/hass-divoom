@@ -114,7 +114,8 @@ notify:
 * name (Recommended): The name for the notify service.
 * mac (Required): The Bluetooth MAC address for the Divoom device.
 * port (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
-* device_type: The concrete type of your Divoom device. Currently `ditoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `tivoo` are supported.
+* device_type: The concrete type of your Divoom device. \
+  Currently `ditoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `tivoo` are supported.
 * media_directory (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
 * escape_payload (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with
@@ -170,8 +171,8 @@ data:
   This mode also accepts the boolean-like parameters `weather`, `temp`, `calendar` and `hot` for activating the corresponding features.
   It's also possible to specify the `color` of the clock.
   * `clock` parameter accepts a number between 0 and 9. The actual supported clock styles depend on your device.\
-    0 = Fullscreen, 1 = Rainbow, 2 = Boxed, 3 = Analog square,\
-    4 = Fullscreen negative, 5 = Analog round, 6 = Widescreen
+    `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square,\
+    `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen
   * `hot` parameter controls the slideshow of the best images while in `clock` mode,
     which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol.
 * `light`: Display the built-in light channel.
@@ -189,18 +190,18 @@ data:
 * `game`: Display one of the built-in games. With the `value` parameter you can choose which game you want to open.
   Depending on your device you may have different amount of games.
 * `gamecontrol`: Sends controls specified with the `value` parameter to the currently open game. \
-  0 or 'go' = go, 1 or 'left' = left, 2 or 'right' = right, 3 or 'up' = up, 4 or 'bottom' = bottom, 5 or 'ok' = ok
+  `0` or `go` = go, `1` or `left` = left, `2` or `right` = right, `3` or `up` = up, `4` or `bottom` = bottom, `5` or `ok` = ok
 * `brightness`: Sets the brightness using the `brightness` or `number` or `value` parameter.
 * `datetime`: Sets the date and time using the `value` parameter in the typical ISO datetime format.
 * `weather`: Sets the weather. Set the temperature using the `value` parameter and the weather type using the `weather` parameter.\
-  1 = clear, 3 = cloudy sky, 5 = thunderstorm, 6 = rain, 8 = snow, 9 = fog
+  `1` = clear, `3` = cloudy sky, `5` = thunderstorm, `6` = rain, `8` = snow, `9` = fog
 
 * `noise`: Shows the noise meter. You can control the start/stop state using the `value` parameter. \
-  0 = stop, 1 = start
+  `0` = stop, `1` = start
 * `countdown`: Shows the countdown using the `countdown` parameter (format mm:ss). You can control the start/stop state using the `value` parameter. \
-  0 = stop, 1 = start
+  `0` = stop, `1` = start
 * `timer`: Shows the timer. You can control the start/stop state using the `value` parameter. \
-  0 = pause, 1 = start, 2 = reset
+  `0` = pause, `1` = start, `2` = reset
 * `alarm`: Sets an alarm in the slot specified by the `number` parameter. With the `value` (format hh:mm) and `weekday` parameters you set when the alarm should go off and if it should repeat or just do it once. \
   With `alarmmode`, `triggermode`, `frequency` and `volume` you can set additional options on your alarm corresponding to what the Divoom app supports on your device. You might have to experiment
   with the options your Divoom device supports and what it actually changes. Unsupported values will be ignored or if possible directly zeroed by this component, to prevent strange behavior.
@@ -226,7 +227,7 @@ data:
 `MODE` on Ditoo additionally support:
 
 * `keyboard`: Changes the keyboard effects using the `value` parameter. \
-  -1 = previous effect, 0 = toggle on/off, 1 = next effect
+  `-1` = previous effect, `0` = toggle on/off, `1` = next effect
 
 #### Examples
 
@@ -256,7 +257,7 @@ Examples for Ditoo: [devices/ditoo.txt](https://github.com/d03n3rfr1tz3/hass-div
 Examples for Pixoo: [devices/pixoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoo.txt) \
 Examples for Pixoo Max: [devices/pixoomax.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoomax.txt) \
 Examples for Timebox: [devices/timebox.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timebox.txt) \
-Examples for Timebox Mini: [devices/timebox.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timeboxmini.txt) \
+Examples for Timebox Mini: [devices/timeboxmini.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timeboxmini.txt) \
 Examples for Tivoo: [devices/tivoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/tivoo.txt) 
 
 ## Troubleshooting
