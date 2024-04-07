@@ -1,11 +1,11 @@
-"""Provides class Timebox that encapsulates the Timebox Bluetooth communication."""
+"""Provides class TimeboxMini that encapsulates the Timebox Mini Bluetooth communication."""
 
 from .divoom import Divoom
 
 class TimeboxMini(Divoom):
-    """Class Timebox encapsulates the Timebox Bluetooth communication."""
+    """Class TimeboxMini encapsulates the Timebox Mini Bluetooth communication."""
     def __init__(self, host=None, port=1, escapePayload=False, logger=None):
-        self.type = "Timebox"
+        self.type = "TimeboxMini"
         self.size = 11
         Divoom.__init__(self, host, port, escapePayload, logger)
         
