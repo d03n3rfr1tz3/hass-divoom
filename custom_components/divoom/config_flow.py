@@ -129,6 +129,8 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             device_type = "pixoo"
         elif self._device_name.startswith("Ditoo"):
             device_type = "ditoo"
+        elif self._device_name.startswith("TimeboxMini") or self._device_name.startswith("Timebox Mini"):
+            device_type = "timeboxmini"
         elif self._device_name.startswith("Timebox"):
             device_type = "timebox"
         elif self._device_name.startswith("Tivoo"):
@@ -136,10 +138,11 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._device_type = device_type
 
         device_types = [
+            "ditoo",
             "pixoo",
             "pixoomax",
-            "ditoo",
             "timebox",
+            "timeboxmini",
             "tivoo"
         ]
         return self.async_show_form(

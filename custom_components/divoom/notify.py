@@ -133,6 +133,10 @@ class DivoomNotificationService(BaseNotificationService):
             from .devices.timebox import Timebox
             self._device = Timebox(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
+        if device_type == 'timeboxmini':
+            from .devices.timeboxmini import TimeboxMini
+            self._device = TimeboxMini(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
         if device_type == 'tivoo':
             from .devices.tivoo import Tivoo
             self._device = Tivoo(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
