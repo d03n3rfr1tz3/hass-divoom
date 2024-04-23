@@ -12,7 +12,7 @@ from homeassistant.components.notify import (
     BaseNotificationService
 )
 
-from homeassistant.const import CONF_MAC, CONF_PORT
+from homeassistant.const import CONF_HOST, CONF_MAC, CONF_PORT
 from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
 
 _LOGGER = logging.getLogger(__package__)
@@ -64,6 +64,7 @@ WEATHER_MODES = {
 }
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
+    vol.Optional(CONF_HOST): cv.string,
     vol.Required(CONF_MAC): cv.string,
     vol.Optional(CONF_PORT, default=1): cv.port,
     vol.Required(CONF_DEVICE_TYPE): cv.string,
@@ -78,6 +79,7 @@ async def async_get_service(
 ):
     """Get the Divoom notification service."""
     
+    host = None
     mac = None
     port = 1
     device_type = "pixoo"
@@ -85,6 +87,7 @@ async def async_get_service(
     escape_payload = False
 
     if discovery_info is not None:
+        if CONF_HOST in discovery_info: host = discovery_info[CONF_HOST]
         if CONF_MAC in discovery_info: mac = discovery_info[CONF_MAC]
         if CONF_PORT in discovery_info: port = discovery_info[CONF_PORT]
         if CONF_DEVICE_TYPE in discovery_info: device_type = discovery_info[CONF_DEVICE_TYPE]
@@ -92,13 +95,14 @@ async def async_get_service(
         if CONF_ESCAPE_PAYLOAD in discovery_info: escape_payload = discovery_info[CONF_ESCAPE_PAYLOAD]
     
     if config is not None:
+        if CONF_HOST in config: host = config[CONF_HOST]
         if CONF_MAC in config: mac = config[CONF_MAC]
         if CONF_PORT in config: port = config[CONF_PORT]
         if CONF_DEVICE_TYPE in config: device_type = config[CONF_DEVICE_TYPE]
         if CONF_MEDIA_DIR in config: media_directory = hass.config.path(config[CONF_MEDIA_DIR])
         if CONF_ESCAPE_PAYLOAD in config: escape_payload = config[CONF_ESCAPE_PAYLOAD]
     
-    notificationService = DivoomNotificationService(mac, port, device_type, media_directory, escape_payload)
+    notificationService = DivoomNotificationService(host, mac, port, device_type, media_directory, escape_payload)
 
     hass.data.setdefault(DOMAIN, {})
     domainConfig = hass.data.get(DOMAIN)
@@ -112,7 +116,7 @@ async def async_get_service(
 class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
 
-    def __init__(self, mac, port, device_type, media_directory, escape_payload):
+    def __init__(self, host, mac, port, device_type, media_directory, escape_payload):
         assert mac is not None
         assert port is not None
         assert device_type is not None
@@ -123,27 +127,27 @@ class DivoomNotificationService(BaseNotificationService):
 
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
-            self._device = Pixoo(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+            self._device = Pixoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'pixoomax':
             from .devices.pixoomax import PixooMax
-            self._device = PixooMax(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+            self._device = PixooMax(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'timebox':
             from .devices.timebox import Timebox
-            self._device = Timebox(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+            self._device = Timebox(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'timeboxmini':
             from .devices.timeboxmini import TimeboxMini
-            self._device = TimeboxMini(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+            self._device = TimeboxMini(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'tivoo':
             from .devices.tivoo import Tivoo
-            self._device = Tivoo(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+            self._device = Tivoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'ditoo':
             from .devices.ditoo import Ditoo
-            self._device = Ditoo(host=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+            self._device = Ditoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if self._device is None:
             _LOGGER.error("device_type {0} does not exist, divoom will not work".format(media_directory))

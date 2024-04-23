@@ -4,10 +4,10 @@ from .divoom import Divoom
 
 class PixooMax(Divoom):
     """Class PixooMax encapsulates the Pixoo Max Bluetooth communication."""
-    def __init__(self, host=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "PixooMax"
         self.size = 32
-        Divoom.__init__(self, host, port, escapePayload, logger)
+        Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def send_volume(self, value=None):
         self.logger.warning("{0}: this device does not support sending the volume.".format(self.type))

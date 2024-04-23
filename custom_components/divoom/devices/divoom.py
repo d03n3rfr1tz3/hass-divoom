@@ -39,10 +39,12 @@ class Divoom:
     escapePayload = False
     
     host = None
+    mac = None
     port = 1
 
-    def __init__(self, host=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.host = host
+        self.mac = mac
         self.port = port
         self.escapePayload = escapePayload
         
@@ -58,22 +60,35 @@ class Divoom:
 
     def connect(self):
         """Open a connection to the Divoom device."""
-        if (self.socket != None): return
+        if (self.socket == None):
+            try:
+                if (self.host == None):
+                    self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+                    self.socket.connect((self.mac, self.port))
+                else:
+                    self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+                    self.socket.connect((self.host, 7777))
 
-        try:
-            self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-            self.socket.connect((self.host, self.port))
-            self.socket.setblocking(0)
-            self.socket.settimeout(2)
-            self.socket_errno = 0
-        except socket.error as error:
-            self.socket_errno = error.errno
+                self.socket.setblocking(0)
+                self.socket.settimeout(2)
+                self.socket_errno = 0
+            except socket.error as error:
+                self.socket_errno = error.errno
+        
+        if (self.socket != None):
+            conn = [0x69]
+            conn += bytearray.fromhex(self.mac.replace(':', ''))
+            conn += [self.port]
+            self.socket.send(conn)
 
     def disconnect(self):
         """Closes the connection to the Divoom device."""
         if (self.socket == None): return
 
         try:
+            if (self.host != None):
+                self.socket.send([0x96])
+
             self.socket.shutdown(socket.SHUT_RDWR)
         except:
             pass

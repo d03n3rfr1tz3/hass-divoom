@@ -38,6 +38,10 @@ devices. One for example is that the Bluetooth Proxies from Home Assistant/ ESPH
 component. Another one is the support in Python itself. While a Bluetooth Classic connection is supported natively by Python, the pairing process
 is not. That's why you very likely have to do some manual work, if you somehow did not do it already.
 
+As an alternative for directly connecting your Home Assistant via Bluetooth to your Divoom device, you can use my [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom).
+With this you don't have to fiddle around with Bluetooth Pairing in your Home Assistant. It's currently still WIP, so there might be some minor issues here and there.
+If you are using my Bluetooth Proxy for ESP32, you can skip the whole Bluetooth Hardware and Bluetooth Pairing parts of this documentation.
+
 #### Bluetooth Hardware
 Of course you need Bluetooth hardware for that. It does not matter if you use the integrated Bluetooth controller of a Raspberry Pi 3/4/5 or an
 additional dongle. As long as it supports a classic Bluetooth connection via RFCOMM, you are good to go. When in doubt, just try it or have a
@@ -95,6 +99,9 @@ Second we need to enable/ configure the component. Again that can be done in two
 * Select your device type (e.g. `pixoo`, `ditoo` and such)
 * Click Send and then Finish
 
+Beware that the UI configuration as well as the auto-discovery currently do not support my [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom).
+Of course that might change in the future, especially because it already discovers and passes through each advertise bluetooth device.
+
 #### Manual Configuration
 This can be done by manually adding the following snippet to your `configuration.yaml`
 and filling in the capitalized placeholders. You can create a notify service for every
@@ -104,6 +111,7 @@ Divoom device you have, therefore allowing you to add multiple of these snippets
 notify:
   - name: NOTIFIER_NAME
     platform: divoom
+    host: "PROXY_HOST_OR_IP"
     mac: "DIVOOM_DEVICE_MAC_ADDRESS"
     port: DIVOOM_DEVICE_PORT
     device_type: "DIVOOM_DEVICE_TYPE"
@@ -112,6 +120,7 @@ notify:
 ```
 
 * name (Recommended): The name for the notify service.
+* host (Optional): The host or IP of your ESP32 with flashed [Bluetooth Proxy](https://github.com/d03n3rfr1tz3/esp32-divoom).
 * mac (Required): The Bluetooth MAC address for the Divoom device.
 * port (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
 * device_type: The concrete type of your Divoom device. \
@@ -129,6 +138,18 @@ notify:
     mac: "12:34:56:78:9A"
     port: 1
     device_type: "pixoo"
+    media_directory: "pixelart"
+    escape_payload: false
+```
+
+```yaml
+notify:
+  - name: Divoom Ditoo
+    platform: divoom
+    host: "192.168.0.123"
+    mac: "12:34:56:78:9A"
+    port: 2
+    device_type: "ditoo"
     media_directory: "pixelart"
     escape_payload: false
 ```
