@@ -8,7 +8,11 @@
           "description": "Wähle dein Divoom Gerät aus.",
           "data": {
             "mac": "Divoom Gerät",
-            "port": "Bluetooth Kanal/Port"
+            "port": "Bluetooth Kanal/Port",
+            "host": "ESP32-Divoom Host/IP"
+          },
+          "data_description": {
+            "host": "ESP32-Divoom ist eine zusätzliche begleitende Firmware, die als Bluetooth (classic) Proxy fungiert. Falls du das hast, kannst du das anstatt einer direkten Bluetooth-Verbindung zu deinem Divoom Gerät nutzen. Falls nicht, lass das Feld einfach leer und dein Home Assistant wird sich direkt per Bluetooth verbinden."
           }
         },
         "device_port": {

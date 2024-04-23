@@ -94,13 +94,14 @@ Second we need to enable/ configure the component. Again that can be done in two
 * Go to Integrations
 * If there is an auto-discovered entry, you are lucky and can skip two steps
 * Use `Add Integration` and Search for `Divoom`
-* Choose your Divoom device from the list of discovered bluetooth devices
+* Choose your Divoom device from the list of discovered Bluetooth devices
 * Choose a `port`. If you are unsure, first try `1`. If that doesn't work, try `2`.
 * Select your device type (e.g. `pixoo`, `ditoo` and such)
 * Click Send and then Finish
 
-Beware that the UI configuration as well as the auto-discovery currently do not support my [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom).
-Of course that might change in the future, especially because it already discovers and passes through each advertise bluetooth device.
+Beware that the UI configuration currently does not fully support my [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom).
+Currently it is supported through auto-discovery via ZeroConf, as well as through the UI configuration by setting the `host` option. It does not
+add to the list of discovered Bluetooth devices, which means you have to manually type the MAC address in that case.
 
 #### Manual Configuration
 This can be done by manually adding the following snippet to your `configuration.yaml`
@@ -121,6 +122,8 @@ notify:
 
 * name (Recommended): The name for the notify service.
 * host (Optional): The host or IP of your ESP32 with flashed [Bluetooth Proxy](https://github.com/d03n3rfr1tz3/esp32-divoom).
+  Beware, that an ESPHome BLE Proxy does not work, because Divoom is using Bluetooth Classic and not Bluetooth Low-Energy.
+  Just leave it out, if you want your Home Assistant to directly connect via Bluetooth.
 * mac (Required): The Bluetooth MAC address for the Divoom device.
 * port (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
 * device_type: The concrete type of your Divoom device. \

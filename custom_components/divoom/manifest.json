@@ -23,5 +23,31 @@
   "issue_tracker": "https://github.com/d03n3rfr1tz3/hass-divoom/issues",
   "loggers": ["divoom"],
   "requirements": [ "pillow>=7.2.0" ],
-  "version": "1.0.1"
+  "version": "1.0.1",
+  "zeroconf": [
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "name": "Ditoo*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "name": "Pixoo*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "name": "Timebox*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "name": "Tivoo*"
+      }
+    }
+  ]
 }
