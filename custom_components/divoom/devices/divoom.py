@@ -87,7 +87,9 @@ class Divoom:
 
         try:
             if (self.host != None):
-                self.socket.send([0x96])
+                conn = [0x96]
+                conn += bytearray.fromhex(self.mac.replace(':', ''))
+                self.socket.send(conn)
 
             self.socket.shutdown(socket.SHUT_RDWR)
         except:
