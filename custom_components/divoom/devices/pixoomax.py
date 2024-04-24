@@ -25,7 +25,7 @@ class PixooMax(Divoom):
         args = [0x06, 0x00]
         args += red.to_bytes(2, byteorder='little')
         args += blue.to_bytes(2, byteorder='little')
-        self.send_command("set view", args)
+        return self.send_command("set view", args)
 
     def show_lyrics(self):
         self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
