@@ -80,7 +80,7 @@ class Divoom:
             conn = [0x69]
             conn += bytearray.fromhex(self.mac.replace(':', ''))
             conn += [self.port]
-            self.socket.send(conn)
+            self.socket.send(bytes(conn))
 
     def disconnect(self):
         """Closes the connection to the Divoom device."""
@@ -90,7 +90,7 @@ class Divoom:
             if (self.host != None):
                 conn = [0x96]
                 conn += bytearray.fromhex(self.mac.replace(':', ''))
-                self.socket.send(conn)
+                self.socket.send(bytes(conn))
 
             self.socket.shutdown(socket.SHUT_RDWR)
         except:

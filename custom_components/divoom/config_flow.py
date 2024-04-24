@@ -4,7 +4,7 @@ import voluptuous as vol
 
 from typing import Any
 from homeassistant import config_entries
-from homeassistant.helpers import config_validation as cv, selector
+from homeassistant.helpers import config_validation as cv
 from homeassistant.data_entry_flow import AbortFlow, FlowResult
 
 from homeassistant.components.bluetooth import (
@@ -15,6 +15,13 @@ from homeassistant.components.bluetooth import (
 
 from homeassistant.components.zeroconf import (
     ZeroconfServiceInfo,
+)
+
+from homeassistant.helpers.selector import (
+    SelectOptionDict,
+    SelectSelector,
+    SelectSelectorConfig,
+    SelectSelectorMode,
 )
 
 from homeassistant.const import CONF_NAME, CONF_HOST, CONF_MAC, CONF_PORT
@@ -46,19 +53,20 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             for discovery_info in async_discovered_service_info(self.hass, False):
                 if discovery_info.address in self._discovered_devices:
                     continue
-                if discovery_info.name.startsWith("Ditoo") or  discovery_info.name.startsWith("Pixoo") or discovery_info.name.startsWith("Timebox") or discovery_info.name.startsWith("Tivoo"):
+                if discovery_info.name.startswith("Ditoo") or  discovery_info.name.startswith("Pixoo") or discovery_info.name.startswith("Timebox") or discovery_info.name.startswith("Tivoo"):
                     self._discovered_devices[discovery_info.address] = discovery_info
 
-            discovered_titles = {
-                selector.SelectOptionDict(value=address, label="{} ({})".format(discovery.name, discovery.address))
+            discovered_titles = [
+                SelectOptionDict(value=address, label="{} ({})".format(discovery.name, discovery.address))
                 for (address, discovery) in self._discovered_devices.items()
-            }
+            ]
             return self.async_show_form(
                 step_id="user",
                 data_schema=vol.Schema(
                     {
-                        vol.Required(CONF_MAC): selector.SelectSelector(
-                            selector.SelectSelectorConfig(
+                        vol.Required(CONF_MAC): SelectSelector(
+                            SelectSelectorConfig(
+                                mode=SelectSelectorMode.DROPDOWN,
                                 options=discovered_titles,
                                 custom_value=True,
                                 multiple=False,
