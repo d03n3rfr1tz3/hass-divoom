@@ -28,25 +28,25 @@
     {
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
-        "name": "Ditoo*"
+        "device_name": "ditoo*"
       }
     },
     {
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
-        "name": "Pixoo*"
+        "device_name": "pixoo*"
       }
     },
     {
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
-        "name": "Timebox*"
+        "device_name": "timebox*"
       }
     },
     {
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
-        "name": "Tivoo*"
+        "device_name": "tivoo*"
       }
     }
   ]
