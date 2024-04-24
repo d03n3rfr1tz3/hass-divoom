@@ -120,17 +120,17 @@ notify:
     escape_payload: false
 ```
 
-* name (Recommended): The name for the notify service.
-* host (Optional): The host or IP of your ESP32 with flashed [Bluetooth Proxy](https://github.com/d03n3rfr1tz3/esp32-divoom).
+* `name` (Recommended): The name for the notify service.
+* `host` (Optional): The host or IP of your ESP32 with flashed [Bluetooth Proxy](https://github.com/d03n3rfr1tz3/esp32-divoom).
   Beware, that an ESPHome BLE Proxy does not work, because Divoom is using Bluetooth Classic and not Bluetooth Low-Energy.
   Just leave it out, if you want your Home Assistant to directly connect via Bluetooth.
-* mac (Required): The Bluetooth MAC address for the Divoom device.
-* port (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
-* device_type: The concrete type of your Divoom device. \
+* `mac` (Required): The Bluetooth MAC address for the Divoom device.
+* `port` (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
+* `device_type`: The concrete type of your Divoom device. \
   Currently `ditoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `tivoo` are supported.
-* media_directory (Required): A directory, relative to the configuration dir, containing image
+* `media_directory` (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
-* escape_payload (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with
+* `escape_payload` (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with
   older firmware (afaik some old Timebox versions). Deactivated by default, because newer versions don't need that.
 
 Here is an example how it could look like.
