@@ -4,7 +4,7 @@ import voluptuous as vol
 
 from typing import Any
 from homeassistant import config_entries
-from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import config_validation as cv, selector
 from homeassistant.data_entry_flow import AbortFlow, FlowResult
 
 from homeassistant.components.bluetooth import (
@@ -46,18 +46,25 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             for discovery_info in async_discovered_service_info(self.hass, False):
                 if discovery_info.address in self._discovered_devices:
                     continue
-
-                self._discovered_devices[discovery_info.address] = discovery_info
+                if discovery_info.name.startsWith("Ditoo") or  discovery_info.name.startsWith("Pixoo") or discovery_info.name.startsWith("Timebox") or discovery_info.name.startsWith("Tivoo"):
+                    self._discovered_devices[discovery_info.address] = discovery_info
 
             discovered_titles = {
-                address: "{} ({})".format(discovery.name, discovery.address)
+                selector.SelectOptionDict(value=address, label="{} ({})".format(discovery.name, discovery.address))
                 for (address, discovery) in self._discovered_devices.items()
             }
             return self.async_show_form(
                 step_id="user",
                 data_schema=vol.Schema(
                     {
-                        vol.Required(CONF_MAC): vol.In(discovered_titles),
+                        vol.Required(CONF_MAC): selector.SelectSelector(
+                            selector.SelectSelectorConfig(
+                                options=discovered_titles,
+                                custom_value=True,
+                                multiple=False,
+                                sort=True,
+                            ),
+                        ),
                         vol.Optional(CONF_PORT, default=1): cv.port,
                         vol.Optional(CONF_HOST, default=None): cv.string
                     }
@@ -68,7 +75,10 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             self._device_host = user_input[CONF_HOST]
 
         if CONF_MAC in user_input:
-            self._device_name = self._discovered_devices[user_input[CONF_MAC]].name
+            if user_input[CONF_MAC] in self._discovered_devices:
+                self._device_name = self._discovered_devices[user_input[CONF_MAC]].name
+            else:
+                self._device_name = "Device"
             self._device_mac = user_input[CONF_MAC]
 
         if CONF_PORT in user_input:
