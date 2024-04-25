@@ -1,5 +1,5 @@
 """Switching states and sending images or animations to a divoom device."""
-import logging, os
+import logging, os, socket
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant
@@ -111,6 +111,15 @@ async def async_get_service(
     loadedServices = domainConfig.get('loaded')
     loadedServices[mac] = notificationService
     
+    try:
+        await hass.async_add_executor_job(notificationService.connect)
+    except BrokenPipeError as error:
+        _LOGGER.error("Error while initially connecting to the Divoom device. %s", error, exc_info=True, stack_info=True)
+        pass
+    except socket.error as error:
+        _LOGGER.error("Error while initially connecting to the Divoom device. %s", error, exc_info=True, stack_info=True)
+        pass
+
     return notificationService
 
 class DivoomNotificationService(BaseNotificationService):
@@ -153,14 +162,15 @@ class DivoomNotificationService(BaseNotificationService):
             _LOGGER.error("device_type {0} does not exist, divoom will not work".format(media_directory))
         elif not os.path.isdir(media_directory):
             _LOGGER.error("media_directory {0} does not exist, divoom may not work properly".format(media_directory))
-        
-        self._device.connect()
 
     def __del__(self):
         self._device.disconnect()
 
     def __exit__(self, type, value, traceback):
         self._device.disconnect()
+
+    def connect(self):
+        self._device.connect()
 
     def disconnect(self):
         self._device.disconnect()
