@@ -109,13 +109,13 @@ class Divoom:
         try:
             if skipPing != True:
                 ping = self.send_ping()
-                if (self.host != None and ping == [0x69]):
+                if (self.host != None and list(ping)[-1] == 0x69):
                     time.sleep(0.5)
                     ping = self.send_ping()
-                if (self.host != None and ping == [0x69]):
+                if (self.host != None and list(ping)[-1] == 0x69):
                     time.sleep(1)
                     ping = self.send_ping()
-                if (self.host != None and ping == [0x96]):
+                if (self.host != None and list(ping)[-1] == 0x96):
                     self.socket_errno = 696
         except socket.error as error:
             self.socket_errno = error.errno
