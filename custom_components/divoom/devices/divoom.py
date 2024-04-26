@@ -319,7 +319,7 @@ class Divoom:
         if isinstance(value, str): value = int(value)
 
         args = []
-        args += (value / 100 * 15).to_bytes(1, byteorder='big')
+        args += int(value * 15 / 100).to_bytes(1, byteorder='big')
         self.send_command("set volume", args, skipRead=True)
 
     def send_keyboard(self, value=None):
