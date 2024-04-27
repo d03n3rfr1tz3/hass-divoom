@@ -264,7 +264,7 @@ Shows the clock channel.
 
 | Parameter | Description |
 | ---       | ---         |
-| `clock` | The style of the clock. Accepts a number between 0 and 9. <br/> `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen |
+| `clock` | The style of the clock. Accepts a number between 0 and 9. <br/> `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen |
 | `weather` | Actives or deactivates showing the weather with `0` or `1`. |
 | `temp` | Actives or deactivates showing the temperature with `0` or `1`. |
 | `calendar` | Actives or deactivates showing the calendar date with `0` or `1`. |
@@ -294,7 +294,7 @@ Shows the countdown tool.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the start/stop state. `0` = stop, `1` = start |
+| `value` | Controls the start/stop state. <br/> `0` = stop, `1` = start |
 | `countdown` | The concrete countdown in the format `mm:ss`. |
 
 ```
@@ -381,7 +381,7 @@ Sends controlling commands to the currently open game.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | `0` or `go` = go, `1` or `left` = left, `2` or `right` = right, `3` or `up` = up, `4` or `bottom` = bottom, `5` or `ok` = ok |
+| `value` | `0` or `go` = go, <br/> `1` or `left` = left, <br/> `2` or `right` = right, <br/> `3` or `up` = up, <br/> `4` or `bottom` = bottom, <br/> `5` or `ok` = ok |
 
 ```
 message: 'gamecontrol'
@@ -394,7 +394,7 @@ Controls the keyboard LEDs specifically on the Ditoo.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Changes the keyboard LED effect. `-1` = previous effect, `0` = toggle on/off, `1` = next effect |
+| `value` | Changes the keyboard LED effect. <br/> `-1` = previous effect, `0` = toggle on/off, `1` = next effect |
 
 ```
 message: 'keyboard'
@@ -451,20 +451,12 @@ Shows the noise meter.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the start/stop state. `0` = stop, `1` = start |
+| `value` | Controls the start/stop state. <br/> `0` = stop, `1` = start |
 
 ```
 message: 'noise'
 data:
   value: 1
-```
-
-#### MODE on
-Turn the display on.
-
-```
-message: 'on'
-data:
 ```
 
 #### MODE off
@@ -475,12 +467,20 @@ message: 'off'
 data:
 ```
 
+#### MODE on
+Turn the display on.
+
+```
+message: 'on'
+data:
+```
+
 #### MODE playstate
 Sets the playstate for the currently played music. Only supported by Divoom devices with audio features.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the play/pause state. `0` = pause, `1` = play |
+| `value` | Controls the play/pause state. <br/> `0` = pause, `1` = play |
 
 ```
 message: 'playstate'
@@ -493,7 +493,7 @@ Shows and plays the radio channel. Only supported by Divoom devices with the rad
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the on/off state. `0` = off, `1` = on |
+| `value` | Controls the on/off state. <br/> `0` = off, `1` = on |
 | `frequency` | The radio frequency to set. |
 
 ```
@@ -536,7 +536,7 @@ Shows the timer tool.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the start/stop state. `0` = stop, `1` = start |
+| `value` | Controls the start/stop state. <br/> `0` = stop, `1` = start |
 
 ```
 message: 'timer'
@@ -576,7 +576,7 @@ Sets the weather.
 | Parameter | Description |
 | ---       | ---         |
 | `value` | The temperature in degree including the temperature type for celsius or fahrenheit. |
-| `weather` | The actual type of the weather. `1` = clear, `3` = cloudy sky, `5` = thunderstorm, `6` = rain, `8` = snow, `9` = fog |
+| `weather` | The actual type of the weather. <br/> `1` = clear, `3` = cloudy sky, `5` = thunderstorm, `6` = rain, `8` = snow, `9` = fog |
 
 ```
 message: 'weather'
