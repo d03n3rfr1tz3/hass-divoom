@@ -22,6 +22,7 @@ PARAM_TEXT = 'text'
 PARAM_VALUE = 'value'
 
 PARAM_CLOCK = 'clock'
+PARAM_TWENTYFOUR = 'twentyfour'
 PARAM_WEATHER = 'weather'
 PARAM_TEMP = 'temp'
 PARAM_CALENDAR = 'calendar'
@@ -235,12 +236,13 @@ class DivoomNotificationService(BaseNotificationService):
 
         elif mode == "clock":
             clock = data.get(PARAM_CLOCK)
+            twentyfour = data.get(PARAM_TWENTYFOUR)
             weather = data.get(PARAM_WEATHER)
             temp = data.get(PARAM_TEMP)
             calendar = data.get(PARAM_CALENDAR)
             color = data.get(PARAM_COLOR)
             hot = data.get(PARAM_HOT)
-            self._device.show_clock(clock=clock, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
+            self._device.show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
 
         elif mode == "light":
             brightness = data.get(PARAM_BRIGHTNESS)

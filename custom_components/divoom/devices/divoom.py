@@ -404,22 +404,24 @@ class Divoom:
         args += clock.second.to_bytes(1, byteorder='big')
         return self.send_command("set date time", args)
 
-    def show_clock(self, clock=None, weather=None, temp=None, calendar=None, color=None, hot=None):
+    def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""
         if clock == None: clock = 0
-        if weather == None: weather = 0
-        if temp == None: temp = 0
-        if calendar == None: calendar = 0
+        if twentyfour == None: twentyfour = True
+        if weather == None: weather = False
+        if temp == None: temp = False
+        if calendar == None: calendar = False
 
-        args = [0x00, 0x01]
-        if clock >= 0 and clock <= 9:
+        args = [0x00]
+        args += [0x01 if twentyfour == True or twentyfour == 1 else 0x00]
+        if clock >= 0 and clock <= 15:
             args += clock.to_bytes(1, byteorder='big') # clock mode/style
             args += [0x01] # clock activated
         else:
             args += [0x00, 0x00] # clock mode/style = 0 and clock deactivated
-        args += weather.to_bytes(1, byteorder='big')
-        args += temp.to_bytes(1, byteorder='big')
-        args += calendar.to_bytes(1, byteorder='big')
+        args += [0x01 if weather == True or weather == 1 else 0x00]
+        args += [0x01 if temp == True or temp == 1 else 0x00]
+        args += [0x01 if calendar == True or calendar == 1 else 0x00]
         if not color is None:
             args += self.convert_color(color)
         result = self.send_command("set view", args)
