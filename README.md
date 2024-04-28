@@ -11,6 +11,7 @@ a Notification Service. Just send controls/animations to your Divoom device thro
 
 ## Table of Contents
   * [Requirements](#requirements)
+      - [Bluetooth Proxy](#bluetooth-proxy)
       - [Bluetooth Hardware](#bluetooth-hardware)
       - [Bluetooth Pairing](#bluetooth-pairing)
   * [Installation](#installation)
@@ -63,8 +64,9 @@ devices. One for example is that the Bluetooth Proxies from Home Assistant/ ESPH
 component. Another one is the support in Python itself. While a Bluetooth Classic connection is supported natively by Python, the pairing process
 is not. That's why you very likely have to do some manual work, if you somehow did not do it already.
 
+#### Bluetooth Proxy
 As an alternative for directly connecting your Home Assistant via Bluetooth to your Divoom device, you can use my [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom).
-With this you don't have to fiddle around with Bluetooth Pairing in your Home Assistant. It's currently still WIP, so there might be some minor issues here and there.
+With this you don't have to fiddle around with Bluetooth Pairing in your Home Assistant. It's currently still quite new, so there might be some minor issues here and there.
 If you are using my Bluetooth Proxy for ESP32, you can skip the whole Bluetooth Hardware and Bluetooth Pairing parts of this documentation.
 
 #### Bluetooth Hardware
