@@ -437,7 +437,7 @@ Sets a memorial (reminder).
 | ---       | ---         |
 | `number`  | The concrete slot for the memorial. For the actual amount of slots you might have to look into the phone app. |
 | `value`   | The date and time in the typical ISO datetime format (year will be ignored). |
-| `text`    | Specifies the name of your memorial, as it will appear in the phone app (default: Home Assistant). |
+| `text`    | Specifies the name of your memorial, as it will appear in the phone app (default: Home Assistant). Limited to 16 characters. |
 
 ```
 message: 'memorial'
