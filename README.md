@@ -31,16 +31,16 @@ a Notification Service. Just send controls/animations to your Divoom device thro
       - [MODE design](#mode-design)
       - [MODE disconnect](#mode-disconnect)
       - [MODE effects](#mode-effects)
-      - [MODE image](#mode-image)
       - [MODE game](#mode-game)
       - [MODE gamecontrol](#mode-gamecontrol)
+      - [MODE image](#mode-image)
       - [MODE keyboard](#mode-keyboard)
       - [MODE light](#mode-light)
       - [MODE lyrics](#mode-lyrics)
       - [MODE memorial](#mode-memorial)
       - [MODE noise](#mode-noise)
-      - [MODE on](#mode-on)
       - [MODE off](#mode-off)
+      - [MODE on](#mode-on)
       - [MODE playstate](#mode-playstate)
       - [MODE radio](#mode-radio)
       - [MODE raw](#mode-raw)
@@ -225,13 +225,13 @@ Sets an alarm. You might have to experiment with the options your Divoom device 
 
 | Parameter | Description |
 | ---       | ---         |
-| `number` | The concrete slot for the alarm. For the actual amount of slots you might have to look into the phone app. |
-| `value` | The concrete time for when the alarm should happen in the format `mm:ss`. |
+| `number`  | The concrete slot for the alarm. For the actual amount of slots you might have to look into the phone app. |
+| `value`   | The concrete time for when the alarm should happen in the format `mm:ss`. |
 | `weekday` | The typical list of weekdays for when the alarm should happen. |
 | `alarmmode` | The alarm mode. Look into your phone app for what is supported by your Divoom device. |
 | `triggermode` | The trigger mode. Look into your phone app for what is supported by your Divoom device. |
 | `frequency` | The radio frequency to set. |
-| `volume` | The volume of the alarm. |
+| `volume`  | The volume of the alarm. |
 
 ```
 message: 'alarm'
@@ -267,10 +267,10 @@ Shows the clock channel.
 | `clock` | The style of the clock. Accepts a number between 0 and 9. <br/> `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen |
 | `twentyfour` | Changes between 12h or 24h format. <br/> `0` = 12h, `1` = 24h. Defaults to 24h. |
 | `weather` | Actives or deactivates showing the weather with `0` or `1`. |
-| `temp` | Actives or deactivates showing the temperature with `0` or `1`. |
+| `temp`    | Actives or deactivates showing the temperature with `0` or `1`. |
 | `calendar` | Actives or deactivates showing the calendar date with `0` or `1`. |
-| `color` | The color of the clock. Accepts an array of RGB color values. |
-| `hot` | Actives or deactivates showing the slideshow of the best images with `0` or `1`, which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol |
+| `color`   | The color of the clock. Accepts an array of RGB color values. |
+| `hot`     | Actives or deactivates showing the slideshow of the best images with `0` or `1`, which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol |
 
 ```
 message: 'clock'
@@ -295,7 +295,7 @@ Shows the countdown tool.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the start/stop state. <br/> `0` = stop, `1` = start |
+| `value`   | Controls the start/stop state. <br/> `0` = stop, `1` = start |
 | `countdown` | The concrete countdown in the format `mm:ss`. |
 
 ```
@@ -309,7 +309,7 @@ Sets the datetime.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | The date and time in the typical ISO datetime format. Leave it empty or null to just use the current date and time. |
+| `value`   | The date and time in the typical ISO datetime format. Leave it empty or null to just use the current date and time. |
 
 ```
 message: 'datetime'
@@ -322,7 +322,7 @@ Shows the design channel.
 
 | Parameter | Description |
 | ---       | ---         |
-| `number` | The number of the concrete design. Ranging from 0-2 you can specify the design 1-3. |
+| `number`  | The number of the concrete design. Ranging from 0-2 you can specify the design 1-3. |
 
 ```
 message: 'design'
@@ -343,7 +343,7 @@ Shows the effects channel.
 
 | Parameter | Description |
 | ---       | ---         |
-| `number` | The number of the concrete effect. Might differ for some Divoom devices. Look into your phone app and count them. |
+| `number`  | The number of the concrete effect. Might differ for some Divoom devices. Look into your phone app and count them. |
 
 ```
 message: 'effects'
@@ -351,25 +351,12 @@ data:
   number: 2
 ```
 
-#### MODE image
-Shows the a static or animated image.
-
-| Parameter | Description |
-| ---       | ---         |
-| `file` | Specifes the image file relative to the configured media_directory, that will be displayed. |
-
-```
-message: 'image'
-data:
-  file: 'ha16.gif'
-```
-
 #### MODE game
 Shows a game. It is theoretically possible to open games, that are not shown in your phone app, but they might not work very well.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | The number of the concrete game. Depending on your device you may have different amount of games. Look into your phone app and count them. |
+| `value`   | The number of the concrete game. Depending on your device you may have different amount of games. Look into your phone app and count them. |
 
 ```
 message: 'game'
@@ -382,7 +369,7 @@ Sends controlling commands to the currently open game.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | `0` or `go` = go, <br/> `1` or `left` = left, <br/> `2` or `right` = right, <br/> `3` or `up` = up, <br/> `4` or `bottom` = bottom, <br/> `5` or `ok` = ok |
+| `value`   | `0` or `go` = go, <br/> `1` or `left` = left, <br/> `2` or `right` = right, <br/> `3` or `up` = up, <br/> `4` or `bottom` = bottom, <br/> `5` or `ok` = ok |
 
 ```
 message: 'gamecontrol'
@@ -390,12 +377,25 @@ data:
   value: 'go'
 ```
 
+#### MODE image
+Shows the a static or animated image.
+
+| Parameter | Description |
+| ---       | ---         |
+| `file`    | Specifes the image file relative to the configured media_directory, that will be displayed. |
+
+```
+message: 'image'
+data:
+  file: 'ha16.gif'
+```
+
 #### MODE keyboard
 Controls the keyboard LEDs specifically on the Ditoo.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Changes the keyboard LED effect. <br/> `-1` = previous effect, `0` = toggle on/off, `1` = next effect |
+| `value`   | Changes the keyboard LED effect. <br/> `-1` = previous effect, `0` = toggle on/off, `1` = next effect |
 
 ```
 message: 'keyboard'
@@ -409,7 +409,7 @@ Shows the light channel.
 | Parameter | Description |
 | ---       | ---         |
 | `brightness` | The brightness value between 0 and 100. |
-| `color` | The color of the light. Accepts an array of RGB color values. |
+| `color`   | The color of the light. Accepts an array of RGB color values. |
 
 ```
 message: 'light'
@@ -419,11 +419,11 @@ data:
 ```
 
 #### MODE lyrics
-Shows the lyrics channel or tool. Might not be supported by every Divoom device.
+Shows the lyrics channel. Might not be supported by every Divoom device.
 
 | Parameter | Description |
 | ---       | ---         |
-| `number` | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
+| `number`  | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
 
 ```
 message: 'lyrics'
@@ -435,9 +435,9 @@ Sets a memorial (reminder).
 
 | Parameter | Description |
 | ---       | ---         |
-| `number` | The concrete slot for the memorial. For the actual amount of slots you might have to look into the phone app. |
-| `value` | The date and time in the typical ISO datetime format (year will be ignored). |
-| `text` | Specifies the name of your memorial, as it will appear in the phone app (default: Home Assistant). |
+| `number`  | The concrete slot for the memorial. For the actual amount of slots you might have to look into the phone app. |
+| `value`   | The date and time in the typical ISO datetime format (year will be ignored). |
+| `text`    | Specifies the name of your memorial, as it will appear in the phone app (default: Home Assistant). |
 
 ```
 message: 'memorial'
@@ -452,7 +452,7 @@ Shows the noise meter.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the start/stop state. <br/> `0` = stop, `1` = start |
+| `value`   | Controls the start/stop state. <br/> `0` = stop, `1` = start |
 
 ```
 message: 'noise'
@@ -481,7 +481,7 @@ Sets the playstate for the currently played music. Only supported by Divoom devi
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the play/pause state. <br/> `0` = pause, `1` = play |
+| `value`   | Controls the play/pause state. <br/> `0` = pause, `1` = play |
 
 ```
 message: 'playstate'
@@ -494,7 +494,7 @@ Shows and plays the radio channel. Only supported by Divoom devices with the rad
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the on/off state. <br/> `0` = off, `1` = on |
+| `value`   | Controls the on/off state. <br/> `0` = off, `1` = on |
 | `frequency` | The radio frequency to set. |
 
 ```
@@ -509,7 +509,7 @@ Sends raw data to the Divoom device. Might be useful, if there is something wron
 
 | Parameter | Description |
 | ---       | ---         |
-| `raw` | The bytes to send. |
+| `raw`     | The bytes to send. |
 
 ```
 message: 'raw'
@@ -518,7 +518,7 @@ data:
 ```
 
 #### MODE scoreboard
-Shows the scoreboard channel.
+Shows the scoreboard channel or tool.
 
 | Parameter | Description |
 | ---       | ---         |
@@ -537,7 +537,7 @@ Shows the timer tool.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Controls the start/stop state. <br/> `0` = stop, `1` = start |
+| `value`   | Controls the start/stop state. <br/> `0` = stop, `1` = start |
 
 ```
 message: 'timer'
@@ -550,7 +550,7 @@ Shows the visualization channel.
 
 | Parameter | Description |
 | ---       | ---         |
-| `number` | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
+| `number`  | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
 
 ```
 message: 'visualization'
@@ -576,7 +576,7 @@ Sets the weather.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | The temperature in degree including the temperature type for celsius or fahrenheit. |
+| `value`   | The temperature in degree including the temperature type for celsius or fahrenheit. |
 | `weather` | The actual type of the weather. <br/> `1` = clear, `3` = cloudy sky, `5` = thunderstorm, `6` = rain, `8` = snow, `9` = fog |
 
 ```
