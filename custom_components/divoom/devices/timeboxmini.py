@@ -4,10 +4,10 @@ from .divoom import Divoom
 
 class TimeboxMini(Divoom):
     """Class TimeboxMini encapsulates the Timebox Mini Bluetooth communication."""
-    def __init__(self, host=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "TimeboxMini"
         self.size = 11
-        Divoom.__init__(self, host, port, escapePayload, logger)
+        Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def show_scoreboard(self, blue=None, red=None):
         """Show scoreboard on the Divoom device with specific score"""
@@ -19,7 +19,7 @@ class TimeboxMini(Divoom):
         args = [0x06, 0x00]
         args += red.to_bytes(2, byteorder='little')
         args += blue.to_bytes(2, byteorder='little')
-        self.send_command("set view", args)
+        return self.send_command("set view", args)
 
     def show_lyrics(self):
         self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))

@@ -4,10 +4,10 @@ from .divoom import Divoom
 
 class Timebox(Divoom):
     """Class Timebox encapsulates the Timebox Bluetooth communication."""
-    def __init__(self, host=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "Timebox"
         self.size = 16
-        Divoom.__init__(self, host, port, escapePayload, logger)
+        Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def show_scoreboard(self, blue=None, red=None):
         """Show scoreboard on the Divoom device with specific score"""
@@ -19,13 +19,13 @@ class Timebox(Divoom):
         args = [0x01, 0x01]
         args += red.to_bytes(2, byteorder='little')
         args += blue.to_bytes(2, byteorder='little')
-        self.send_command("set tool", args)
+        return self.send_command("set tool", args)
 
     def show_lyrics(self):
         """Show lyrics on the Divoom device with specific score"""
 
         args = [0x06, 0x00, 0x00, 0x00]
-        self.send_command("set view", args)
+        return self.send_command("set view", args)
 
     def send_keyboard(self, value=None):
         self.logger.warning("{0}: this device does not support changing the keyboard light.".format(self.type))

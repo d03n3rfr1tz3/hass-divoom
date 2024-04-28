@@ -4,10 +4,10 @@ from .divoom import Divoom
 
 class Pixoo(Divoom):
     """Class Pixoo encapsulates the Pixoo Bluetooth communication."""
-    def __init__(self, host=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "Pixoo"
         self.size = 16
-        Divoom.__init__(self, host, port, escapePayload, logger)
+        Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def send_volume(self, value=None):
         self.logger.warning("{0}: this device does not support sending the volume.".format(self.type))
@@ -25,7 +25,7 @@ class Pixoo(Divoom):
         args = [0x06, 0x00]
         args += red.to_bytes(2, byteorder='little')
         args += blue.to_bytes(2, byteorder='little')
-        self.send_command("set view", args)
+        return self.send_command("set view", args)
 
     def show_lyrics(self):
         self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
