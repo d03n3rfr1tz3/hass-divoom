@@ -31,6 +31,7 @@ class Divoom:
         "set game": 0xa0,
         "set design": 0xbd,
         "set sleep": 0xa3,
+        "set sleeptime": 0x40,
     }
 
     logger = None
@@ -681,16 +682,34 @@ class Divoom:
         while self.receive(512) == 512:
             self.drop_message_buffer()
 
-    def sleep(self, value=None, mode=None, volume=None):
-        """Set sleep mode on the Divoom device and optionally sets mode and volume"""
+    def sleep(self, value=None, mode=None, volume=None, time=None, color=None, brightness=None):
+        """Set sleep mode on the Divoom device and optionally sets mode, volume, time, color, and brightness"""
         if mode is None: mode = 0
-        if volume is None: volume = 100
         sleep_value = 0x01 if value else 0x00
+        if volume is None: volume = 100
+        if brightness is None: brightness = 100
 
-        args = []
-        args += sleep_value.to_bytes(1, byteorder='big')
-        args += mode.to_bytes(1, byteorder='big')
-        args += volume.to_bytes(1, byteorder='big')
+        if time is None:
+            args = []
+            args += sleep_value.to_bytes(1, byteorder='big')
+            args += mode.to_bytes(1, byteorder='big')
+            args += volume.to_bytes(1, byteorder='big')
 
-        result = self.send_command("set sleep", args)
-        return result
+            result = self.send_command("set sleep", args)
+        else:
+            args = []
+            args += time.to_bytes(1, byteorder='big')
+            args += mode.to_bytes(1, byteorder='big')
+            args += sleep_value.to_bytes(1, byteorder='big')
+            args += b'\x00\x00'  # nil FM frequency values
+            args += volume.to_bytes(1, byteorder='big')
+            if color is not None:
+                args += self.convert_color(color)
+            else:
+                args += self.convert_color((0, 0, 0))
+            args += brightness.to_bytes(1, byteorder='big')
+
+            result = self.send_command("set sleeptime", args)
+
+            return result
+

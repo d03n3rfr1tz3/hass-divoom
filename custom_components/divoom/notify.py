@@ -37,7 +37,9 @@ PARAM_FREQUENCY = 'frequency'
 PARAM_NUMBER = 'number'
 PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
+
 PARAM_SLEEPMODE = 'sleepmode'
+PARAM_SLEEPTIME = 'sleeptime'
 
 PARAM_PLAYER1 = 'player1'
 PARAM_PLAYER2 = 'player2'
@@ -357,7 +359,11 @@ class DivoomNotificationService(BaseNotificationService):
             value = data.get(PARAM_VALUE)
             mode = data.get(PARAM_SLEEPMODE)
             volume = data.get(PARAM_VOLUME)
-            self._device.sleep(value=value, mode=mode, volume=volume)
+            time = data.get(PARAM_SLEEPTIME)
+            color = data.get(PARAM_COLOR)
+            brightness = data.get(PARAM_BRIGHTNESS)
+
+            self._device.sleep(value=value, mode=mode, volume=volume, time=time, color=color, brightness=brightness)
 
         else:
             _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'".format(mode))
