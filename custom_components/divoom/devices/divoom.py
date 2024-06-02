@@ -29,7 +29,8 @@ class Divoom:
         "set brightness": 0x74,
         "set game keypress": 0x88,
         "set game": 0xa0,
-        "set design": 0xbd
+        "set design": 0xbd,
+        "set sleep": 0xa3,
     }
 
     logger = None
@@ -679,3 +680,17 @@ class Divoom:
         """Quickly read most input from Divoom device and remove from buffer. """
         while self.receive(512) == 512:
             self.drop_message_buffer()
+
+    def sleep(self, value=None, mode=None, volume=None):
+        """Set sleep mode on the Divoom device and optionally sets mode and volume"""
+        if mode is None: mode = 0
+        if volume is None: volume = 100
+        sleep_value = 0x01 if value else 0x00
+
+        args = []
+        args += sleep_value.to_bytes(1, byteorder='big')
+        args += mode.to_bytes(1, byteorder='big')
+        args += volume.to_bytes(1, byteorder='big')
+
+        result = self.send_command("set sleep", args)
+        return result
