@@ -46,8 +46,6 @@ PARAM_PLAYER2 = 'player2'
 
 PARAM_FILE = 'file'
 
-PARAM_SCENE = 1,
-
 PARAM_RAW = 'raw'
 
 VALID_MODES = {

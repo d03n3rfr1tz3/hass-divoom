@@ -46,6 +46,7 @@ a Notification Service. Just send controls/animations to your Divoom device thro
       - [MODE radio](#mode-radio)
       - [MODE raw](#mode-raw)
       - [MODE scoreboard](#mode-scoreboard)
+      - [MODE sleep](#mode-sleep)
       - [MODE timer](#mode-timer)
       - [MODE visualization](#mode-visualization)
       - [MODE volume](#mode-volume)
@@ -532,6 +533,29 @@ message: 'scoreboard'
 data:
   player1: 2
   player2: 1
+```
+
+#### MODE sleep
+Enabled or disables the sleep mode, which plays soothing sounds, optionally with a timer and light.
+
+| Parameter    | Description |
+| ---          | ---         |
+| `sleeptime`  | The time after which to stop the sleepmode. When provided the device lights up. |
+| `sleepmode`  | The sound effect to play. Check in the app how many options are available. Accepts a number. |
+| `value`      | Controls the start/stop state. <br/> `0` = stop, `1` = start |
+| `volume`     | The volume value between 0 and 100. |
+| `color`      | The color of the clock. Accepts an array of RGB color values. Only relevant when `sleeptime` is set. |
+| `brightness` | The brightness value between 0 and 100. Only relevant when `sleeptime` is set. |
+
+```
+message: 'sleep'
+data:
+  sleeptime: 30
+  sleepmode: 4
+  value: 1
+  volume: 10
+  color: [255, 255, 0]
+  brightness: 50
 ```
 
 #### MODE timer
