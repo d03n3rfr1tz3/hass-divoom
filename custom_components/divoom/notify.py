@@ -39,7 +39,7 @@ PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
 
 PARAM_SLEEPMODE = 'sleepmode'
-PARAM_SLEEPTIME = 'sleeptime'
+PARAM_SLEEPTIME = 'time'
 
 PARAM_PLAYER1 = 'player1'
 PARAM_PLAYER2 = 'player2'

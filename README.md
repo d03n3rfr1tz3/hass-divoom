@@ -540,7 +540,7 @@ Enabled or disables the sleep mode, which plays soothing sounds, optionally with
 
 | Parameter    | Description |
 | ---          | ---         |
-| `sleeptime`  | The time after which to stop the sleepmode. When provided the device lights up. |
+| `time`       | The time after which to stop the sleep mode. Defaults to `120` when not provided. |
 | `sleepmode`  | The sound effect to play. Check in the app how many options are available. Accepts a number. |
 | `value`      | Controls the start/stop state. <br/> `0` = stop, `1` = start |
 | `volume`     | The volume value between 0 and 100. |
@@ -550,7 +550,7 @@ Enabled or disables the sleep mode, which plays soothing sounds, optionally with
 ```
 message: 'sleep'
 data:
-  sleeptime: 30
+  time: 30
   sleepmode: 4
   value: 1
   volume: 10
