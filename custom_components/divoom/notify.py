@@ -354,14 +354,16 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.send_command(command=raw[0], args=raw[1:])
 
         elif mode == "sleep":
-            value = data.get(PARAM_VALUE)
-            mode = data.get(PARAM_SLEEPMODE)
-            volume = data.get(PARAM_VOLUME)
-            time = data.get(PARAM_SLEEPTIME)
-            color = data.get(PARAM_COLOR)
-            brightness = data.get(PARAM_BRIGHTNESS)
-
-            self._device.sleep(value=value, mode=mode, volume=volume, time=time, color=color, brightness=brightness)
+            params = {
+                'value': data.get(PARAM_VALUE),
+                'mode': data.get(PARAM_SLEEPMODE),
+                'volume': data.get(PARAM_VOLUME),
+                'time': data.get(PARAM_SLEEPTIME),
+                'color': data.get(PARAM_COLOR),
+                'brightness': data.get(PARAM_BRIGHTNESS),
+                'frequency': data.get(PARAM_FREQUENCY)
+            }
+            self._device.sleep(params)
 
         else:
             _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'".format(mode))

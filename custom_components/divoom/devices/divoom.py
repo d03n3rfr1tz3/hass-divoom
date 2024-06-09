@@ -59,6 +59,19 @@ class Divoom:
     def __exit__(self, type, value, traceback):
         self.disconnect()
 
+    def _parse_frequency(self, frequency):
+        if frequency is not None:
+            if isinstance(frequency, str):
+                frequency = float(frequency)
+
+            frequency = frequency * 10
+            if frequency > 1000:
+                return [int(frequency - 1000), int(frequency / 100)]
+            else:
+                return [int(frequency % 100), int(frequency / 100)]
+
+        return [0x00, 0x00]
+
     def connect(self):
         """Open a connection to the Divoom device."""
         if (self.socket == None):
@@ -582,18 +595,7 @@ class Divoom:
 
         args += alarmMode.to_bytes(1, byteorder='big')
         args += triggerMode.to_bytes(1, byteorder='big')
-
-        if frequency != None:
-            if isinstance(frequency, str): frequency = float(frequency)
-
-            frequency = frequency * 10
-            if frequency > 1000:
-                args += [int(frequency - 1000), int(frequency / 100)]
-            else:
-                args += [int(frequency % 100), int(frequency / 100)]
-        else:
-            args += [0x00, 0x00]
-
+        args += self._parse_frequency(frequency)
         args += volume.to_bytes(1, byteorder='big')
         return self.send_command("set alarm", args)
 
@@ -681,24 +683,26 @@ class Divoom:
         while self.receive(512) == 512:
             self.drop_message_buffer()
 
-    def sleep(self, value=None, mode=None, volume=None, time=None, color=None, brightness=None):
+    def sleep(self, params):
         """Set sleep mode on the Divoom device and optionally sets mode, volume, time, color, and brightness"""
-        if time is None: time = 120
-        if mode is None: mode = 0
+        if params is None:
+            params = {}
+        value = params.get('value')
         sleep_value = 0x01 if value else 0x00
-        if volume is None: volume = 100
-        if brightness is None: brightness = 100
+        mode = params.get('mode') or 0
+        volume = params.get('volume') or 100
+        time = params.get('time') or 120
+        color = params.get('color') or (0, 0, 0)
+        brightness = params.get('brightness') or 100
+        frequency = params.get('frequency')
 
         args = []
         args += time.to_bytes(1, byteorder='big')
         args += mode.to_bytes(1, byteorder='big')
         args += sleep_value.to_bytes(1, byteorder='big')
-        args += b'\x00\x00'  # nil FM frequency values
+        args += self._parse_frequency(frequency)
         args += volume.to_bytes(1, byteorder='big')
-        if color is not None:
-            args += self.convert_color(color)
-        else:
-            args += self.convert_color((0, 0, 0))
+        args += self.convert_color(color)
         args += brightness.to_bytes(1, byteorder='big')
 
         result = self.send_command("set sleeptime", args)
