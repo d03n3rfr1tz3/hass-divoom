@@ -3,6 +3,9 @@
   "name": "Divoom",
   "bluetooth": [
     {
+      "local_name": "Aurabox*"
+    },
+    {
       "local_name": "Ditoo*"
     },
     {
@@ -25,6 +28,12 @@
   "requirements": [ "pillow>=7.2.0" ],
   "version": "1.1.0",
   "zeroconf": [
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "device_name": "aurabox*"
+      }
+    },
     {
       "type": "_divoom_esp32._tcp.local.",
       "properties": {

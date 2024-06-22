@@ -168,6 +168,14 @@ class DivoomNotificationService(BaseNotificationService):
         self._device = None
         self._media_directory = media_directory
 
+        if device_type == 'aurabox':
+            from .devices.aurabox import Aurabox
+            self._device = Aurabox(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
+        if device_type == 'ditoo':
+            from .devices.ditoo import Ditoo
+            self._device = Ditoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
             self._device = Pixoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
@@ -187,10 +195,6 @@ class DivoomNotificationService(BaseNotificationService):
         if device_type == 'tivoo':
             from .devices.tivoo import Tivoo
             self._device = Tivoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
-        
-        if device_type == 'ditoo':
-            from .devices.ditoo import Ditoo
-            self._device = Ditoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if self._device is None:
             _LOGGER.error("device_type {0} does not exist, divoom will not work".format(media_directory))

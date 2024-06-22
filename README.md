@@ -155,7 +155,7 @@ notify:
 * `mac` (Required): The Bluetooth MAC address for the Divoom device.
 * `port` (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
 * `device_type`: The concrete type of your Divoom device. \
-  Currently `ditoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `tivoo` are supported.
+  Currently `aurabox`, `ditoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `tivoo` are supported.
 * `media_directory` (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
 * `escape_payload` (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with
@@ -639,6 +639,7 @@ UI: \
 
 ### Examples per Device
 You can find more examples for each mode and all supported devices in separate files: \
+Examples for Aurabox: [devices/aurabox.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/aurabox.txt) \
 Examples for Ditoo: [devices/ditoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/ditoo.txt) \
 Examples for Pixoo: [devices/pixoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoo.txt) \
 Examples for Pixoo Max: [devices/pixoomax.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoomax.txt) \

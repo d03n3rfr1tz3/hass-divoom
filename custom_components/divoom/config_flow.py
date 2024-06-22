@@ -53,7 +53,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             for discovery_info in async_discovered_service_info(self.hass, False):
                 if discovery_info.address in self._discovered_devices:
                     continue
-                if discovery_info.name.startswith("Ditoo") or  discovery_info.name.startswith("Pixoo") or discovery_info.name.startswith("Timebox") or discovery_info.name.startswith("Tivoo"):
+                if discovery_info.name.startswith("Aurabox") or discovery_info.name.startswith("Ditoo") or discovery_info.name.startswith("Pixoo") or discovery_info.name.startswith("Timebox") or discovery_info.name.startswith("Tivoo"):
                     self._discovered_devices[discovery_info.address] = discovery_info
 
             discovered_titles = [
@@ -172,12 +172,14 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return await self.async_step_confirm()
 
         device_type = ""
-        if self._device_name.startswith("PixooMax") or self._device_name.startswith("Pixoo Max"):
+        if self._device_name.startswith("Aurabox"):
+            device_type = "aurabox"
+        elif self._device_name.startswith("Ditoo"):
+            device_type = "ditoo"
+        elif self._device_name.startswith("PixooMax") or self._device_name.startswith("Pixoo Max"):
             device_type = "pixoomax"
         elif self._device_name.startswith("Pixoo"):
             device_type = "pixoo"
-        elif self._device_name.startswith("Ditoo"):
-            device_type = "ditoo"
         elif self._device_name.startswith("TimeboxMini") or self._device_name.startswith("Timebox Mini"):
             device_type = "timeboxmini"
         elif self._device_name.startswith("Timebox"):
@@ -187,6 +189,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._device_type = device_type
 
         device_types = [
+            "aurabox",
             "ditoo",
             "pixoo",
             "pixoomax",
