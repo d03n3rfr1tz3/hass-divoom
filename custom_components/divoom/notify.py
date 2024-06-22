@@ -38,6 +38,9 @@ PARAM_NUMBER = 'number'
 PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
 
+PARAM_SLEEPMODE = 'sleepmode'
+PARAM_SLEEPTIME = 'time'
+
 PARAM_PLAYER1 = 'player1'
 PARAM_PLAYER2 = 'player2'
 
@@ -45,7 +48,37 @@ PARAM_FILE = 'file'
 
 PARAM_RAW = 'raw'
 
-VALID_MODES = {'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'}
+VALID_MODES = {
+    'alarm',
+    'brightness',
+    'clock',
+    'connect',
+    'countdown',
+    'datetime',
+    'design',
+    'disconnect',
+    'effects',
+    'game',
+    'gamecontrol',
+    'image',
+    'keyboard',
+    'light',
+    'lyrics',
+    'memorial',
+    'noise',
+    'off',
+    'on',
+    'playstate',
+    'radio',
+    'raw',
+    'scoreboard',
+    'sleep',
+    'timer',
+    'visualization',
+    'volume',
+    'weather',
+}
+
 WEATHER_MODES = {
     'clear-night': 1, 
     'cloudy': 3, 
@@ -319,6 +352,18 @@ class DivoomNotificationService(BaseNotificationService):
         elif mode == "raw":
             raw = data.get(PARAM_RAW)
             self._device.send_command(command=raw[0], args=raw[1:])
+
+        elif mode == "sleep":
+            params = {
+                'value': data.get(PARAM_VALUE),
+                'mode': data.get(PARAM_SLEEPMODE),
+                'volume': data.get(PARAM_VOLUME),
+                'time': data.get(PARAM_SLEEPTIME),
+                'color': data.get(PARAM_COLOR),
+                'brightness': data.get(PARAM_BRIGHTNESS),
+                'frequency': data.get(PARAM_FREQUENCY)
+            }
+            self._device.sleep(params)
 
         else:
             _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'".format(mode))
