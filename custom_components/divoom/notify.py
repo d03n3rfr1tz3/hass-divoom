@@ -341,6 +341,16 @@ class DivoomNotificationService(BaseNotificationService):
             frequency = data.get(PARAM_FREQUENCY)
             self._device.show_radio(value=value, frequency=frequency)
 
+        elif mode == "sleep":
+            sleepvalue = data.get(PARAM_VALUE)
+            sleeptime = data.get(PARAM_SLEEPTIME)
+            sleepmode = data.get(PARAM_SLEEPMODE)
+            volume = data.get(PARAM_VOLUME)
+            color = data.get(PARAM_COLOR)
+            brightness = data.get(PARAM_BRIGHTNESS)
+            frequency = data.get(PARAM_FREQUENCY)
+            self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency)
+
         elif mode == "game":
             value = data.get(PARAM_VALUE)
             self._device.show_game(value=value)
@@ -353,20 +363,8 @@ class DivoomNotificationService(BaseNotificationService):
             raw = data.get(PARAM_RAW)
             self._device.send_command(command=raw[0], args=raw[1:])
 
-        elif mode == "sleep":
-            params = {
-                'value': data.get(PARAM_VALUE),
-                'mode': data.get(PARAM_SLEEPMODE),
-                'volume': data.get(PARAM_VOLUME),
-                'time': data.get(PARAM_SLEEPTIME),
-                'color': data.get(PARAM_COLOR),
-                'brightness': data.get(PARAM_BRIGHTNESS),
-                'frequency': data.get(PARAM_FREQUENCY)
-            }
-            self._device.sleep(params)
-
         else:
-            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'raw'".format(mode))
+            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'sleep', 'raw'".format(mode))
             return False
         
         return True

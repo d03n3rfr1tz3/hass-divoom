@@ -17,6 +17,7 @@ class Divoom:
         "set hot": 0x26,
         "set temp type": 0x2b,
         "set time type": 0x2c,
+        "set sleeptime": 0x40,
         "set alarm": 0x43,
         "set image": 0x44,
         "set view": 0x45,
@@ -30,7 +31,6 @@ class Divoom:
         "set game keypress": 0x88,
         "set game": 0xa0,
         "set design": 0xbd,
-        "set sleeptime": 0x40,
     }
 
     logger = None
@@ -635,13 +635,36 @@ class Divoom:
             if isinstance(frequency, str): frequency = float(frequency)
 
             args = []
-            frequency = frequency * 10
-            if frequency > 1000:
-                args += [int(frequency - 1000), int(frequency / 100)]
-            else:
-                args += [int(frequency % 100), int(frequency / 100)]
+            args += self._parse_frequency(frequency)
             self.send_command("set radio frequency", args)
         return result
+
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
+        """Show sleep mode on the Divoom device and optionally sets mode, volume, time, color, frequency and brightness"""
+        if sleeptime == None: sleeptime = 120
+        if sleepmode == None: sleepmode = 0
+        if volume == None: volume = 100
+        if brightness == None: brightness = 100
+        if isinstance(sleeptime, str): sleeptime = int(sleeptime)
+        if isinstance(sleepmode, str): sleepmode = int(sleepmode)
+        if isinstance(volume, str): volume = int(volume)
+        if isinstance(brightness, str): brightness = int(brightness)
+
+        args = []
+        args += sleeptime.to_bytes(1, byteorder='big')
+        args += sleepmode.to_bytes(1, byteorder='big')
+        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+
+        args += self._parse_frequency(frequency)
+        args += volume.to_bytes(1, byteorder='big')
+
+        if color is None:
+            args += [0x00, 0x00, 0x00]
+        else:
+            args += self.convert_color(color)
+        args += brightness.to_bytes(1, byteorder='big')
+
+        return self.send_command("set sleeptime", args)
 
     def show_game(self, value=None):
         """Show game on the Divoom device"""
@@ -682,30 +705,4 @@ class Divoom:
         """Quickly read most input from Divoom device and remove from buffer. """
         while self.receive(512) == 512:
             self.drop_message_buffer()
-
-    def sleep(self, params):
-        """Set sleep mode on the Divoom device and optionally sets mode, volume, time, color, and brightness"""
-        if params is None:
-            params = {}
-        value = params.get('value')
-        sleep_value = 0x01 if value else 0x00
-        mode = params.get('mode') or 0
-        volume = params.get('volume') or 100
-        time = params.get('time') or 120
-        color = params.get('color') or (0, 0, 0)
-        brightness = params.get('brightness') or 100
-        frequency = params.get('frequency')
-
-        args = []
-        args += time.to_bytes(1, byteorder='big')
-        args += mode.to_bytes(1, byteorder='big')
-        args += sleep_value.to_bytes(1, byteorder='big')
-        args += self._parse_frequency(frequency)
-        args += volume.to_bytes(1, byteorder='big')
-        args += self.convert_color(color)
-        args += brightness.to_bytes(1, byteorder='big')
-
-        result = self.send_command("set sleeptime", args)
-
-        return result
 
