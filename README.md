@@ -536,17 +536,17 @@ data:
 ```
 
 #### MODE sleep
-Enabled or disables the sleep mode, which plays soothing sounds, optionally with a timer and light.
+Shows the sleep mode, which plays soothing sounds, optionally with a timer and light.
 
 | Parameter    | Description |
 | ---          | ---         |
 | `value`      | Controls the start/stop state. <br/> `0` = stop, `1` = start |
-| `brightness` | The brightness value between 0 and 100. |
-| `color`      | The color of the clock. Accepts an array of RGB color values. |
-| `frequency`  | The radio frequency to set. |
-| `sleepmode`  | The sound effect to play. Check in the app how many options are available. Accepts a number. |
 | `time`       | The time in minutes after which to stop the sleep mode. Defaults to `120` when not provided. |
+| `sleepmode`  | The sound effect to play. Check in the app how many options are available. Accepts a number. |
+| `frequency`  | The radio frequency to set. |
 | `volume`     | The volume value between 0 and 100. |
+| `color`      | The color of the display. Accepts an array of RGB color values. |
+| `brightness` | The brightness value between 0 and 100. |
 
 ```
 message: 'sleep'
