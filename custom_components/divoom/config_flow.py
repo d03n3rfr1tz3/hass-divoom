@@ -74,12 +74,12 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             ),
                         ),
                         vol.Optional(CONF_PORT, default=1): cv.port,
-                        vol.Optional(CONF_HOST, default=None): cv.string
+                        vol.Optional(CONF_HOST, default=""): cv.string
                     }
                 ),
             )
         
-        if CONF_HOST in user_input:
+        if CONF_HOST in user_input and user_input[CONF_HOST] != "":
             self._device_host = user_input[CONF_HOST]
 
         if CONF_MAC in user_input:
@@ -171,7 +171,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_confirm()
 
-        device_type = ""
+        device_type = None
         if self._device_name.startswith("Aurabox"):
             device_type = "aurabox"
         elif self._device_name.startswith("Ditoo"):
@@ -189,19 +189,27 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._device_type = device_type
 
         device_types = [
-            "aurabox",
-            "ditoo",
-            "pixoo",
-            "pixoomax",
-            "timebox",
-            "timeboxmini",
-            "tivoo"
+            SelectOptionDict(value="aurabox", label="Aurabox"),
+            SelectOptionDict(value="ditoo", label="Ditoo"),
+            SelectOptionDict(value="pixoo", label="Pixoo"),
+            SelectOptionDict(value="pixoomax", label="PixooMax"),
+            SelectOptionDict(value="timebox", label="Timebox"),
+            SelectOptionDict(value="timeboxmini", label="TimeboxMini"),
+            SelectOptionDict(value="tivoo", label="Tivoo"),
         ]
         return self.async_show_form(
             step_id="device_type",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_DEVICE_TYPE, default=device_type): vol.In(device_types)
+                    vol.Required(CONF_DEVICE_TYPE, default=device_type): SelectSelector(
+                        SelectSelectorConfig(
+                            mode=SelectSelectorMode.LIST,
+                            options=device_types,
+                            custom_value=False,
+                            multiple=False,
+                            sort=True,
+                        ),
+                    ),
                 }
             ),
         )
