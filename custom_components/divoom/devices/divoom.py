@@ -44,7 +44,7 @@ class Divoom:
     port = 1
 
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
-        self.host = host
+        self.host = host if host else None
         self.mac = mac
         self.port = port
         self.escapePayload = escapePayload
