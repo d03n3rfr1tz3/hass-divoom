@@ -84,7 +84,7 @@ class Divoom:
                     self.socket.connect((self.host, 7777))
 
                 self.socket.setblocking(0)
-                self.socket.settimeout(2)
+                self.socket.settimeout(3)
                 self.socket_errno = 0
             except socket.error as error:
                 self.socket_errno = error.errno
@@ -173,20 +173,27 @@ class Divoom:
         """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
         if (self.socket == None): return
 
+        result = 0
         request = self.make_message(payload)
-        try:
-            self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
-            result = self.socket.send(bytes(request))
+        ready = select.select([], [self.socket], [], 0.2)
+        if ready[1]:
+            try:
+                self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
+                result = self.socket.send(bytes(request))
+            except socket.error as error:
+                self.socket_errno = error.errno
+                raise
+        else:
+            self.socket_errno = 98
 
-            if skipRead == False and self.logger.isEnabledFor(logging.DEBUG):
+        if skipRead == False and self.logger.isEnabledFor(logging.DEBUG):
+            ready = select.select([self.socket], [], [], 0.2)
+            if ready[0]:
                 response = self.socket.recv(1024)
                 self.logger.debug("{0} PAYLOAD IN: {1}".format(self.type, ' '.join([hex(b) for b in response])))
                 return response or result
-        
-            return result
-        except socket.error as error:
-            self.socket_errno = error.errno
-            raise
+    
+        return result
 
     def send_command(self, command, args=None, skipRead=False):
         """Send command with optional arguments"""
