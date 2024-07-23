@@ -123,13 +123,13 @@ class Divoom:
         try:
             if skipPing != True:
                 ping = self.send_ping()
-                if (self.host != None and list(ping)[-1] == 0x69):
+                if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x69):
                     time.sleep(0.5)
                     ping = self.send_ping()
-                if (self.host != None and list(ping)[-1] == 0x69):
+                if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x69):
                     time.sleep(1)
                     ping = self.send_ping()
-                if (self.host != None and list(ping)[-1] == 0x96):
+                if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x96):
                     self.socket_errno = 696
         except socket.error as error:
             self.socket_errno = error.errno
@@ -169,7 +169,7 @@ class Divoom:
             self.socket_errno = error.errno
             raise
 
-    def send_payload(self, payload, skipRead=False):
+    def send_payload(self, payload, skipRead=None):
         """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
         if (self.socket == None): return
 
@@ -186,7 +186,7 @@ class Divoom:
         else:
             self.socket_errno = 98
 
-        if skipRead == False and self.logger.isEnabledFor(logging.DEBUG):
+        if skipRead == False or (skipRead == None and self.logger.isEnabledFor(logging.DEBUG)):
             ready = select.select([self.socket], [], [], 0.2)
             if ready[0]:
                 response = self.socket.recv(1024)
@@ -195,7 +195,7 @@ class Divoom:
     
         return result
 
-    def send_command(self, command, args=None, skipRead=False):
+    def send_command(self, command, args=None, skipRead=None):
         """Send command with optional arguments"""
         if (self.socket == None): return
 
@@ -350,7 +350,7 @@ class Divoom:
 
     def send_ping(self):
         """Send a ping (actually it's requesting current view) to the Divoom device to check connectivity"""
-        return self.send_command("get view")
+        return self.send_command("get view", [], skipRead=False)
 
     def send_brightness(self, value=None):
         """Send brightness to the Divoom device"""
