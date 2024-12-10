@@ -172,19 +172,20 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             return await self.async_step_confirm()
 
         device_type = None
-        if self._device_name.startswith("Aurabox"):
+        device_name = self._device_name.lower()
+        if device_name.startswith("aurabox"):
             device_type = "aurabox"
-        elif self._device_name.startswith("Ditoo"):
+        elif device_name.startswith("ditoo"):
             device_type = "ditoo"
-        elif self._device_name.startswith("PixooMax") or self._device_name.startswith("Pixoo Max"):
+        elif device_name.startswith("pixoomax") or device_name.startswith("pixoo-max") or device_name.startswith("pixoo max"):
             device_type = "pixoomax"
-        elif self._device_name.startswith("Pixoo"):
+        elif device_name.startswith("pixoo"):
             device_type = "pixoo"
-        elif self._device_name.startswith("TimeboxMini") or self._device_name.startswith("Timebox Mini"):
+        elif device_name.startswith("timeboxmini") or device_name.startswith("timebox-mini") or device_name.startswith("timebox mini"):
             device_type = "timeboxmini"
-        elif self._device_name.startswith("Timebox"):
+        elif device_name.startswith("timebox"):
             device_type = "timebox"
-        elif self._device_name.startswith("Tivoo"):
+        elif device_name.startswith("tivoo"):
             device_type = "tivoo"
         self._device_type = device_type
 
