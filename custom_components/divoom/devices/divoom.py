@@ -268,6 +268,9 @@ class Divoom:
             
             picture_frames = []
             palette = img.getpalette()
+            imgWidth, imgHeight = img.size
+            displaySize = self.size if self.size < 32 or imgWidth < 32 or imgHeight < 32 else 32
+            
             try:
                 while True:
                     try:
@@ -290,21 +293,22 @@ class Divoom:
                 time = pair[1]
                 
                 colors = []
-                pixels = [None]*self.size*self.size
+                pixels = [None]*displaySize*displaySize
                 
                 if time is None:
                     time = 0
                 
-                for pos in itertools.product(range(self.size), range(self.size)):
+                for pos in itertools.product(range(displaySize), range(displaySize)):
                     y, x = pos
                     r, g, b, a = picture_frame.getpixel((x, y))
                     if [r, g, b] not in colors:
                         colors.append([r, g, b])
                     color_index = colors.index([r, g, b])
-                    pixels[x + self.size * y] = color_index
+                    pixels[x + displaySize * y] = color_index
                 
                 colorCount = len(colors)
-                if colorCount >= 256:
+                if colorCount >= (1024 if displaySize == 32 else 256):
+                    self.logger.warning("{0}: too many colors found in the palette of the GIF, therefore it might not be displayed.".format(self.type))
                     colorCount = 0
                 
                 timeCode = [0x00, 0x00]
@@ -313,8 +317,8 @@ class Divoom:
                 
                 frame = []
                 frame += timeCode
-                frame += [0x00]
-                frame += colorCount.to_bytes(1, byteorder='big')
+                frame += [0x03 if displaySize == 32 else 0x00]
+                frame += colorCount.to_bytes(2 if displaySize == 32 else 1, byteorder='big')
                 for color in colors:
                     frame += self.convert_color(color)
                 frame += self.process_pixels(pixels, colors)
