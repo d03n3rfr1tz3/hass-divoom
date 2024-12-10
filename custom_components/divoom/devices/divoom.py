@@ -318,7 +318,7 @@ class Divoom:
                 frame = []
                 frame += timeCode
                 frame += [0x03 if displaySize == 32 else 0x00]
-                frame += colorCount.to_bytes(2 if displaySize == 32 else 1, byteorder='big')
+                frame += colorCount.to_bytes(2 if displaySize == 32 else 1, byteorder='little')
                 for color in colors:
                     frame += self.convert_color(color)
                 frame += self.process_pixels(pixels, colors)
