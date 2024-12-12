@@ -175,7 +175,7 @@ class Divoom:
 
         result = 0
         request = self.make_message(payload)
-        ready = select.select([], [self.socket], [], 0.2)
+        ready = select.select([], [self.socket], [], 0.1)
         if ready[1]:
             try:
                 self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
@@ -251,7 +251,7 @@ class Divoom:
         return color[0].to_bytes(1, byteorder='big') + color[1].to_bytes(1, byteorder='big') + color[2].to_bytes(1, byteorder='big')
 
     def make_frame(self, frame):
-        length = len(frame)+3
+        length = len(frame) + 3
         header = [0xAA]
         header += length.to_bytes(2, byteorder='little')
         return [header + frame, length]
@@ -268,8 +268,7 @@ class Divoom:
             
             picture_frames = []
             palette = img.getpalette()
-            imgWidth, imgHeight = img.size
-            displaySize = self.size if self.size < 32 or imgWidth < 32 or imgHeight < 32 else 32
+            needsResize = True if img.size[0] != self.size or img.size[0] != self.size else False
             
             try:
                 while True:
@@ -277,13 +276,16 @@ class Divoom:
                         if img.mode in ("L", "LA", "P", "PA") and not img.getpalette():
                             img.putpalette(palette)
                     except ValueError as error:
-                        self.logger.warning("{0}: error while trying to put palette into GIF frames. {1}".format(self.type, error))
+                        self.logger.warning("{0}: error while trying to put palette into GIF frames. The GIF might be displayed with errors. {1}".format(self.type, error))
 
-                    duration = img.info['duration']
                     new_frame = Image.new('RGBA', img.size)
                     new_frame.paste(img, (0, 0), img.convert('RGBA'))
-                    picture_frames.append([new_frame, duration])
 
+                    if needsResize:
+                        new_frame = new_frame.resize((self.size, self.size), Image.Resampling.NEAREST)
+                    
+                    duration = img.info['duration'] if 'duration' in img.info else None
+                    picture_frames.append([new_frame, duration])
                     img.seek(img.tell() + 1)
             except EOFError:
                 pass
@@ -293,32 +295,29 @@ class Divoom:
                 time = pair[1]
                 
                 colors = []
-                pixels = [None]*displaySize*displaySize
+                pixels = [None] * self.size * self.size
                 
-                if time is None:
-                    time = 0
-                
-                for pos in itertools.product(range(displaySize), range(displaySize)):
+                for pos in itertools.product(range(self.size), range(self.size)):
                     y, x = pos
                     r, g, b, a = picture_frame.getpixel((x, y))
                     if [r, g, b] not in colors:
                         colors.append([r, g, b])
                     color_index = colors.index([r, g, b])
-                    pixels[x + displaySize * y] = color_index
-                
-                colorCount = len(colors)
-                if colorCount >= (1024 if displaySize == 32 else 256):
-                    self.logger.warning("{0}: too many colors found in the palette of the GIF, therefore it might not be displayed.".format(self.type))
-                    colorCount = 0
+                    pixels[x + self.size * y] = color_index
                 
                 timeCode = [0x00, 0x00]
+                if time is None: time = 0
                 if len(picture_frames) > 1:
                     timeCode = time.to_bytes(2, byteorder='little')
                 
+                colorCount = len(colors)
+                if colorCount >= (self.size * self.size):
+                    colorCount = 0
+                
                 frame = []
                 frame += timeCode
-                frame += [0x03 if displaySize == 32 else 0x00]
-                frame += colorCount.to_bytes(2 if displaySize == 32 else 1, byteorder='little')
+                frame += [0x03 if self.size >= 32 else 0x00]
+                frame += colorCount.to_bytes(2 if self.size >= 32 else 1, byteorder='little')
                 for color in colors:
                     frame += self.convert_color(color)
                 frame += self.process_pixels(pixels, colors)
