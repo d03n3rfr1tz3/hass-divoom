@@ -7,6 +7,7 @@ class PixooMax(Divoom):
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "PixooMax"
         self.size = 32
+        self.chunks = 200
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
     
     def make_framepart(self, lsum, index, framePart):

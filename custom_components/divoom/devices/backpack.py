@@ -1,11 +1,11 @@
-"""Provides class Pixoo that encapsulates the Pixoo Bluetooth communication."""
+"""Provides class Backpack that encapsulates the Backpack Bluetooth communication."""
 
 from .divoom import Divoom
 
-class Pixoo(Divoom):
-    """Class Pixoo encapsulates the Pixoo Bluetooth communication."""
+class Backpack(Divoom):
+    """Class Backpack encapsulates the Backpack Bluetooth communication."""
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
-        self.type = "Pixoo"
+        self.type = "Backpack"
         self.size = 16
         self.chunks = 200
         Divoom.__init__(self, host, mac, port, escapePayload, logger)

@@ -46,6 +46,7 @@ a Notification Service. Just send controls/animations to your Divoom device thro
       - [MODE radio](#mode-radio)
       - [MODE raw](#mode-raw)
       - [MODE scoreboard](#mode-scoreboard)
+      - [MODE signal](#mode-signal)
       - [MODE sleep](#mode-sleep)
       - [MODE timer](#mode-timer)
       - [MODE visualization](#mode-visualization)
@@ -533,6 +534,19 @@ message: 'scoreboard'
 data:
   player1: 2
   player2: 1
+```
+
+#### MODE signal
+Shows the signal channel.
+
+| Parameter | Description |
+| ---       | ---         |
+| `number`  | The number of the concrete signal. Look into your phone app and count them. |
+
+```
+message: 'signal'
+data:
+  number: 2
 ```
 
 #### MODE sleep

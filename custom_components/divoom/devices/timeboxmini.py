@@ -7,6 +7,7 @@ class TimeboxMini(Divoom):
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "TimeboxMini"
         self.size = 11
+        self.chunks = 182
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def show_scoreboard(self, blue=None, red=None):

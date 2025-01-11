@@ -53,7 +53,9 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             for discovery_info in async_discovered_service_info(self.hass, False):
                 if discovery_info.address in self._discovered_devices:
                     continue
-                if discovery_info.name.startswith("Aurabox") or discovery_info.name.startswith("Ditoo") or discovery_info.name.startswith("Pixoo") or discovery_info.name.startswith("Timebox") or discovery_info.name.startswith("Tivoo"):
+
+                device_name = discovery_info.name.lower()
+                if "aurabox" in device_name or "timebox" in device_name or "ditoo" in device_name or "pixoo" in device_name or "tivoo" in device_name or "divoom" in device_name:
                     self._discovered_devices[discovery_info.address] = discovery_info
 
             discovered_titles = [
@@ -175,7 +177,9 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         device_name = self._device_name.lower()
         if device_name.startswith("aurabox"):
             device_type = "aurabox"
-        elif device_name.startswith("ditoo"):
+        elif device_name.startswith("pixoo-backpack") or device_name.startswith("pixoo-slingbag") or device_name.startswith("divoom-backpack"):
+            device_type = "backpack"
+        elif device_name.startswith("ditoo") or device_name.startswith("divoom-ditoo") or device_name.startswith("divoom ditoo"):
             device_type = "ditoo"
         elif device_name.startswith("pixoomax") or device_name.startswith("pixoo-max") or device_name.startswith("pixoo max"):
             device_type = "pixoomax"
@@ -191,6 +195,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         device_types = [
             SelectOptionDict(value="aurabox", label="Aurabox"),
+            SelectOptionDict(value="backpack", label="Backpack"),
             SelectOptionDict(value="ditoo", label="Ditoo"),
             SelectOptionDict(value="pixoo", label="Pixoo"),
             SelectOptionDict(value="pixoomax", label="PixooMax"),

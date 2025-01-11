@@ -48,7 +48,7 @@ PARAM_FILE = 'file'
 
 PARAM_RAW = 'raw'
 
-VALID_MODES = {
+VALID_MODES = [
     'alarm',
     'brightness',
     'clock',
@@ -72,12 +72,13 @@ VALID_MODES = {
     'radio',
     'raw',
     'scoreboard',
+    'signal',
     'sleep',
     'timer',
     'visualization',
     'volume',
     'weather',
-}
+]
 
 WEATHER_MODES = {
     'clear-night': 1, 
@@ -171,6 +172,10 @@ class DivoomNotificationService(BaseNotificationService):
         if device_type == 'aurabox':
             from .devices.aurabox import Aurabox
             self._device = Aurabox(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
+        if device_type == 'backpack':
+            from .devices.backpack import BackPack
+            self._device = BackPack(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'ditoo':
             from .devices.ditoo import Ditoo
@@ -290,7 +295,7 @@ class DivoomNotificationService(BaseNotificationService):
             number = data.get(PARAM_NUMBER)
             self._device.show_effects(number=number)
 
-        elif mode == "visualization":
+        elif mode == "signal" or mode == "visualization":
             number = data.get(PARAM_NUMBER)
             self._device.show_visualization(number=number)
 
@@ -368,7 +373,12 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.send_command(command=raw[0], args=raw[1:])
 
         else:
-            _LOGGER.error("Invalid mode '{0}', must be one of 'on', 'off', 'connect', 'disconnect', 'clock', 'light', 'effects', 'visualization', 'scoreboard', 'lyrics', 'design', 'image', 'brightness', 'datetime', 'game', 'gamecontrol', 'keyboard', 'playstate', 'radio', 'volume', 'weather', 'countdown', 'noise', 'timer', 'alarm', 'memorial', 'sleep', 'raw'".format(mode))
+            validModes = ""
+            for validMode in VALID_MODES:
+                if len(validModes) > 0: validModes += ", "
+                validModes += "'{0}'".format(validMode)
+
+            _LOGGER.error("Invalid mode '{0}'. Must be one of: {1}".format(mode, validModes))
             return False
         
         return True

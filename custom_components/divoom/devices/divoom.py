@@ -543,7 +543,7 @@ class Divoom:
                 framePartsSize += pair[1]
             
             index = 0
-            for framePart in self.chunks(frameParts, 200):
+            for framePart in self.chunks(frameParts, self.chunks):
                 frame = self.make_framepart(framePartsSize, index, framePart)
                 result = self.send_command("set animation frame", frame, skipRead=True)
                 index += 1
