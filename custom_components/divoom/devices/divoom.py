@@ -258,8 +258,8 @@ class Divoom:
 
     def make_framepart(self, lsum, index, framePart):
         header = []
-        header += lsum.to_bytes(2, byteorder='little')
-        header += [index]
+        header += lsum.to_bytes(4 if self.size == 32 else 2, byteorder='little')  # Pixoo-Max expects more
+        header += index.to_bytes(2 if self.size == 32 else 1, byteorder='little') # Pixoo-Max expects more
         return header + framePart
 
     def process_image(self, image):
@@ -268,7 +268,18 @@ class Divoom:
             
             picture_frames = []
             palette = img.getpalette()
-            needsResize = True if img.size[0] != self.size or img.size[0] != self.size else False
+
+            frameSize = img.size
+            needsFlags = False
+            needsResize = False
+            if frameSize[0] != self.size or frameSize[1] != self.size:
+                frameSize = (self.size, self.size)
+                needsResize = True
+            if self.size == 32:
+                if img.size[0] == 16 and img.size[1] == 16:
+                    frameSize = img.size
+                    needsResize = False
+                else: needsFlags = True
             
             try:
                 while True:
@@ -282,7 +293,7 @@ class Divoom:
                     new_frame.paste(img, (0, 0), img.convert('RGBA'))
 
                     if needsResize:
-                        new_frame = new_frame.resize((self.size, self.size), Image.Resampling.NEAREST)
+                        new_frame = new_frame.resize(frameSize, Image.Resampling.NEAREST)
                     
                     duration = img.info['duration'] if 'duration' in img.info else None
                     picture_frames.append([new_frame, duration])
@@ -295,15 +306,15 @@ class Divoom:
                 time = pair[1]
                 
                 colors = []
-                pixels = [None] * self.size * self.size
+                pixels = [None] * frameSize[0] * frameSize[1]
                 
-                for pos in itertools.product(range(self.size), range(self.size)):
+                for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
                     y, x = pos
                     r, g, b, a = picture_frame.getpixel((x, y))
                     if [r, g, b] not in colors:
                         colors.append([r, g, b])
                     color_index = colors.index([r, g, b])
-                    pixels[x + self.size * y] = color_index
+                    pixels[x + frameSize[1] * y] = color_index
                 
                 timeCode = [0x00, 0x00]
                 if time is None: time = 0
@@ -311,23 +322,31 @@ class Divoom:
                     timeCode = time.to_bytes(2, byteorder='little')
                 
                 colorCount = len(colors)
-                if colorCount >= (self.size * self.size):
-                    colorCount = 0
+                if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
                 
+                paletteFlag = 0x00 # reset palette flag.
+                if needsFlags and len(frames) == 0: paletteFlag = 0x03 # Pixoo-Max expects 0x03 flag on first frame. might indicate bigger palette size.
+                if needsFlags and len(frames) >= 1: paletteFlag = 0x04 # Pixoo-Max expects 0x04 flag on other frames. might indicate bigger palette size.
+
                 frame = []
                 frame += timeCode
-                frame += [0x03 if self.size >= 32 else 0x00]
-                frame += colorCount.to_bytes(2 if self.size >= 32 else 1, byteorder='little')
+                frame += [paletteFlag]
+                frame += colorCount.to_bytes(2 if needsFlags else 1, byteorder='little')
                 for color in colors:
                     frame += self.convert_color(color)
                 frame += self.process_pixels(pixels, colors)
                 frames.append(frame)
         
         result = []
+
+        if needsFlags: # Pixoo-Max expects two empty frames with flags 0x05 and 0x06 at the start
+            result.append(self.make_frame([0x00, 0x00, 0x05, 0x00, 0x00]))
+            result.append(self.make_frame([0x00, 0x00, 0x06, 0x00, 0x00, 0x00]))
+
         for frame in frames:
             result.append(self.make_frame(frame))
         
-        return result
+        return [result, len(picture_frames)]
 
     def process_pixels(self, pixels, colors):
         """Correctly transform each pixel information based on https://github.com/RomRider/node-divoom-timebox-evo/blob/master/PROTOCOL.md#pixel-string-pixel_data """
@@ -512,8 +531,7 @@ class Divoom:
 
     def show_image(self, file):
         """Show image or animation on the Divoom device"""
-        frames = self.process_image(file)
-        framesCount = len(frames)
+        frames, framesCount = self.process_image(file)
         
         result = None
         if framesCount > 1:
