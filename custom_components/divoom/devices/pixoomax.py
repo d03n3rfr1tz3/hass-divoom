@@ -8,7 +8,13 @@ class PixooMax(Divoom):
         self.type = "PixooMax"
         self.size = 32
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
-        
+    
+    def make_framepart(self, lsum, index, framePart):
+        header = []
+        header += lsum.to_bytes(4, byteorder='little')  # Pixoo-Max expects more
+        header += index.to_bytes(2, byteorder='little') # Pixoo-Max expects more
+        return header + framePart
+
     def send_volume(self, value=None):
         self.logger.warning("{0}: this device does not support sending the volume.".format(self.type))
 

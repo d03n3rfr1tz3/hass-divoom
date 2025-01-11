@@ -269,17 +269,15 @@ class Divoom:
             picture_frames = []
             palette = img.getpalette()
 
-            frameSize = img.size
             needsFlags = False
             needsResize = False
-            if frameSize[0] != self.size or frameSize[1] != self.size:
-                frameSize = (self.size, self.size)
-                needsResize = True
+            frameSize = (self.size, self.size)
             if self.size == 32:
-                if img.size[0] == 16 and img.size[1] == 16:
-                    frameSize = img.size
-                    needsResize = False
+                if img.size[0] <= 16 and img.size[1] <= 16: # Pixoo-Max can handle 16x16 itself
+                    frameSize = (16, 16)
                 else: needsFlags = True
+            if img.size[0] != frameSize[0] or img.size[1] != frameSize[1]:
+                needsResize = True
             
             try:
                 while True:
@@ -301,6 +299,7 @@ class Divoom:
             except EOFError:
                 pass
             
+            framesCount = len(picture_frames)
             for pair in picture_frames:
                 picture_frame = pair[0]
                 time = pair[1]
@@ -318,7 +317,7 @@ class Divoom:
                 
                 timeCode = [0x00, 0x00]
                 if time is None: time = 0
-                if len(picture_frames) > 1:
+                if framesCount > 1:
                     timeCode = time.to_bytes(2, byteorder='little')
                 
                 colorCount = len(colors)
@@ -346,7 +345,7 @@ class Divoom:
         for frame in frames:
             result.append(self.make_frame(frame))
         
-        return [result, len(picture_frames)]
+        return [result, framesCount]
 
     def process_pixels(self, pixels, colors):
         """Correctly transform each pixel information based on https://github.com/RomRider/node-divoom-timebox-evo/blob/master/PROTOCOL.md#pixel-string-pixel_data """
