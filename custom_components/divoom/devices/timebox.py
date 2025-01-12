@@ -28,5 +28,8 @@ class Timebox(Divoom):
         args = [0x06, 0x00, 0x00, 0x00]
         return self.send_command("set view", args)
 
+    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
+        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+
     def send_keyboard(self, value=None):
         self.logger.warning("{0}: this device does not support changing the keyboard light.".format(self.type))

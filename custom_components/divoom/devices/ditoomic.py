@@ -1,11 +1,11 @@
-"""Provides class Ditoo that encapsulates the Ditoo Bluetooth communication."""
+"""Provides class DitooMic that encapsulates the DitooMic Bluetooth communication."""
 
 from .divoom import Divoom
 
-class Ditoo(Divoom):
-    """Class Ditoo encapsulates the Ditoo Bluetooth communication."""
+class DitooMic(Divoom):
+    """Class DitooMic encapsulates the DitooMic Bluetooth communication."""
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
-        self.type = "Ditoo"
+        self.type = "DitooMic"
         self.size = 16
         self.chunks = 200
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
@@ -29,7 +29,18 @@ class Ditoo(Divoom):
         return self.send_command("set view", args)
 
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+        """Show equalizer on the Divoom device"""
+        if number == None: return
+        if isinstance(number, str): number = int(number)
+
+        args = [0x1E, 0x01]
+        args += [0x01 if streamMode else 0x00]
+        args += [0x01 if audioMode else 0x00]
+        args += [0x01 if backgroundMode else 0x00]
+        args += number.to_bytes(1, byteorder='little')
+        args += [0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00] # some of these might be the landscape, but the app doesnt send them in fake mode
+        result = self.send_command("set design", args)
+        return result
 
     def send_keyboard(self, value=None):
         """Send keyboard command on the Divoom device"""

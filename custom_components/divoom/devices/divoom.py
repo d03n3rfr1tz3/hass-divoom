@@ -392,19 +392,7 @@ class Divoom:
         return self.send_command("set volume", args, skipRead=True)
 
     def send_keyboard(self, value=None):
-        """Send keyboard command on the Divoom device"""
-        if value == None: return
-        if isinstance(value, str): value = int(value)
-
-        if value == 0: # toggle keyboard
-            args = [0x02, 0x29]
-            return self.send_command("set keyboard", args, skipRead=True)
-        elif value >= 1: # switch to next keyboard effect
-            args = [0x01, 0x28]
-            return self.send_command("set keyboard", args, skipRead=True)
-        elif value <= -1: # switch to prev keyboard effect
-            args = [0x00, 0x27]
-            return self.send_command("set keyboard", args, skipRead=True)
+        self.logger.warning("{0}: the implementation is missing.".format(self.type))
 
     def send_playstate(self, value=None):
         """Send play/pause state to the Divoom device"""
@@ -526,6 +514,9 @@ class Divoom:
         self.logger.warning("{0}: the implementation is missing. it needs a decision, in which way the scoreboard can be accessed (set view or set tool).".format(self.type))
 
     def show_lyrics(self):
+        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+
+    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
         self.logger.warning("{0}: the implementation is missing.".format(self.type))
 
     def show_image(self, file):

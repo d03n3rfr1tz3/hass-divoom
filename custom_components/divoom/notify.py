@@ -29,6 +29,9 @@ PARAM_CALENDAR = 'calendar'
 PARAM_HOT = 'hot'
 
 PARAM_ALARMMODE = 'alarmmode'
+PARAM_AUDIOMODE = 'audiomode'
+PARAM_BACKGROUNDMODE = 'backgroundmode'
+PARAM_STREAMMODE = 'streammode'
 PARAM_TRIGGERMODE = 'triggermode'
 PARAM_BRIGHTNESS = 'brightness'
 PARAM_COLOR = 'color'
@@ -58,6 +61,7 @@ VALID_MODES = [
     'design',
     'disconnect',
     'effects',
+    'equalizer',
     'game',
     'gamecontrol',
     'image',
@@ -180,6 +184,10 @@ class DivoomNotificationService(BaseNotificationService):
         if device_type == 'ditoo':
             from .devices.ditoo import Ditoo
             self._device = Ditoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
+        if device_type == 'ditoomic':
+            from .devices.ditoomic import DitooMic
+            self._device = DitooMic(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
@@ -306,6 +314,13 @@ class DivoomNotificationService(BaseNotificationService):
 
         elif mode == "lyrics":
             self._device.show_lyrics()
+
+        elif mode == "equalizer":
+            number = data.get(PARAM_NUMBER)
+            audioMode = data.get(PARAM_AUDIOMODE)
+            backgroundMode = data.get(PARAM_BACKGROUNDMODE)
+            streamMode = data.get(PARAM_STREAMMODE)
+            self._device.show_equalizer(number=number, audioMode=audioMode, backgroundMode=backgroundMode, streamMode=streamMode)
 
         elif mode == "design":
             number = data.get(PARAM_NUMBER)

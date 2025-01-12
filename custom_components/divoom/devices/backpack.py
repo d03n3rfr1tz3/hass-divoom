@@ -31,6 +31,9 @@ class Backpack(Divoom):
     def show_lyrics(self):
         self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
 
+    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
+        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+
     def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
         Divoom.show_alarm(self, number=number, time=time, weekdays=weekdays, alarmMode=0, triggerMode=0, frequency=0, volume=1)
 

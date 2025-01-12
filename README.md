@@ -156,7 +156,8 @@ notify:
 * `mac` (Required): The Bluetooth MAC address for the Divoom device.
 * `port` (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
 * `device_type`: The concrete type of your Divoom device. \
-  Currently `aurabox`, `ditoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `tivoo` are supported.
+  Currently `aurabox`, `backpack`, `ditoo`, `ditoomic`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini` and `tivoo` are supported.
+  If you have a different device, you might try one that's most similar to yours.
 * `media_directory` (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
 * `escape_payload` (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with
@@ -355,6 +356,22 @@ data:
   number: 2
 ```
 
+#### MODE equalizer
+Starts the music equalizer.
+
+| Parameter         | Description |
+| ---               | ---         |
+| `number`          | The number of the concrete equalizer. Look into your phone app and count them. |
+| `audiomode`       | Actives or deactivates the original audio mode with `0` or `1`. |
+| `backgroundmode`  | Actives or deactivates the background audio mode with `0` or `1`. |
+| `streammode`      | Actives or deactivates the streaming audio mode with `0` or `1`. |
+
+```
+message: 'effects'
+data:
+  number: 2
+```
+
 #### MODE game
 Shows a game. It is theoretically possible to open games, that are not shown in your phone app, but they might not work very well.
 
@@ -410,10 +427,10 @@ data:
 #### MODE light
 Shows the light channel.
 
-| Parameter | Description |
-| ---       | ---         |
+| Parameter    | Description |
+| ---          | ---         |
 | `brightness` | The brightness value between 0 and 100. |
-| `color`   | The color of the light. Accepts an array of RGB color values. |
+| `color`      | The color of the light. Accepts an array of RGB color values. |
 
 ```
 message: 'light'
@@ -654,7 +671,9 @@ UI: \
 ### Examples per Device
 You can find more examples for each mode and all supported devices in separate files: \
 Examples for Aurabox: [devices/aurabox.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/aurabox.txt) \
+Examples for Backpack: [devices/backpack.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/backpack.txt) \
 Examples for Ditoo: [devices/ditoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/ditoo.txt) \
+Examples for Ditoo Mic: [devices/ditoomic.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/ditoomic.txt) \
 Examples for Pixoo: [devices/pixoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoo.txt) \
 Examples for Pixoo Max: [devices/pixoomax.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoomax.txt) \
 Examples for Timebox: [devices/timebox.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timebox.txt) \
