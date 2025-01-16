@@ -258,8 +258,8 @@ class Divoom:
 
     def make_framepart(self, lsum, index, framePart):
         header = []
-        header += lsum.to_bytes(4 if self.size == 32 else 2, byteorder='little')  # Pixoo-Max expects more
-        header += index.to_bytes(2 if self.size == 32 else 1, byteorder='little') # Pixoo-Max expects more
+        header += lsum.to_bytes(4 if self.screensize == 32 else 2, byteorder='little')  # Pixoo-Max expects more
+        header += index.to_bytes(2 if self.screensize == 32 else 1, byteorder='little') # Pixoo-Max expects more
         return header + framePart
 
     def process_image(self, image):
@@ -271,8 +271,8 @@ class Divoom:
 
             needsFlags = False
             needsResize = False
-            frameSize = (self.size, self.size)
-            if self.size == 32:
+            frameSize = (self.screensize, self.screensize)
+            if self.screensize == 32:
                 if img.size[0] <= 16 and img.size[1] <= 16: # Pixoo-Max can handle 16x16 itself
                     frameSize = (16, 16)
                 else: needsFlags = True
@@ -534,7 +534,7 @@ class Divoom:
                 framePartsSize += pair[1]
             
             index = 0
-            for framePart in self.chunks(frameParts, self.chunks):
+            for framePart in self.chunks(frameParts, self.chunksize):
                 frame = self.make_framepart(framePartsSize, index, framePart)
                 result = self.send_command("set animation frame", frame, skipRead=True)
                 index += 1

@@ -6,8 +6,8 @@ class Timebox(Divoom):
     """Class Timebox encapsulates the Timebox Bluetooth communication."""
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "Timebox"
-        self.size = 16
-        self.chunks = 200
+        self.screensize = 16
+        self.chunksize = 200
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def show_scoreboard(self, blue=None, red=None):

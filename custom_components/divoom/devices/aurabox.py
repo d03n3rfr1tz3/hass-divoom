@@ -6,8 +6,8 @@ class Aurabox(Divoom):
     """Class Aurabox encapsulates the Aurabox Bluetooth communication."""
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "Aurabox"
-        self.size = 10
-        self.chunks = 182
+        self.screensize = 10
+        self.chunksize = 182
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def show_scoreboard(self, blue=None, red=None):

@@ -6,8 +6,8 @@ class Pixoo(Divoom):
     """Class Pixoo encapsulates the Pixoo Bluetooth communication."""
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "Pixoo"
-        self.size = 16
-        self.chunks = 200
+        self.screensize = 16
+        self.chunksize = 200
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def send_volume(self, value=None):
