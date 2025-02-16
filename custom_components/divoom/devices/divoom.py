@@ -218,7 +218,7 @@ class Divoom:
         """Compute the payload checksum. Returned as list with LSM, MSB"""
         length = sum(payload)
         csum = []
-        csum += length.to_bytes(2, byteorder='little')
+        csum += length.to_bytes(4 if self.screensize == 32 else 2, byteorder='little')
         return csum
 
     def chunks(self, lst, n):
