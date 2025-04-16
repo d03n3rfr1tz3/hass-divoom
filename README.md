@@ -367,9 +367,10 @@ Starts the music equalizer.
 | `streammode`      | Actives or deactivates the streaming audio mode with `0` or `1`. |
 
 ```
-message: 'effects'
+message: 'equalizer'
 data:
   number: 2
+  audiomode: 1
 ```
 
 #### MODE game
