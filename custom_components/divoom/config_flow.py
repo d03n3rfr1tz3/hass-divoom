@@ -13,7 +13,7 @@ from homeassistant.components.bluetooth import (
     async_discovered_service_info,
 )
 
-from homeassistant.components.zeroconf import (
+from homeassistant.helpers.service_info.zeroconf import (
     ZeroconfServiceInfo,
 )
 
