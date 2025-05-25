@@ -123,7 +123,7 @@ async def async_get_service(
     port = 1
     device_type = "pixoo"
     media_directory = "pixelart"
-    escape_payload = False
+    escape_payload = None
 
     if discovery_info is not None:
         if CONF_HOST in discovery_info: host = discovery_info[CONF_HOST]

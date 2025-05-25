@@ -8,6 +8,7 @@ class DitooMic(Divoom):
         self.type = "DitooMic"
         self.screensize = 16
         self.chunksize = 200
+        if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def show_scoreboard(self, blue=None, red=None):

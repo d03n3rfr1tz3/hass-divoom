@@ -8,6 +8,7 @@ class Backpack(Divoom):
         self.type = "Backpack"
         self.screensize = 16
         self.chunksize = 200
+        if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def send_volume(self, value=None):

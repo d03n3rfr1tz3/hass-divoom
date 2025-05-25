@@ -8,6 +8,7 @@ class PixooMax(Divoom):
         self.type = "PixooMax"
         self.screensize = 32
         self.chunksize = 200
+        if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
     
     def make_framepart(self, lsum, index, framePart):
