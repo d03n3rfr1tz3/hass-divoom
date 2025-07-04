@@ -14,7 +14,7 @@ class PixooMax(Divoom):
     def make_framepart(self, lsum, index, framePart):
         header = []
         header += lsum.to_bytes(4, byteorder='little')  # Pixoo-Max expects more
-        header += index.to_bytes(2, byteorder='little') # Pixoo-Max expects more
+        if index >= 0: header += index.to_bytes(2, byteorder='little') # Pixoo-Max expects more
         return header + framePart
 
     def send_volume(self, value=None):

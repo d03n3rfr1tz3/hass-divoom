@@ -259,7 +259,7 @@ class Divoom:
     def make_framepart(self, lsum, index, framePart):
         header = []
         header += lsum.to_bytes(4 if self.screensize == 32 else 2, byteorder='little')  # Pixoo-Max expects more
-        header += index.to_bytes(2 if self.screensize == 32 else 1, byteorder='little') # Pixoo-Max expects more
+        if index >= 0: header += index.to_bytes(2 if self.screensize == 32 else 1, byteorder='little') # Pixoo-Max expects more
         return header + framePart
 
     def process_image(self, image):
@@ -323,9 +323,8 @@ class Divoom:
                 colorCount = len(colors)
                 if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
                 
-                paletteFlag = 0x00 # reset palette flag.
-                if needsFlags and len(frames) == 0: paletteFlag = 0x03 # Pixoo-Max expects 0x03 flag on first frame. might indicate bigger palette size.
-                if needsFlags and len(frames) >= 1: paletteFlag = 0x04 # Pixoo-Max expects 0x04 flag on other frames. might indicate bigger palette size.
+                paletteFlag = 0x00 # default palette flag.
+                if needsFlags: paletteFlag = 0x03 # Pixoo-Max expects 0x03 flag. might indicate bigger palette size.
 
                 frame = []
                 frame += timeCode
@@ -541,8 +540,8 @@ class Divoom:
         
         elif framesCount == 1:
             """Sending as Image"""
-            pair = frames[0]
-            frame = [0x00, 0x0A, 0x0A, 0x04] + pair[0]
+            pair = frames[-1]
+            frame = self.make_framepart(pair[1], -1, pair[0])
             result = self.send_command("set image", frame, skipRead=True)
         return result
 
