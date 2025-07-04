@@ -483,7 +483,7 @@ data:
 ```
 
 #### MODE off
-Turn the display off.
+Turn the display off, by setting the pixels to black, the brightness to 0 and also switching a specific `power`-flag to 0.
 
 ```
 message: 'off'
@@ -491,7 +491,8 @@ data:
 ```
 
 #### MODE on
-Turn the display on.
+Turn the display on, by setting the pixels to black, the brightness to 100 and also switching a specific `power`-flag to 1.
+Because of the pixels still being black and no automatic way to go back to the previous shown mode, you should send another command (like MODE `clock`) afterwards.
 
 ```
 message: 'on'
