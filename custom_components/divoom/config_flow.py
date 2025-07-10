@@ -55,7 +55,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     continue
 
                 device_name = discovery_info.name.lower()
-                if "aurabox" in device_name or "timebox" in device_name or "ditoo" in device_name or "pixoo" in device_name or "tivoo" in device_name or "divoom" in device_name:
+                if "aurabox" in device_name or "timebox" in device_name or "ditoo" in device_name or "pixoo" in device_name or "timoo" in device_name or "tivoo" in device_name or "divoom" in device_name:
                     self._discovered_devices[discovery_info.address] = discovery_info
 
             discovered_titles = [
@@ -159,6 +159,8 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             device_port = 2
         elif device_name.startswith("timeboxmini") or device_name.startswith("timebox-mini") or device_name.startswith("timebox mini"):
             device_port = 4
+        elif device_name.startswith("timoo"):
+            device_port = 2
 
         return self.async_show_form(
             step_id="device_port",
@@ -198,6 +200,8 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             device_type = "timeboxmini"
         elif device_name.startswith("timebox"):
             device_type = "timebox"
+        elif device_name.startswith("timoo"):
+            device_type = "timoo"
         elif device_name.startswith("tivoo"):
             device_type = "tivoo"
         self._device_type = device_type
@@ -211,6 +215,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             SelectOptionDict(value="pixoomax", label="Pixoo Max"),
             SelectOptionDict(value="timebox", label="Timebox"),
             SelectOptionDict(value="timeboxmini", label="Timebox Mini"),
+            SelectOptionDict(value="timoo", label="Timoo"),
             SelectOptionDict(value="tivoo", label="Tivoo"),
         ]
         return self.async_show_form(

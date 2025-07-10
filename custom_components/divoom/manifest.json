@@ -15,6 +15,9 @@
       "local_name": "Timebox*"
     },
     {
+      "local_name": "Timoo*"
+    },
+    {
       "local_name": "Tivoo*"
     }
   ],
@@ -50,6 +53,12 @@
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
         "device_name": "timebox*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "device_name": "timoo*"
       }
     },
     {

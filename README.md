@@ -91,7 +91,7 @@ some placeholders above.
 
 * `HCI_DEVICE`: The id of your Bluetooth controller. Typically just `hci0`, especially if you are using integrated Raspberry Pi Bluetooth.
 * `DIVOOM_DEVICE_MAC`: The MAC address of your Divoom device. You can either get it via the Divoom App or by scanning for it.
-* `DIVOOM_DEVICE_PORT`: The port of your Divoom device. Typically its just `1`, but on some audio-supported devices it might be `2`.
+* `DIVOOM_DEVICE_PORT`: The port of your Divoom device. Typically its just `1`, but on some audio-supported devices, like the Timoo, Tivoo or Ditoo it might be `2`. Timebox Mini is also a special case with its `port: 4`.
 
 ## Installation
 First we need to install the component. That can be done in two ways: Easy or Manual
@@ -124,7 +124,7 @@ Second we need to enable/ configure the component. Again that can be done in two
 * If there is an auto-discovered entry, you are lucky and can skip two steps
 * Use `Add Integration` and Search for `Divoom`
 * Choose your Divoom device from the list of discovered Bluetooth devices
-* Choose a `port`. If you are unsure, first try `1`. If that doesn't work, try `2`.
+* Choose a `port`. If you are unsure, first try `1`. If that doesn't work, try `2`, `4` or all the other digits.
 * Select your device type (e.g. `pixoo`, `ditoo` and such)
 * Click Send and then Finish
 
@@ -156,7 +156,7 @@ notify:
 * `mac` (Required): The Bluetooth MAC address for the Divoom device.
 * `port` (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
 * `device_type`: The concrete type of your Divoom device. \
-  Currently `aurabox`, `backpack`, `ditoo`, `ditoomic`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini` and `tivoo` are supported.
+  Currently `aurabox`, `backpack`, `ditoo`, `ditoomic`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `timoo` and `tivoo` are supported.
   If you have a different device, you might try one that's most similar to yours.
 * `media_directory` (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
@@ -680,6 +680,7 @@ Examples for Pixoo: [devices/pixoo.txt](https://github.com/d03n3rfr1tz3/hass-div
 Examples for Pixoo Max: [devices/pixoomax.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoomax.txt) \
 Examples for Timebox: [devices/timebox.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timebox.txt) \
 Examples for Timebox Mini: [devices/timeboxmini.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timeboxmini.txt) \
+Examples for Timoo: [devices/timoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timoo.txt) \
 Examples for Tivoo: [devices/tivoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/tivoo.txt) 
 
 ## Troubleshooting
@@ -688,7 +689,7 @@ Make sure, that you at least paired your Home Assistant device once to your Divo
 Also make sure, that your Phone is not currently connected to your Divoom device, because some don't allow that many connections.
 
 If it seems to connect, but looses connection the moment you use any mode, you might have chosen the wrong port. On Pixoo and other non-audio
-devices, it's typically `port: 1`. But on audio devices, like the Tivoo or Ditoo, it might be `port: 2`.
+devices, it's typically `port: 1`. But on audio devices, like the Timoo, Tivoo or Ditoo, it might be `port: 2`. Timebox Mini is also a special case with its `port: 4`.
 
 ### GIF does not work
 
