@@ -9,6 +9,9 @@
       "local_name": "Ditoo*"
     },
     {
+      "local_name": "Divoom*"
+    },
+    {
       "local_name": "Pixoo*"
     },
     {
@@ -41,6 +44,12 @@
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
         "device_name": "ditoo*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "device_name": "divoom*"
       }
     },
     {

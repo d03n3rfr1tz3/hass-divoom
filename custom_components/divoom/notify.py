@@ -178,8 +178,8 @@ class DivoomNotificationService(BaseNotificationService):
             self._device = Aurabox(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'backpack':
-            from .devices.backpack import BackPack
-            self._device = BackPack(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+            from .devices.backpack import Backpack
+            self._device = Backpack(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'ditoo':
             from .devices.ditoo import Ditoo
