@@ -78,6 +78,7 @@ VALID_MODES = [
     'scoreboard',
     'signal',
     'sleep',
+    'temperature',
     'timer',
     'visualization',
     'volume',
@@ -243,10 +244,10 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.reconnect(skipPing=skipPing)
 
         if mode == 'on':
-            self._device.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
+            self._device.send_on()
 
         elif mode == 'off':
-            self._device.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
+            self._device.send_off()
         
         elif mode == "connect":
             self._device.connect()
@@ -297,6 +298,11 @@ class DivoomNotificationService(BaseNotificationService):
             color = data.get(PARAM_COLOR)
             hot = data.get(PARAM_HOT)
             self._device.show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
+
+        elif mode == "temperature":
+            value = data.get(PARAM_TEMP) or data.get(PARAM_VALUE)
+            color = data.get(PARAM_COLOR)
+            self._device.show_temperature(value=value, color=color)
 
         elif mode == "light":
             brightness = data.get(PARAM_BRIGHTNESS)

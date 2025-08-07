@@ -371,6 +371,14 @@ class Divoom:
     def send_ping(self):
         """Send a ping (actually it's requesting current view) to the Divoom device to check connectivity"""
         return self.send_command("get view", [], skipRead=False)
+    
+    def send_on(self):
+        """Sets the display on of the Divoom device"""
+        self.show_light(color=[0x01, 0x01, 0x01], brightness=100, power=True)
+    
+    def send_off(self):
+        """Sets the display off of the Divoom device"""
+        self.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
 
     def send_brightness(self, value=None):
         """Send brightness to the Divoom device"""
@@ -458,6 +466,12 @@ class Divoom:
         if hot != None:
             args = [0x01 if hot == True or hot == 1 else 0x00]
             self.send_command("set hot", args, skipRead=True)
+        return result
+
+    def show_temperature(self, value=None, color=None):
+        """Show temperature on the Divoom device in the color"""
+        result = self.show_clock(clock=None, twentyfour=None, weather=None, temp=True, calendar=None, color=color, hot=None)
+        self.send_command("set temp type", [0x01 if value == True or value == 1 else 0x00])
         return result
 
     def show_light(self, color, brightness=None, power=None):

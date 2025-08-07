@@ -48,6 +48,7 @@ a Notification Service. Just send controls/animations to your Divoom device thro
       - [MODE scoreboard](#mode-scoreboard)
       - [MODE signal](#mode-signal)
       - [MODE sleep](#mode-sleep)
+      - [MODE temperature](#mode-temperature)
       - [MODE timer](#mode-timer)
       - [MODE visualization](#mode-visualization)
       - [MODE volume](#mode-volume)
@@ -265,7 +266,7 @@ data:
 ```
 
 #### MODE clock
-Shows the clock channel.
+Shows the clock channel. Be aware, that this mode is very limited on older device like Aurabox or Timebox Mini.
 
 | Parameter | Description |
 | ---       | ---         |
@@ -590,6 +591,21 @@ data:
   volume: 10
   color: [255, 255, 0]
   brightness: 50
+```
+
+#### MODE temperature
+Shows the temperature channel. Be aware, that this mode is specifically for Aurabox or Timebox Mini. It still works on other device, but utilizes the `clock` mode and therefore might change settings unintentional.
+
+| Parameter | Description |
+| ---       | ---         |
+| `value` | Changes between °C or °F unit. <br/> `0` = °C, `1` = °F. Defaults to °C. |
+| `color`   | The color of the temperature. Accepts an array of RGB color values. |
+
+```
+message: 'temperature'
+data:
+  value: 0
+  color: [250, 0, 0]
 ```
 
 #### MODE timer

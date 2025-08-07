@@ -7,34 +7,17 @@ message: 'brightness'
 data:
   brightness: 75
 
-# activate channel 'clock' in rainbow style with specific components
+# activate channel 'clock' with 24h format
 message: 'clock'
 data:
-  clock: 1
-  weather: 0
-  temp: 0
-  calendar: 1
+  twentyfour: 1
   color: [250, 0, 0]
 
-# activate channel 'clock' in analog style with specific components
-message: 'clock'
+# activate channel 'temperature' with °C
+message: 'temperature'
 data:
-  clock: 5
-  weather: 1
-  temp: 1
-  calendar: 1
-  color: [0, 250, 0]
-
-# activate light mode with specific color
-message: 'light'
-data:
-  brightness: 75
+  value: 0
   color: [250, 0, 0]
-
-# activate light mode with fading colors
-message: 'light'
-data:
-  brightness: 75
 
 # activate channel 'effects' with specific effect
 message: 'effects'
@@ -51,10 +34,6 @@ message: 'scoreboard'
 data:
   player1: 2
   player2: 1
-
-# activate channel 'lyrics'
-message: 'lyrics'
-data:
 
 # activate an image or animation, depending of the number of frames found in the file
 message: 'image'
@@ -87,16 +66,6 @@ message: 'radio'
 data:
   value: 1
   frequency: 100.3
-
-# activates the countdown with 1 minute and 30 seconds
-message: 'countdown'
-data:
-  countdown: '01:30'
-
-# activates the noise meter
-message: 'noise'
-data:
-  value: 1
 
 # activates the timer
 message: 'timer'
