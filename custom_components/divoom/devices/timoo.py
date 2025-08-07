@@ -8,6 +8,7 @@ class Timoo(Divoom):
         self.type = "Timoo"
         self.screensize = 16
         self.chunksize = 200
+        self.colorpalette = None
         if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         

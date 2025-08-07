@@ -8,9 +8,46 @@ class Aurabox(Divoom):
         self.type = "Aurabox"
         self.screensize = 10
         self.chunksize = 182
+        self.colorpalette = [
+            [000, 000, 000],
+            [255, 000, 000],
+            [000, 255, 000],
+            [255, 255, 000],
+            [000, 000, 255],
+            [255, 000, 255],
+            [000, 255, 255],
+            [255, 255, 255]
+        ]
         if escapePayload == None: escapePayload = True
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
+    def get_color(self, color):
+         if color in self.colorpalette:
+            return self.colorpalette.index(color)
+         return 0
+
+    def make_frame(self, frame):
+        length = len(frame)
+        return [frame, length]
+
+    def process_frame(self, pixels, colors, colorCount, framesCount, time, paletteFlag, needsFlags):
+        result = []
+        if framesCount > 1:
+            result += time.to_bytes(1, byteorder='little')
+        for pixelset in self.chunks(pixels, 2):
+            color1 = colors[pixelset[0]]
+            color2 = colors[pixelset[1]]
+            colorIndex1 = self.get_color(color1)
+            colorIndex2 = self.get_color(color2)
+            result += [(colorIndex1>>4) + (colorIndex2>>4)]
+        return result
+
+    def process_pixels(self, pixels, colors):
+        result = []
+        for pixel in pixels:
+            result += colors[pixel]
+        return result
+    
     def send_on(self):
         self.logger.warning("{0}: this device does not support light view.".format(self.type))
     
@@ -18,6 +55,20 @@ class Aurabox(Divoom):
         """Sets the display off of the Divoom device"""
         args = [0x02]
         return self.send_command("set view", args)
+
+    def send_brightness(self, value=None):
+        """Send brightness to the Divoom device"""
+        if value == None: return
+        if isinstance(value, str): value = int(value)
+        
+        args = []
+        if value >= 75:
+            args += (210).to_bytes(1, byteorder='big')
+        elif value >= 25:
+            args += (63).to_bytes(1, byteorder='big')
+        else:
+            args += (0).to_bytes(1, byteorder='big')
+        return self.send_command("set lightness", args, skipRead=True)
 
     def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""

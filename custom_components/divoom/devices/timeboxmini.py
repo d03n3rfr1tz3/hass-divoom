@@ -8,9 +8,35 @@ class TimeboxMini(Divoom):
         self.type = "TimeboxMini"
         self.screensize = 11
         self.chunksize = 182
+        self.colorpalette = None
         if escapePayload == None: escapePayload = True
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
+    def make_frame(self, frame):
+        length = len(frame)
+        return [frame, length]
+
+    def process_frame(self, pixels, colors, colorCount, framesCount, time, paletteFlag, needsFlags):
+        timeCode = [0x00, 0x00]
+        if framesCount > 1:
+            timeCode = time.to_bytes(1, byteorder='little')
+        
+        result = []
+        result += timeCode
+        for pixelset in self.chunks(pixels, 2):
+            color1 = colors[pixelset[0]]
+            color2 = colors[pixelset[1]]
+            result += [((color1[0] & 0xf0)>>4) + (color1[1] & 0xf0)]
+            result += [((color1[2] & 0xf0)>>4) + (color2[0] & 0xf0)]
+            result += [((color2[1] & 0xf0)>>4) + (color2[2] & 0xf0)]
+        return result
+
+    def process_pixels(self, pixels, colors):
+        result = []
+        for pixel in pixels:
+            result += colors[pixel]
+        return result
+    
     def send_on(self):
         self.logger.warning("{0}: this device does not support light view.".format(self.type))
     

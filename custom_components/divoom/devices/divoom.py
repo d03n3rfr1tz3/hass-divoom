@@ -17,6 +17,7 @@ class Divoom:
         "set hot": 0x26,
         "set temp type": 0x2b,
         "set time type": 0x2c,
+        "set lightness": 0x32,
         "set sleeptime": 0x40,
         "set alarm": 0x43,
         "set image": 0x44,
@@ -248,7 +249,11 @@ class Divoom:
         return [0x01] + escaped_payload + [0x02]
 
     def convert_color(self, color):
-        return color[0].to_bytes(1, byteorder='big') + color[1].to_bytes(1, byteorder='big') + color[2].to_bytes(1, byteorder='big')
+        result = []
+        result += color[0].to_bytes(1, byteorder='big')
+        result += color[1].to_bytes(1, byteorder='big')
+        result += color[2].to_bytes(1, byteorder='big')
+        return result
 
     def make_frame(self, frame):
         length = len(frame) + 3
@@ -266,9 +271,13 @@ class Divoom:
         frames = []
         with Image.open(image) as img:
             
-            picture_frames = []
-            palette = img.getpalette()
+            img_palette = None
+            if self.colorpalette is not None: 
+                colorpalette = [color for colors in self.colorpalette for color in colors]
+                img_palette = Image.new('P', (16, 16))
+                img_palette.putpalette(colorpalette * int(16 * 16 / len(self.colorpalette)))
 
+            picture_frames = []
             needsFlags = False
             needsResize = False
             frameSize = (self.screensize, self.screensize)
@@ -281,14 +290,12 @@ class Divoom:
             
             try:
                 while True:
-                    try:
-                        if img.mode in ("L", "LA", "P", "PA") and not img.getpalette():
-                            img.putpalette(palette)
-                    except ValueError as error:
-                        self.logger.warning("{0}: error while trying to put palette into GIF frames. The GIF might be displayed with errors. {1}".format(self.type, error))
+                    img_color = img
+                    if img_palette is not None:
+                        img_color = img.convert('P', palette=img_palette, dither=Image.Dither.NONE)
 
                     new_frame = Image.new('RGBA', img.size)
-                    new_frame.paste(img, (0, 0), img.convert('RGBA'))
+                    new_frame.paste(img, (0, 0), img_color.convert('RGBA'))
 
                     if needsResize:
                         new_frame = new_frame.resize(frameSize, Image.Resampling.NEAREST)
@@ -315,10 +322,7 @@ class Divoom:
                     color_index = colors.index([r, g, b])
                     pixels[x + frameSize[1] * y] = color_index
                 
-                timeCode = [0x00, 0x00]
                 if time is None: time = 0
-                if framesCount > 1:
-                    timeCode = time.to_bytes(2, byteorder='little')
                 
                 colorCount = len(colors)
                 if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
@@ -326,13 +330,7 @@ class Divoom:
                 paletteFlag = 0x00 # default palette flag.
                 if needsFlags: paletteFlag = 0x03 # Pixoo-Max expects 0x03 flag. might indicate bigger palette size.
 
-                frame = []
-                frame += timeCode
-                frame += [paletteFlag]
-                frame += colorCount.to_bytes(2 if needsFlags else 1, byteorder='little')
-                for color in colors:
-                    frame += self.convert_color(color)
-                frame += self.process_pixels(pixels, colors)
+                frame = self.process_frame(pixels, colors, colorCount, framesCount, time, paletteFlag, needsFlags)
                 frames.append(frame)
         
         result = []
@@ -345,6 +343,20 @@ class Divoom:
             result.append(self.make_frame(frame))
         
         return [result, framesCount]
+    
+    def process_frame(self, pixels, colors, colorCount, framesCount, time, paletteFlag, needsFlags):
+        timeCode = [0x00, 0x00]
+        if framesCount > 1:
+            timeCode = time.to_bytes(2, byteorder='little')
+        
+        result = []
+        result += timeCode
+        result += [paletteFlag]
+        result += colorCount.to_bytes(2 if needsFlags else 1, byteorder='little')
+        for color in colors:
+            result += self.convert_color(color)
+        result += self.process_pixels(pixels, colors)
+        return result
 
     def process_pixels(self, pixels, colors):
         """Correctly transform each pixel information based on https://github.com/RomRider/node-divoom-timebox-evo/blob/master/PROTOCOL.md#pixel-string-pixel_data """
