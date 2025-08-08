@@ -30,7 +30,7 @@ class Aurabox(Divoom):
         length = len(frame)
         return [frame, length]
 
-    def process_frame(self, pixels, colors, colorCount, framesCount, time, paletteFlag, needsFlags):
+    def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):
         result = []
         if framesCount > 1:
             result += time.to_bytes(1, byteorder='little')

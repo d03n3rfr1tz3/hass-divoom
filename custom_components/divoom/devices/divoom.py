@@ -219,7 +219,7 @@ class Divoom:
         """Compute the payload checksum. Returned as list with LSM, MSB"""
         length = sum(payload)
         csum = []
-        csum += length.to_bytes(4 if self.screensize == 32 else 2, byteorder='little')
+        csum += length.to_bytes(4 if length >= 65535 else 2, byteorder='little')
         return csum
 
     def chunks(self, lst, n):
@@ -330,10 +330,7 @@ class Divoom:
                 colorCount = len(colors)
                 if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
                 
-                paletteFlag = 0x00 # default palette flag.
-                if needsFlags: paletteFlag = 0x03 # Pixoo-Max expects 0x03 flag. might indicate bigger palette size.
-
-                frame = self.process_frame(pixels, colors, colorCount, framesCount, time, paletteFlag, needsFlags)
+                frame = self.process_frame(pixels, colors, colorCount, framesCount, time, needsFlags)
                 frames.append(frame)
         
         result = []
@@ -347,11 +344,14 @@ class Divoom:
         
         return [result, framesCount]
     
-    def process_frame(self, pixels, colors, colorCount, framesCount, time, paletteFlag, needsFlags):
+    def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):
         timeCode = [0x00, 0x00]
         if framesCount > 1:
             timeCode = time.to_bytes(2, byteorder='little')
         
+        paletteFlag = 0x00 # default palette flag.
+        if needsFlags: paletteFlag = 0x03 # Pixoo-Max expects 0x03 flag. might indicate bigger palette size.
+
         result = []
         result += timeCode
         result += [paletteFlag]

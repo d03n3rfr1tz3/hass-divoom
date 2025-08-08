@@ -12,15 +12,6 @@ class PixooMax(Divoom):
         if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
     
-    def make_framepart(self, lsum, index, framePart):
-        header = []
-        if index >= 0:
-            header += lsum.to_bytes(4, byteorder='little')  # Pixoo-Max expects more
-            header += index.to_bytes(2, byteorder='little') # Pixoo-Max expects more
-        else:
-            header += [0x00, 0x0A, 0x0A, 0x04] # Fixed header on single frames
-        return header + framePart
-
     def send_volume(self, value=None):
         self.logger.warning("{0}: this device does not support sending the volume.".format(self.type))
 

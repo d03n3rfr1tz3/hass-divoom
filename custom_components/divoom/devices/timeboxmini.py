@@ -16,7 +16,7 @@ class TimeboxMini(Divoom):
         length = len(frame)
         return [frame, length]
 
-    def process_frame(self, pixels, colors, colorCount, framesCount, time, paletteFlag, needsFlags):
+    def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):
         timeCode = [0x00, 0x00]
         if framesCount > 1:
             timeCode = time.to_bytes(1, byteorder='little')
