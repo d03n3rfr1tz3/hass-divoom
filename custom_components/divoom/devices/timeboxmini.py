@@ -16,28 +16,26 @@ class TimeboxMini(Divoom):
         length = len(frame)
         return [frame, length]
 
+    def make_framepart(self, lsum, index, framePart):
+        header = []
+        header += [0x00, 0x0A, 0x0A, 0x04] # Fixed header
+        if index >= 0:
+            header += index.to_bytes(1, byteorder='little') # Pixoo-Max expects more
+        return header + framePart
+
     def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):
-        timeCode = [0x00, 0x00]
-        if framesCount > 1:
-            timeCode = time.to_bytes(1, byteorder='little')
-        
         result = []
-        result += timeCode
+        if framesCount > 1:
+            result += time.to_bytes(1, byteorder='little')
         for pixelset in self.chunks(pixels, 2):
-            color1 = colors[pixelset[0]]
-            color2 = colors[pixelset[1]]
+            col1 = True if len(pixelset) > 0 else False
+            col2 = True if len(pixelset) > 1 else False
+            color1 = colors[pixelset[0]] if col1 else [0, 0, 0]
+            color2 = colors[pixelset[1]] if col2 else [0, 0, 0]
             result += [((color1[0] & 0xf0)>>4) + (color1[1] & 0xf0)]
             result += [((color1[2] & 0xf0)>>4) + (color2[0] & 0xf0)]
-            result += [((color2[1] & 0xf0)>>4) + (color2[2] & 0xf0)]
+            if col2: result += [((color2[1] & 0xf0)>>4) + (color2[2] & 0xf0)]
         return result
-
-    def send_on(self):
-        self.logger.warning("{0}: this device does not support light view.".format(self.type))
-    
-    def send_off(self):
-        """Sets the display off of the Divoom device"""
-        args = [0x02]
-        return self.send_command("set view", args)
 
     def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""
@@ -57,10 +55,37 @@ class TimeboxMini(Divoom):
         args += [0x01 if value == True or value == 1 else 0x00]
         if not color is None:
             args += self.convert_color(color)
+        args += [0x00]
         return self.send_command("set view", args)
 
     def show_light(self, color, brightness=None, power=None):
-        self.logger.warning("{0}: this device does not support light view.".format(self.type))
+        """Show light on the Divoom device in the color"""
+        if brightness == None: brightness = 100
+        if isinstance(brightness, str): brightness = int(brightness)
+
+        args = [0x02]
+        if color is None:
+            args += [0xFF, 0xFF, 0xFF]
+            args += brightness.to_bytes(1, byteorder='big')
+            args += [0x01]
+        else:
+            args += self.convert_color(color)
+            args += brightness.to_bytes(1, byteorder='big')
+            args += [0x00]
+        return self.send_command("set view", args)
+
+    def show_visualization(self, number, color1=None, color2=None):
+        """Show visualization on the Divoom device"""
+        if number == None: return
+        if isinstance(number, str): number = int(number)
+        if color1 is None: color1 = [0, 0, 0]
+        if color2 is None: color2 = [255, 255, 255]
+
+        args = [0x04]
+        args += number.to_bytes(1, byteorder='big')
+        args += self.convert_color(color1)
+        args += self.convert_color(color2)
+        return self.send_command("set view", args)
 
     def show_timer(self, value=None):
         """Show timer tool on the Divoom device"""

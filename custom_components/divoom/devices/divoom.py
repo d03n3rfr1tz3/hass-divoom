@@ -372,13 +372,8 @@ class Divoom:
             pixelBits = "{0:b}".format(pixel).zfill(8)
             pixelString += pixelBits[::-1][:bitsPerPixel:]
         
-        chunkSize = 8
-        pixelChunks = []
-        for i in range(0, len(pixelString), chunkSize):
-            pixelChunks += [pixelString[i:i+chunkSize]]
-        
         result = []
-        for pixel in pixelChunks:
+        for pixel in self.chunks(pixelString, 8):
             result += [int(pixel[::-1], 2)]
         
         return result
@@ -516,7 +511,7 @@ class Divoom:
         args += number.to_bytes(1, byteorder='big')
         return self.send_command("set view", args)
 
-    def show_visualization(self, number):
+    def show_visualization(self, number, color1, color2):
         """Show visualization on the Divoom device"""
         if number == None: return
         if isinstance(number, str): number = int(number)

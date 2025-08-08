@@ -19,6 +19,12 @@ data:
   value: 0
   color: [250, 0, 0]
 
+# activate light mode with specific color
+message: 'light'
+data:
+  brightness: 75
+  color: [250, 0, 0]
+
 # activate channel 'effects' with specific effect
 message: 'effects'
 data:
@@ -28,6 +34,12 @@ data:
 message: 'visualization'
 data:
   number: 2
+
+# activate channel 'visualization' with specific visualization and colors
+message: 'visualization'
+data:
+  number: 2
+  color: [[0, 0, 0], [250, 0, 0]]
 
 # activate scoreboard with some scores
 message: 'scoreboard'
