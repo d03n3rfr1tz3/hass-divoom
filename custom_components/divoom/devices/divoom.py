@@ -263,8 +263,11 @@ class Divoom:
 
     def make_framepart(self, lsum, index, framePart):
         header = []
-        header += lsum.to_bytes(4 if self.screensize == 32 else 2, byteorder='little')  # Pixoo-Max expects more
-        if index >= 0: header += index.to_bytes(2 if self.screensize == 32 else 1, byteorder='little') # Pixoo-Max expects more
+        if index >= 0:
+            header += lsum.to_bytes(4 if self.screensize == 32 else 2, byteorder='little')  # Pixoo-Max expects more
+            header += index.to_bytes(2 if self.screensize == 32 else 1, byteorder='little') # Pixoo-Max expects more
+        else:
+            header += [0x00, 0x0A, 0x0A, 0x04] # Fixed header on single frames
         return header + framePart
 
     def process_image(self, image):

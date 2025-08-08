@@ -31,12 +31,6 @@ class TimeboxMini(Divoom):
             result += [((color2[1] & 0xf0)>>4) + (color2[2] & 0xf0)]
         return result
 
-    def process_pixels(self, pixels, colors):
-        result = []
-        for pixel in pixels:
-            result += colors[pixel]
-        return result
-    
     def send_on(self):
         self.logger.warning("{0}: this device does not support light view.".format(self.type))
     
