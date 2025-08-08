@@ -51,15 +51,16 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is None or CONF_MAC not in user_input:
 
             for discovery_info in async_discovered_service_info(self.hass, False):
-                if discovery_info.address in self._discovered_devices:
+                discovery_address = discovery_info.address.lower()
+                if discovery_address in self._discovered_devices:
                     continue
 
                 device_name = discovery_info.name.lower()
                 if "aurabox" in device_name or "timebox" in device_name or "ditoo" in device_name or "pixoo" in device_name or "timoo" in device_name or "tivoo" in device_name or "divoom" in device_name:
-                    self._discovered_devices[discovery_info.address] = discovery_info
+                    self._discovered_devices[discovery_address] = discovery_info
 
             discovered_titles = [
-                SelectOptionDict(value=address, label="{} ({})".format(discovery.name, discovery.address))
+                SelectOptionDict(value=address, label="{} ({})".format(discovery.name, discovery.address.lower()))
                 for (address, discovery) in self._discovered_devices.items()
             ]
             return self.async_show_form(
@@ -109,7 +110,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle a flow initialized by bluetooth discovery."""
 
         self._device_name = discovery_info.name
-        self._device_mac = discovery_info.address
+        self._device_mac = discovery_info.address.lower()
 
         await self.async_set_unique_id(self._device_mac)
         await self.async_check_uniqueness()
@@ -126,7 +127,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         """Handle a flow initialized by zeroconf discovery."""
 
         self._device_host = discovery_info.host
-        self._device_mac = discovery_info.properties.get("device_mac")
+        self._device_mac = discovery_info.properties.get("device_mac").lower()
         self._device_name = discovery_info.properties.get("device_name")
 
         await self.async_set_unique_id(self._device_mac)
@@ -250,7 +251,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     CONF_PORT: self._device_port,
                     CONF_DEVICE_TYPE: self._device_type,
                     CONF_MEDIA_DIR: CONF_MEDIA_DIR_DEFAULT,
-                    CONF_ESCAPE_PAYLOAD: False
+                    CONF_ESCAPE_PAYLOAD: None
                 },
             )
 
