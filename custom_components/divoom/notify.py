@@ -316,7 +316,7 @@ class DivoomNotificationService(BaseNotificationService):
         elif mode == "signal" or mode == "visualization":
             number = data.get(PARAM_NUMBER)
             color = data.get(PARAM_COLOR)
-            self._device.show_visualization(number=number, color1=color[0] if color is not None and len(color) > 0 else None, color1=color[1] if color is not None and len(color) > 1 else None)
+            self._device.show_visualization(number=number, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
 
         elif mode == "scoreboard":
             player1 = data.get(PARAM_PLAYER1)
