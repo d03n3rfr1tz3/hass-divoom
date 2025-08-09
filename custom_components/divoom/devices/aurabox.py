@@ -9,22 +9,28 @@ class Aurabox(Divoom):
         self.screensize = 10
         self.chunksize = 182
         self.colorpalette = [
-            [000, 000, 000],
-            [255, 000, 000],
-            [000, 255, 000],
-            [255, 255, 000],
-            [000, 000, 255],
-            [255, 000, 255],
-            [000, 255, 255],
+            [  0,   0,   0],
+            [255,   0,   0],
+            [  0, 255,   0],
+            [255, 255,   0],
+            [  0,   0, 255],
+            [255,   0, 255],
+            [  0, 255, 255],
             [255, 255, 255]
         ]
         if escapePayload == None: escapePayload = True
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def get_color(self, color):
+         if color[0] <=   5: color[0] =   0
+         if color[1] <=   5: color[1] =   0
+         if color[2] <=   5: color[2] =   0
+         if color[0] >= 250: color[0] = 255
+         if color[1] >= 250: color[1] = 255
+         if color[2] >= 250: color[2] = 255
          if color in self.colorpalette:
             return self.colorpalette.index(color)
-         return 0
+         return -1
 
     def make_frame(self, frame):
         length = len(frame)
@@ -42,11 +48,9 @@ class Aurabox(Divoom):
         if framesCount > 1:
             result += time.to_bytes(1, byteorder='little')
         for pixelset in self.chunks(pixels, 2):
-            color1 = colors[pixelset[0]]
-            color2 = colors[pixelset[1]]
-            colorIndex1 = self.get_color(color1)
-            colorIndex2 = self.get_color(color2)
-            result += [(colorIndex1>>4) + (colorIndex2>>4)]
+            color1 = self.get_color(colors[pixelset[0]])
+            color2 = self.get_color(colors[pixelset[1]])
+            result += [((color1 if color1 >= 0 else 0) << 4) | (color2 if color2 >= 0 else 0)]
         return result
 
     def send_brightness(self, value=None):
@@ -75,64 +79,56 @@ class Aurabox(Divoom):
 
     def show_temperature(self, value=None, color=None):
         """Show temperature on the Divoom device in the color"""
-        if value == None: value = False
 
         args = [0x01]
-        args += [0x01 if value == True or value == 1 else 0x00]
-        if not color is None:
-            args += self.convert_color(color)
-        args += [0x00]
-        return self.send_command("set view", args)
+        result = self.send_command("set view", args)
+
+        if value is not None:
+            if value == False or value == 0:
+                self.send_command("set temp unit", [0x00])
+            if value == True or value == 1:
+                self.send_command("set temp unit", [0x01])
+
+        return result
 
     def show_light(self, color, brightness=None, power=None):
         """Show light on the Divoom device in the color"""
-        if brightness == None: brightness = 100
         if isinstance(brightness, str): brightness = int(brightness)
 
+        if brightness is not None:
+            self.send_brightness(brightness)
+        
         args = [0x02]
-        if color is None:
-            args += [0xFF, 0xFF, 0xFF]
-            args += brightness.to_bytes(1, byteorder='big')
-            args += [0x01]
-        else:
-            args += self.convert_color(color)
-            args += brightness.to_bytes(1, byteorder='big')
-            args += [0x00]
+        result = self.send_command("set view", args)
+
+        if color is not None:
+            colorIndex = self.get_color(color)
+            if colorIndex >= 0:
+                self.send_command("set light color", colorIndex.to_bytes(1, byteorder='big'))
+            else: self.logger.warning("{0}: this device does not support RGB values. please chose from one of the following colors: {1}".format(self.type, ', '.join(str(x) for x in self.colorpalette)))
+        
+        return result
+
+    def show_effects(self, number):
+        """Show effects on the Divoom device"""
+        if number == None: return
+        if isinstance(number, str): number = int(number)
+
+        args += (4 + number).to_bytes(1, byteorder='big')
         return self.send_command("set view", args)
 
     def show_visualization(self, number, color1=None, color2=None):
         """Show visualization on the Divoom device"""
-        if number == None: return
-        if isinstance(number, str): number = int(number)
-        if color1 is None: color1 = [0, 0, 0]
-        if color2 is None: color2 = [255, 255, 255]
 
-        args = [0x04]
+        args = [0x03]
         args += number.to_bytes(1, byteorder='big')
-        args += self.convert_color(color1)
-        args += self.convert_color(color2)
         return self.send_command("set view", args)
 
     def show_timer(self, value=None):
-        """Show timer tool on the Divoom device"""
-        if value == None: value = 2
-        if isinstance(value, str): value = int(value)
-
-        args = [0x06]
-        args += value.to_bytes(1, byteorder='big')
-        return self.send_command("set view", args)
+        self.logger.warning("{0}: this device does not support timer view.".format(self.type))
 
     def show_scoreboard(self, blue=None, red=None):
-        """Show scoreboard on the Divoom device with specific score"""
-        if blue == None: blue = 0
-        if isinstance(blue, str): blue = int(blue)
-        if red == None: red = 0
-        if isinstance(red, str): red = int(red)
-
-        args = [0x07]
-        args += red.to_bytes(2, byteorder='little')
-        args += blue.to_bytes(2, byteorder='little')
-        return self.send_command("set view", args)
+        self.logger.warning("{0}: this device does not support scoreboard view.".format(self.type))
 
     def show_lyrics(self):
         self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
