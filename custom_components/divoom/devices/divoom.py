@@ -276,12 +276,6 @@ class Divoom:
         frames = []
         with Image.open(image) as img:
             
-            img_palette = None
-            if self.colorpalette is not None: 
-                colorpalette = [color for colors in self.colorpalette for color in colors]
-                img_palette = Image.new('P', (16, 16))
-                img_palette.putpalette(colorpalette * int(16 * 16 / len(self.colorpalette)))
-
             picture_frames = []
             needsFlags = False
             needsResize = False
@@ -295,9 +289,8 @@ class Divoom:
             
             try:
                 while True:
-                    img_color = img.convert('P', palette=img_palette, dither=Image.Dither.NONE) if img_palette is not None else img
                     new_frame = Image.new('RGBA', img.size)
-                    new_frame.paste(img_color, (0, 0), img_color.convert('RGBA'))
+                    new_frame.paste(img, (0, 0), img.convert('RGBA'))
 
                     if needsResize:
                         new_frame = new_frame.resize(frameSize, Image.Resampling.NEAREST)

@@ -22,15 +22,16 @@ class Aurabox(Divoom):
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def get_color(self, color):
-         if color[0] <=   5: color[0] =   0
-         if color[1] <=   5: color[1] =   0
-         if color[2] <=   5: color[2] =   0
-         if color[0] >= 250: color[0] = 255
-         if color[1] >= 250: color[1] = 255
-         if color[2] >= 250: color[2] = 255
-         if color in self.colorpalette:
+        if color[0] <= 127: color[0] =   0
+        if color[1] <= 127: color[1] =   0
+        if color[2] <= 127: color[2] =   0
+        if color[0] >= 128: color[0] = 255
+        if color[1] >= 128: color[1] = 255
+        if color[2] >= 128: color[2] = 255
+
+        if color in self.colorpalette:
             return self.colorpalette.index(color)
-         return -1
+        return -1
 
     def make_frame(self, frame):
         length = len(frame)
