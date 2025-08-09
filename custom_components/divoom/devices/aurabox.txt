@@ -53,12 +53,6 @@ message: 'datetime'
 data:
   value: '2024-12-31 18:30:00'
 
-# update weather by setting 25°C and rainy weather
-message: 'weather'
-data:
-  value: '25°C'
-  weather: 6
-
 # change the play/pause state
 message: 'playstate'
 data:
@@ -80,12 +74,13 @@ message: 'alarm'
 data:
   number: 0
   value: '07:30'
-  weekday:
-    - mon
-    - tue
-    - wed
-    - thu
-    - fri
+
+# activate the sleep mode for 30 minutes
+message: 'sleep'
+data:
+  value: 1
+  time: 30
+  sleepmode: 4
 
 # activates the memorial in the first slot for 0:00 new year
 message: 'memorial'

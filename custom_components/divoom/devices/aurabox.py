@@ -46,11 +46,32 @@ class Aurabox(Divoom):
     def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):
         result = []
         if framesCount > 1:
+            if time > 255: time = 255
             result += time.to_bytes(1, byteorder='little')
         for pixelset in self.chunks(pixels, 2):
             color1 = self.get_color(colors[pixelset[0]])
             color2 = self.get_color(colors[pixelset[1]])
-            result += [((color1 if color1 >= 0 else 0) << 4) | (color2 if color2 >= 0 else 0)]
+            result += [((color2 if color2 >= 0 else 0) << 4) | (color1 if color1 >= 0 else 0)]
+        return result
+
+    def show_image(self, file):
+        """Show image or animation on the Divoom device"""
+        frames, framesCount = self.process_image(file)
+        
+        result = None
+        if framesCount > 1:
+            """Sending as Animation"""
+            index = 0
+            for pair in frames:
+                frame = self.make_framepart(pair[1], index, pair[0])
+                result = self.send_command("set animation frame", frame, skipRead=True)
+                index += 1
+        
+        elif framesCount == 1:
+            """Sending as Image"""
+            pair = frames[-1]
+            frame = self.make_framepart(pair[1], -1, pair[0])
+            result = self.send_command("set image", frame, skipRead=True)
         return result
 
     def send_brightness(self, value=None):
@@ -114,6 +135,7 @@ class Aurabox(Divoom):
         if number == None: return
         if isinstance(number, str): number = int(number)
 
+        args = []
         args += (4 + number).to_bytes(1, byteorder='big')
         return self.send_command("set view", args)
 
@@ -123,6 +145,37 @@ class Aurabox(Divoom):
         args = [0x03]
         args += number.to_bytes(1, byteorder='big')
         return self.send_command("set view", args)
+
+    def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
+        """Show alarm tool on the Divoom device"""
+
+        args = []
+        if time != None:
+            args += int(time[0:2]).to_bytes(1, byteorder='big')
+            args += int(time[3:]).to_bytes(1, byteorder='big')
+        else:
+            args += [0x00, 0x00]
+        args += [0x01]
+        args += (0xff if time != None else 0x00).to_bytes(1, byteorder='big')
+
+        return self.send_command("set alarm", args)
+
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
+        """Show sleep mode on the Divoom device and optionally sets mode, time"""
+        if sleeptime == None: sleeptime = 90
+        if sleepmode == None: sleepmode = 0
+        if isinstance(sleeptime, str): sleeptime = int(sleeptime)
+        if isinstance(sleepmode, str): sleepmode = int(sleepmode)
+
+        args = []
+        args += sleeptime.to_bytes(1, byteorder='big')
+        args += sleepmode.to_bytes(1, byteorder='big')
+        args += (0xff if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+
+        return self.send_command("set sleeptime", args)
+
+    def send_weather(self, value=None, weather=None):
+        self.logger.warning("{0}: this device does not support weather info.".format(self.type))
 
     def show_timer(self, value=None):
         self.logger.warning("{0}: this device does not support timer view.".format(self.type))

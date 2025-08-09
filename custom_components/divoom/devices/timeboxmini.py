@@ -26,6 +26,7 @@ class TimeboxMini(Divoom):
     def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):
         result = []
         if framesCount > 1:
+            if time > 255: time = 255
             result += time.to_bytes(1, byteorder='little')
         for pixelset in self.chunks(pixels, 2):
             col1 = True if len(pixelset) > 0 else False
@@ -35,6 +36,26 @@ class TimeboxMini(Divoom):
             result += [((color1[0] & 0xf0)>>4) + (color1[1] & 0xf0)]
             result += [((color1[2] & 0xf0)>>4) + (color2[0] & 0xf0)]
             if col2: result += [((color2[1] & 0xf0)>>4) + (color2[2] & 0xf0)]
+        return result
+
+    def show_image(self, file):
+        """Show image or animation on the Divoom device"""
+        frames, framesCount = self.process_image(file)
+        
+        result = None
+        if framesCount > 1:
+            """Sending as Animation"""
+            index = 0
+            for pair in frames:
+                frame = self.make_framepart(pair[1], index, pair[0])
+                result = self.send_command("set animation frame", frame, skipRead=True)
+                index += 1
+        
+        elif framesCount == 1:
+            """Sending as Image"""
+            pair = frames[-1]
+            frame = self.make_framepart(pair[1], -1, pair[0])
+            result = self.send_command("set image", frame, skipRead=True)
         return result
 
     def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
@@ -107,6 +128,34 @@ class TimeboxMini(Divoom):
         args += red.to_bytes(2, byteorder='little')
         args += blue.to_bytes(2, byteorder='little')
         return self.send_command("set view", args)
+
+    def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
+        """Show alarm tool on the Divoom device"""
+
+        args = []
+        if time != None:
+            args += int(time[0:2]).to_bytes(1, byteorder='big')
+            args += int(time[3:]).to_bytes(1, byteorder='big')
+        else:
+            args += [0x00, 0x00]
+        args += [0x01]
+        args += (0xff if time != None else 0x00).to_bytes(1, byteorder='big')
+
+        return self.send_command("set alarm", args)
+
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
+        """Show sleep mode on the Divoom device and optionally sets mode, time"""
+        if sleeptime == None: sleeptime = 90
+        if sleepmode == None: sleepmode = 0
+        if isinstance(sleeptime, str): sleeptime = int(sleeptime)
+        if isinstance(sleepmode, str): sleepmode = int(sleepmode)
+
+        args = []
+        args += sleeptime.to_bytes(1, byteorder='big')
+        args += sleepmode.to_bytes(1, byteorder='big')
+        args += (0xff if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+
+        return self.send_command("set sleeptime", args)
 
     def show_lyrics(self):
         self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))

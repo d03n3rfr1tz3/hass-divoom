@@ -123,6 +123,15 @@ data:
     - thu
     - fri
 
+# activate the sleep mode for 30 minutes
+message: 'sleep'
+data:
+  value: 1
+  time: 30
+  sleepmode: 4
+  volume: 10
+  brightness: 50
+
 # activates the memorial in the first slot for 0:00 new year
 message: 'memorial'
 data:
