@@ -203,7 +203,9 @@ it's not the preferred way anymore.
 
 ### Basic Modes
 The general structure for all modes are similar, but each mode has different parameter. Below the example
-of the basic structure, you can find a documentation of each mode.
+of the basic structure, you can find a documentation of each mode. Not all modes are supported across
+all devices. If in doubt, look into your mobile app if your device even has the corresponding feature
+and then look into the example files for your specific device.
 
 Modern:
 ```yaml
@@ -427,7 +429,7 @@ data:
 ```
 
 #### MODE light
-Shows the light channel.
+Shows the light channel. Be aware, that this mode is very limited on the Aurabox, because it only supports 8 colors.
 
 | Parameter    | Description |
 | ---          | ---         |
