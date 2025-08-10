@@ -101,6 +101,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.context["title_placeholders"] = {
             "name": self._device_name,
             "mac": self._device_mac,
+            "host_text": " via {}".format(self._device_host) if self._device_host is not None else "",
         }
         return await self.async_step_device_type()
 
@@ -118,6 +119,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.context["title_placeholders"] = {
             "name": self._device_name,
             "mac": self._device_mac,
+            "host_text": " via {}".format(self._device_host) if self._device_host is not None else "",
         }
         return await self.async_step_device_port()
 
@@ -136,6 +138,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self.context["title_placeholders"] = {
             "name": self._device_name,
             "mac": self._device_mac,
+            "host_text": " via {}".format(self._device_host) if self._device_host is not None else "",
         }
         return await self.async_step_device_port()
 

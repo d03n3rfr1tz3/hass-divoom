@@ -1,6 +1,6 @@
 {
     "config": {
-      "flow_title": "{name} ({mac})",
+      "flow_title": "{name} ({mac}{host_text})",
       "title": "Divoom (BT)",
       "step": {
         "user": {
