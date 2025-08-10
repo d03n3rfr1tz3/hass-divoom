@@ -47,8 +47,9 @@ class Aurabox(Divoom):
     def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):
         result = []
         if framesCount > 1:
-            if time > 255: time = 255
-            result += time.to_bytes(1, byteorder='little')
+            delay = int(time / 100)
+            if delay > 255: delay = 255
+            result += delay.to_bytes(1, byteorder='little')
         for pixelset in self.chunks(pixels, 2):
             color1 = self.get_color(colors[pixelset[0]])
             color2 = self.get_color(colors[pixelset[1]])
