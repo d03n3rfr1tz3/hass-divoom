@@ -272,7 +272,7 @@ class Divoom:
             header += [0x00, 0x0A, 0x0A, 0x04] # Fixed header on single frames
         return header + framePart
 
-    def process_image(self, image):
+    def process_image(self, image, time=None):
         frames = []
         with Image.open(image) as img:
             
@@ -304,7 +304,7 @@ class Divoom:
             framesCount = len(picture_frames)
             for pair in picture_frames:
                 picture_frame = pair[0]
-                time = pair[1]
+                picture_time = pair[1]
                 
                 colors = []
                 pixels = [None] * frameSize[0] * frameSize[1]
@@ -317,12 +317,12 @@ class Divoom:
                     color_index = colors.index([r, g, b])
                     pixels[x + frameSize[1] * y] = color_index
                 
-                if time is None: time = 0
+                if picture_time is None: picture_time = 0
                 
                 colorCount = len(colors)
                 if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
                 
-                frame = self.process_frame(pixels, colors, colorCount, framesCount, time, needsFlags)
+                frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
                 frames.append(frame)
         
         result = []
@@ -534,9 +534,9 @@ class Divoom:
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
         self.logger.warning("{0}: the implementation is missing.".format(self.type))
 
-    def show_image(self, file):
+    def show_image(self, file, time=None):
         """Show image or animation on the Divoom device"""
-        frames, framesCount = self.process_image(file)
+        frames, framesCount = self.process_image(file, time=time)
         
         result = None
         if framesCount > 1:

@@ -403,11 +403,12 @@ data:
 ```
 
 #### MODE image
-Shows the a static or animated image.
+Shows a static or animated image.
 
 | Parameter | Description |
 | ---       | ---         |
 | `file`    | Specifes the image file relative to the configured media_directory, that will be displayed. |
+| `time`    | The time in milliseconds between each frame. Defaults to timing of the GIF if omitted. |
 
 ```
 message: 'image'

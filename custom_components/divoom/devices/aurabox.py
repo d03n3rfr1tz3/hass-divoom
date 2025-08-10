@@ -55,9 +55,9 @@ class Aurabox(Divoom):
             result += [((color2 if color2 >= 0 else 0) << 4) | (color1 if color1 >= 0 else 0)]
         return result
 
-    def show_image(self, file):
+    def show_image(self, file, time=None):
         """Show image or animation on the Divoom device"""
-        frames, framesCount = self.process_image(file)
+        frames, framesCount = self.process_image(file, time=time)
         
         result = None
         if framesCount > 1:

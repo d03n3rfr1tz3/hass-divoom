@@ -42,7 +42,7 @@ PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
 
 PARAM_SLEEPMODE = 'sleepmode'
-PARAM_SLEEPTIME = 'time'
+PARAM_TIME = 'time'
 
 PARAM_PLAYER1 = 'player1'
 PARAM_PLAYER2 = 'player2'
@@ -340,7 +340,8 @@ class DivoomNotificationService(BaseNotificationService):
         elif mode == "image":
             image_file = data.get(PARAM_FILE)
             image_path = os.path.join(self._media_directory, image_file)
-            self._device.show_image(image_path)
+            time = data.get(PARAM_TIME)
+            self._device.show_image(image_path, time=time)
 
         elif mode == "countdown":
             value = data.get(PARAM_VALUE)
@@ -378,7 +379,7 @@ class DivoomNotificationService(BaseNotificationService):
 
         elif mode == "sleep":
             sleepvalue = data.get(PARAM_VALUE)
-            sleeptime = data.get(PARAM_SLEEPTIME)
+            sleeptime = data.get(PARAM_TIME)
             sleepmode = data.get(PARAM_SLEEPMODE)
             volume = data.get(PARAM_VOLUME)
             color = data.get(PARAM_COLOR)

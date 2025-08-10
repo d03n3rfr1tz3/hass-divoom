@@ -38,9 +38,9 @@ class TimeboxMini(Divoom):
             if col2: result += [((color2[1] & 0xf0)>>4) + (color2[2] & 0xf0)]
         return result
 
-    def show_image(self, file):
+    def show_image(self, file, time=None):
         """Show image or animation on the Divoom device"""
-        frames, framesCount = self.process_image(file)
+        frames, framesCount = self.process_image(file, time=time)
         
         result = None
         if framesCount > 1:
