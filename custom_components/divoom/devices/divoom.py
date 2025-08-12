@@ -172,6 +172,21 @@ class Divoom:
             self.socket_errno = error.errno
             raise
 
+    def send_command(self, command, args=None, skipRead=None):
+        """Send command with optional arguments"""
+        if (self.socket == None): return
+
+        if args is None:
+            args = []
+        if isinstance(command, str):
+            command = self.COMMANDS[command]
+        length = len(args)+3
+        payload = []
+        payload += length.to_bytes(2, byteorder='little')
+        payload += [command]
+        payload += args
+        return self.send_payload(payload, skipRead=skipRead)
+
     def send_payload(self, payload, skipRead=None):
         """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
         if (self.socket == None): return
@@ -198,21 +213,6 @@ class Divoom:
     
         return result
 
-    def send_command(self, command, args=None, skipRead=None):
-        """Send command with optional arguments"""
-        if (self.socket == None): return
-
-        if args is None:
-            args = []
-        if isinstance(command, str):
-            command = self.COMMANDS[command]
-        length = len(args)+3
-        payload = []
-        payload += length.to_bytes(2, byteorder='little')
-        payload += [command]
-        payload += args
-        return self.send_payload(payload, skipRead=skipRead)
-
     def drop_message_buffer(self):
         """Drop all dat currently in the message buffer,"""
         self.message_buf = []
@@ -228,6 +228,13 @@ class Divoom:
         """Yield successive n-sized chunks from lst."""
         for i in range(0, len(lst), n):
             yield lst[i:i + n]
+
+    def convert_color(self, color):
+        result = []
+        result += color[0].to_bytes(1, byteorder='big')
+        result += color[1].to_bytes(1, byteorder='big')
+        result += color[2].to_bytes(1, byteorder='big')
+        return result
 
     def escape_payload(self, payload):
         """Escaping is not needed anymore as some smarter guys found out"""
@@ -249,13 +256,6 @@ class Divoom:
         cs_payload = payload + self.checksum(payload)
         escaped_payload = self.escape_payload(cs_payload)
         return [0x01] + escaped_payload + [0x02]
-
-    def convert_color(self, color):
-        result = []
-        result += color[0].to_bytes(1, byteorder='big')
-        result += color[1].to_bytes(1, byteorder='big')
-        result += color[2].to_bytes(1, byteorder='big')
-        return result
 
     def make_frame(self, frame):
         length = len(frame) + 3
@@ -382,217 +382,6 @@ class Divoom:
         """Sets the display off of the Divoom device"""
         self.show_light(color=[0x01, 0x01, 0x01], brightness=0, power=False)
 
-    def send_brightness(self, value=None):
-        """Send brightness to the Divoom device"""
-        if value == None: return
-        if isinstance(value, str): value = int(value)
-        
-        args = []
-        args += value.to_bytes(1, byteorder='big')
-        return self.send_command("set brightness", args, skipRead=True)
-
-    def send_volume(self, value=None):
-        """Send volume to the Divoom device"""
-        if value == None: value = 0
-        if isinstance(value, str): value = int(value)
-
-        args = []
-        args += int(value * 15 / 100).to_bytes(1, byteorder='big')
-        return self.send_command("set volume", args, skipRead=True)
-
-    def send_keyboard(self, value=None):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
-
-    def send_playstate(self, value=None):
-        """Send play/pause state to the Divoom device"""
-        args = []
-        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
-        return self.send_command("set playstate", args)
-
-    def send_weather(self, value=None, weather=None):
-        """Send weather to the Divoom device"""
-        if value == None: return
-        if weather == None: weather = 0
-        if isinstance(weather, str): weather = int(weather)
-
-        args = []
-        args += int(round(float(value[0:-2]))).to_bytes(1, byteorder='big', signed=True)
-        args += weather.to_bytes(1, byteorder='big')
-        result = self.send_command("set temp", args)
-
-        if value[-2] == "°C":
-            self.send_command("set temp type", [0x00])
-        if value[-2] == "°F":
-            self.send_command("set temp type", [0x01])
-        return result
-
-    def send_datetime(self, value=None):
-        """Send date and time information to the Divoom device"""
-        if value == None:
-            clock = datetime.datetime.now()
-        else:
-            clock = datetime.datetime.fromisoformat(value)
-
-        args = []
-        args += int(clock.year % 100).to_bytes(1, byteorder='big')
-        args += int(clock.year / 100).to_bytes(1, byteorder='big')
-        args += clock.month.to_bytes(1, byteorder='big')
-        args += clock.day.to_bytes(1, byteorder='big')
-        args += clock.hour.to_bytes(1, byteorder='big')
-        args += clock.minute.to_bytes(1, byteorder='big')
-        args += clock.second.to_bytes(1, byteorder='big')
-        return self.send_command("set date time", args)
-
-    def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
-        """Show clock on the Divoom device in the color"""
-        if clock == None: clock = 0
-        if twentyfour == None: twentyfour = True
-        if weather == None: weather = False
-        if temp == None: temp = False
-        if calendar == None: calendar = False
-
-        args = [0x00]
-        args += [0x01 if twentyfour == True or twentyfour == 1 else 0x00]
-        if clock >= 0 and clock <= 15:
-            args += clock.to_bytes(1, byteorder='big') # clock mode/style
-            args += [0x01] # clock activated
-        else:
-            args += [0x00, 0x00] # clock mode/style = 0 and clock deactivated
-        args += [0x01 if weather == True or weather == 1 else 0x00]
-        args += [0x01 if temp == True or temp == 1 else 0x00]
-        args += [0x01 if calendar == True or calendar == 1 else 0x00]
-        if not color is None:
-            args += self.convert_color(color)
-        result = self.send_command("set view", args)
-
-        if hot != None:
-            args = [0x01 if hot == True or hot == 1 else 0x00]
-            self.send_command("set hot", args, skipRead=True)
-        return result
-
-    def show_temperature(self, value=None, color=None):
-        """Show temperature on the Divoom device in the color"""
-        result = self.show_clock(clock=None, twentyfour=None, weather=None, temp=True, calendar=None, color=color, hot=None)
-        self.send_command("set temp type", [0x01 if value == True or value == 1 else 0x00])
-        return result
-
-    def show_light(self, color, brightness=None, power=None):
-        """Show light on the Divoom device in the color"""
-        if power == None: power = True
-        if brightness == None: brightness = 100
-        if isinstance(brightness, str): brightness = int(brightness)
-
-        args = [0x01]
-        if color is None:
-            args += [0xFF, 0xFF, 0xFF]
-            args += brightness.to_bytes(1, byteorder='big')
-            args += [0x01]
-        else:
-            args += self.convert_color(color)
-            args += brightness.to_bytes(1, byteorder='big')
-            args += [0x00]
-        args += [0x01 if power == True or power == 1 else 0x00, 0x00, 0x00, 0x00]
-        return self.send_command("set view", args)
-
-    def show_effects(self, number):
-        """Show effects on the Divoom device"""
-        if number == None: return
-        if isinstance(number, str): number = int(number)
-
-        args = [0x03]
-        args += number.to_bytes(1, byteorder='big')
-        return self.send_command("set view", args)
-
-    def show_visualization(self, number, color1, color2):
-        """Show visualization on the Divoom device"""
-        if number == None: return
-        if isinstance(number, str): number = int(number)
-
-        args = [0x04]
-        args += number.to_bytes(1, byteorder='big')
-        return self.send_command("set view", args)
-
-    def show_design(self, number=None):
-        """Show design on the Divoom device"""
-        args = [0x05]
-        result = self.send_command("set view", args)
-
-        if number != None: # additionally change design tab
-            if isinstance(number, str): number = int(number)
-
-            args = [0x17]
-            args += number.to_bytes(1, byteorder='big')
-            result = self.send_command("set design", args)
-        return result
-
-    def show_scoreboard(self, blue=None, red=None):
-        self.logger.warning("{0}: the implementation is missing. it needs a decision, in which way the scoreboard can be accessed (set view or set tool).".format(self.type))
-
-    def show_lyrics(self):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
-
-    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
-
-    def show_image(self, file, time=None):
-        """Show image or animation on the Divoom device"""
-        frames, framesCount = self.process_image(file, time=time)
-        
-        result = None
-        if framesCount > 1:
-            """Sending as Animation"""
-            frameParts = []
-            framePartsSize = 0
-            
-            for pair in frames:
-                frameParts += pair[0]
-                framePartsSize += pair[1]
-            
-            index = 0
-            for framePart in self.chunks(frameParts, self.chunksize):
-                frame = self.make_framepart(framePartsSize, index, framePart)
-                result = self.send_command("set animation frame", frame, skipRead=True)
-                index += 1
-        
-        elif framesCount == 1:
-            """Sending as Image"""
-            pair = frames[-1]
-            frame = self.make_framepart(pair[1], -1, pair[0])
-            result = self.send_command("set image", frame, skipRead=True)
-        return result
-
-    def show_countdown(self, value=None, countdown=None):
-        """Show countdown tool on the Divoom device"""
-        if value == None: value = 1
-        if isinstance(value, str): value = int(value)
-
-        args = [0x03]
-        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
-        if countdown != None:
-            args += int(countdown[0:2]).to_bytes(1, byteorder='big')
-            args += int(countdown[3:]).to_bytes(1, byteorder='big')
-        else:
-            args += [0x00, 0x00]
-        return self.send_command("set tool", args)
-
-    def show_noise(self, value=None):
-        """Show noise tool on the Divoom device"""
-        if value == None: value = 0
-        if isinstance(value, str): value = int(value)
-
-        args = [0x02]
-        args += (0x01 if value == True or value == 1 else 0x02).to_bytes(1, byteorder='big')
-        return self.send_command("set tool", args)
-
-    def show_timer(self, value=None):
-        """Show timer tool on the Divoom device"""
-        if value == None: value = 2
-        if isinstance(value, str): value = int(value)
-
-        args = [0x00]
-        args += value.to_bytes(1, byteorder='big')
-        return self.send_command("set tool", args)
-
     def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
         """Show alarm tool on the Divoom device"""
         if number == None: number = 0
@@ -632,72 +421,97 @@ class Divoom:
         args += volume.to_bytes(1, byteorder='big')
         return self.send_command("set alarm", args)
 
-    def show_memorial(self, number=None, value=None, text=None, animate=True):
-        """Show memorial tool on the Divoom device"""
-        if number == None: number = 0
-        if text == None: text = "Home Assistant"
-        if isinstance(number, str): number = int(number)
-        if not isinstance(text, str): text = str(text)
-
+    def send_brightness(self, value=None):
+        """Send brightness to the Divoom device"""
+        if value == None: return
+        if isinstance(value, str): value = int(value)
+        
         args = []
-        args += number.to_bytes(1, byteorder='big')
-        args += (0x01 if value != None else 0x00).to_bytes(1, byteorder='big')
+        args += value.to_bytes(1, byteorder='big')
+        return self.send_command("set brightness", args, skipRead=True)
 
-        if value != None:
-            clock = datetime.datetime.fromisoformat(value)
-            args += clock.month.to_bytes(1, byteorder='big')
-            args += clock.day.to_bytes(1, byteorder='big')
-            args += clock.hour.to_bytes(1, byteorder='big')
-            args += clock.minute.to_bytes(1, byteorder='big')
+    def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
+        """Show clock on the Divoom device in the color"""
+        if clock == None: clock = 0
+        if twentyfour == None: twentyfour = True
+        if weather == None: weather = False
+        if temp == None: temp = False
+        if calendar == None: calendar = False
+
+        args = [0x00]
+        args += [0x01 if twentyfour == True or twentyfour == 1 else 0x00]
+        if clock >= 0 and clock <= 15:
+            args += clock.to_bytes(1, byteorder='big') # clock mode/style
+            args += [0x01] # clock activated
         else:
-            args += [0x00, 0x00, 0x00, 0x00]
-        
-        args += (0x01 if animate == True else 0x00).to_bytes(1, byteorder='big')
-        for char in text[0:15].ljust(16, '\n').encode('utf-8'):
-            args += (0x00 if char == 0x0a else char).to_bytes(2, byteorder='big')
-        
-        return self.send_command("set memorial", args)
+            args += [0x00, 0x00] # clock mode/style = 0 and clock deactivated
+        args += [0x01 if weather == True or weather == 1 else 0x00]
+        args += [0x01 if temp == True or temp == 1 else 0x00]
+        args += [0x01 if calendar == True or calendar == 1 else 0x00]
+        if not color is None:
+            args += self.convert_color(color)
+        result = self.send_command("set view", args)
 
-    def show_radio(self, value=None, frequency=None):
-        """Show radio on the Divoom device and optionally changes to the given frequency"""
-        args = []
-        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
-        result = self.send_command("set radio", args)
-
-        if (value == True or value == 1) and frequency != None:
-            if isinstance(frequency, str): frequency = float(frequency)
-
-            args = []
-            args += self._parse_frequency(frequency)
-            self.send_command("set radio frequency", args)
+        if hot != None:
+            args = [0x01 if hot == True or hot == 1 else 0x00]
+            self.send_command("set hot", args, skipRead=True)
         return result
 
-    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
-        """Show sleep mode on the Divoom device and optionally sets mode, volume, time, color, frequency and brightness"""
-        if sleeptime == None: sleeptime = 120
-        if sleepmode == None: sleepmode = 0
-        if volume == None: volume = 100
-        if brightness == None: brightness = 100
-        if isinstance(sleeptime, str): sleeptime = int(sleeptime)
-        if isinstance(sleepmode, str): sleepmode = int(sleepmode)
-        if isinstance(volume, str): volume = int(volume)
-        if isinstance(brightness, str): brightness = int(brightness)
+    def show_countdown(self, value=None, countdown=None):
+        """Show countdown tool on the Divoom device"""
+        if value == None: value = 1
+        if isinstance(value, str): value = int(value)
+
+        args = [0x03]
+        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+        if countdown != None:
+            args += int(countdown[0:2]).to_bytes(1, byteorder='big')
+            args += int(countdown[3:]).to_bytes(1, byteorder='big')
+        else:
+            args += [0x00, 0x00]
+        return self.send_command("set tool", args)
+
+    def send_datetime(self, value=None):
+        """Send date and time information to the Divoom device"""
+        if value == None:
+            clock = datetime.datetime.now()
+        else:
+            clock = datetime.datetime.fromisoformat(value)
 
         args = []
-        args += sleeptime.to_bytes(1, byteorder='big')
-        args += sleepmode.to_bytes(1, byteorder='big')
-        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+        args += int(clock.year % 100).to_bytes(1, byteorder='big')
+        args += int(clock.year / 100).to_bytes(1, byteorder='big')
+        args += clock.month.to_bytes(1, byteorder='big')
+        args += clock.day.to_bytes(1, byteorder='big')
+        args += clock.hour.to_bytes(1, byteorder='big')
+        args += clock.minute.to_bytes(1, byteorder='big')
+        args += clock.second.to_bytes(1, byteorder='big')
+        return self.send_command("set date time", args)
 
-        args += self._parse_frequency(frequency)
-        args += volume.to_bytes(1, byteorder='big')
+    def show_design(self, number=None):
+        """Show design on the Divoom device"""
+        args = [0x05]
+        result = self.send_command("set view", args)
 
-        if color is None:
-            args += [0x00, 0x00, 0x00]
-        else:
-            args += self.convert_color(color)
-        args += brightness.to_bytes(1, byteorder='big')
+        if number != None: # additionally change design tab
+            if isinstance(number, str): number = int(number)
 
-        return self.send_command("set sleeptime", args)
+            args = [0x17]
+            args += number.to_bytes(1, byteorder='big')
+            result = self.send_command("set design", args)
+        return result
+
+    def show_effects(self, number):
+        """Show effects on the Divoom device"""
+        if number == None: return
+        if isinstance(number, str): number = int(number)
+
+        args = [0x03]
+        args += number.to_bytes(1, byteorder='big')
+        return self.send_command("set view", args)
+
+    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
+        self.logger.warning("{0}: the implementation is missing.".format(self.type))
 
     def show_game(self, value=None):
         """Show game on the Divoom device"""
@@ -727,6 +541,192 @@ class Divoom:
             result = self.send_command("set game keydown", args, skipRead=True)
             time.sleep(0.1)
             result = self.send_command("set game keyup", args, skipRead=True)
+        return result
+
+    def show_image(self, file, time=None):
+        """Show image or animation on the Divoom device"""
+        frames, framesCount = self.process_image(file, time=time)
+        
+        result = None
+        if framesCount > 1:
+            """Sending as Animation"""
+            frameParts = []
+            framePartsSize = 0
+            
+            for pair in frames:
+                frameParts += pair[0]
+                framePartsSize += pair[1]
+            
+            index = 0
+            for framePart in self.chunks(frameParts, self.chunksize):
+                frame = self.make_framepart(framePartsSize, index, framePart)
+                result = self.send_command("set animation frame", frame, skipRead=True)
+                index += 1
+        
+        elif framesCount == 1:
+            """Sending as Image"""
+            pair = frames[-1]
+            frame = self.make_framepart(pair[1], -1, pair[0])
+            result = self.send_command("set image", frame, skipRead=True)
+        return result
+
+    def send_keyboard(self, value=None):
+        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+
+    def show_light(self, color, brightness=None, power=None):
+        """Show light on the Divoom device in the color"""
+        if power == None: power = True
+        if brightness == None: brightness = 100
+        if isinstance(brightness, str): brightness = int(brightness)
+
+        args = [0x01]
+        if color is None:
+            args += [0xFF, 0xFF, 0xFF]
+            args += brightness.to_bytes(1, byteorder='big')
+            args += [0x01]
+        else:
+            args += self.convert_color(color)
+            args += brightness.to_bytes(1, byteorder='big')
+            args += [0x00]
+        args += [0x01 if power == True or power == 1 else 0x00, 0x00, 0x00, 0x00]
+        return self.send_command("set view", args)
+
+    def show_lyrics(self):
+        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+
+    def show_memorial(self, number=None, value=None, text=None, animate=True):
+        """Show memorial tool on the Divoom device"""
+        if number == None: number = 0
+        if text == None: text = "Home Assistant"
+        if isinstance(number, str): number = int(number)
+        if not isinstance(text, str): text = str(text)
+
+        args = []
+        args += number.to_bytes(1, byteorder='big')
+        args += (0x01 if value != None else 0x00).to_bytes(1, byteorder='big')
+
+        if value != None:
+            clock = datetime.datetime.fromisoformat(value)
+            args += clock.month.to_bytes(1, byteorder='big')
+            args += clock.day.to_bytes(1, byteorder='big')
+            args += clock.hour.to_bytes(1, byteorder='big')
+            args += clock.minute.to_bytes(1, byteorder='big')
+        else:
+            args += [0x00, 0x00, 0x00, 0x00]
+        
+        args += (0x01 if animate == True else 0x00).to_bytes(1, byteorder='big')
+        for char in text[0:15].ljust(16, '\n').encode('utf-8'):
+            args += (0x00 if char == 0x0a else char).to_bytes(2, byteorder='big')
+        
+        return self.send_command("set memorial", args)
+
+    def show_noise(self, value=None):
+        """Show noise tool on the Divoom device"""
+        if value == None: value = 0
+        if isinstance(value, str): value = int(value)
+
+        args = [0x02]
+        args += (0x01 if value == True or value == 1 else 0x02).to_bytes(1, byteorder='big')
+        return self.send_command("set tool", args)
+
+    def send_playstate(self, value=None):
+        """Send play/pause state to the Divoom device"""
+        args = []
+        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+        return self.send_command("set playstate", args)
+
+    def show_radio(self, value=None, frequency=None):
+        """Show radio on the Divoom device and optionally changes to the given frequency"""
+        args = []
+        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+        result = self.send_command("set radio", args)
+
+        if (value == True or value == 1) and frequency != None:
+            if isinstance(frequency, str): frequency = float(frequency)
+
+            args = []
+            args += self._parse_frequency(frequency)
+            self.send_command("set radio frequency", args)
+        return result
+
+    def show_scoreboard(self, blue=None, red=None):
+        self.logger.warning("{0}: the implementation is missing. it needs a decision, in which way the scoreboard can be accessed (set view or set tool).".format(self.type))
+
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
+        """Show sleep mode on the Divoom device and optionally sets mode, volume, time, color, frequency and brightness"""
+        if sleeptime == None: sleeptime = 120
+        if sleepmode == None: sleepmode = 0
+        if volume == None: volume = 100
+        if brightness == None: brightness = 100
+        if isinstance(sleeptime, str): sleeptime = int(sleeptime)
+        if isinstance(sleepmode, str): sleepmode = int(sleepmode)
+        if isinstance(volume, str): volume = int(volume)
+        if isinstance(brightness, str): brightness = int(brightness)
+
+        args = []
+        args += sleeptime.to_bytes(1, byteorder='big')
+        args += sleepmode.to_bytes(1, byteorder='big')
+        args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+
+        args += self._parse_frequency(frequency)
+        args += volume.to_bytes(1, byteorder='big')
+
+        if color is None:
+            args += [0x00, 0x00, 0x00]
+        else:
+            args += self.convert_color(color)
+        args += brightness.to_bytes(1, byteorder='big')
+
+        return self.send_command("set sleeptime", args)
+
+    def show_temperature(self, value=None, color=None):
+        """Show temperature on the Divoom device in the color"""
+        result = self.show_clock(clock=None, twentyfour=None, weather=None, temp=True, calendar=None, color=color, hot=None)
+        self.send_command("set temp type", [0x01 if value == True or value == 1 else 0x00])
+        return result
+
+    def show_timer(self, value=None):
+        """Show timer tool on the Divoom device"""
+        if value == None: value = 2
+        if isinstance(value, str): value = int(value)
+
+        args = [0x00]
+        args += value.to_bytes(1, byteorder='big')
+        return self.send_command("set tool", args)
+
+    def show_visualization(self, number, color1, color2):
+        """Show visualization on the Divoom device"""
+        if number == None: return
+        if isinstance(number, str): number = int(number)
+
+        args = [0x04]
+        args += number.to_bytes(1, byteorder='big')
+        return self.send_command("set view", args)
+
+    def send_volume(self, value=None):
+        """Send volume to the Divoom device"""
+        if value == None: value = 0
+        if isinstance(value, str): value = int(value)
+
+        args = []
+        args += int(value * 15 / 100).to_bytes(1, byteorder='big')
+        return self.send_command("set volume", args, skipRead=True)
+
+    def send_weather(self, value=None, weather=None):
+        """Send weather to the Divoom device"""
+        if value == None: return
+        if weather == None: weather = 0
+        if isinstance(weather, str): weather = int(weather)
+
+        args = []
+        args += int(round(float(value[0:-2]))).to_bytes(1, byteorder='big', signed=True)
+        args += weather.to_bytes(1, byteorder='big')
+        result = self.send_command("set temp", args)
+
+        if value[-2] == "°C":
+            self.send_command("set temp type", [0x00])
+        if value[-2] == "°F":
+            self.send_command("set temp type", [0x01])
         return result
 
     def clear_input_buffer(self):

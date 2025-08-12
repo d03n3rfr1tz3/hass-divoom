@@ -12,6 +12,15 @@ class Timoo(Divoom):
         if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
+    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
+        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+
+    def show_lyrics(self):
+        """Show lyrics on the Divoom device with specific score"""
+
+        args = [0x06, 0x00, 0x00, 0x00]
+        return self.send_command("set view", args)
+
     def show_scoreboard(self, blue=None, red=None):
         """Show scoreboard on the Divoom device with specific score"""
         if blue == None: blue = 0
@@ -23,12 +32,3 @@ class Timoo(Divoom):
         args += red.to_bytes(2, byteorder='little')
         args += blue.to_bytes(2, byteorder='little')
         return self.send_command("set tool", args)
-
-    def show_lyrics(self):
-        """Show lyrics on the Divoom device with specific score"""
-
-        args = [0x06, 0x00, 0x00, 0x00]
-        return self.send_command("set view", args)
-
-    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))

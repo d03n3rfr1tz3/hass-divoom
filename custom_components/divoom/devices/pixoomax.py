@@ -12,11 +12,23 @@ class PixooMax(Divoom):
         if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
     
-    def send_volume(self, value=None):
-        self.logger.warning("{0}: this device does not support sending the volume.".format(self.type))
+    def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
+        Divoom.show_alarm(self, number=number, time=time, weekdays=weekdays, alarmMode=0, triggerMode=0, frequency=0, volume=1)
+
+    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
+        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+
+    def send_keyboard(self, value=None):
+        self.logger.warning("{0}: this device does not support changing the keyboard light.".format(self.type))
+
+    def show_lyrics(self):
+        self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
 
     def send_playstate(self, value=None):
         self.logger.warning("{0}: this device does not support sending the play/pause state.".format(self.type))
+
+    def show_radio(self, value=None, frequency=None):
+        self.logger.warning("{0}: this device does not support showing the radio.".format(self.type))
 
     def show_scoreboard(self, blue=None, red=None):
         """Show scoreboard on the Divoom device with specific score"""
@@ -30,17 +42,5 @@ class PixooMax(Divoom):
         args += blue.to_bytes(2, byteorder='little')
         return self.send_command("set view", args)
 
-    def show_lyrics(self):
-        self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
-
-    def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
-
-    def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
-        Divoom.show_alarm(self, number=number, time=time, weekdays=weekdays, alarmMode=0, triggerMode=0, frequency=0, volume=1)
-
-    def show_radio(self, value=None, frequency=None):
-        self.logger.warning("{0}: this device does not support showing the radio.".format(self.type))
-
-    def send_keyboard(self, value=None):
-        self.logger.warning("{0}: this device does not support changing the keyboard light.".format(self.type))
+    def send_volume(self, value=None):
+        self.logger.warning("{0}: this device does not support sending the volume.".format(self.type))

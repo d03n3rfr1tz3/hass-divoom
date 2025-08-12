@@ -243,37 +243,147 @@ class DivoomNotificationService(BaseNotificationService):
             skipPing = True if mode == "gamecontrol" or mode == "raw" else False
             self._device.reconnect(skipPing=skipPing)
 
-        if mode == 'on':
-            self._device.send_on()
-
-        elif mode == 'off':
-            self._device.send_off()
-        
-        elif mode == "connect":
+        if mode == "connect":
             self._device.connect()
 
         elif mode == "disconnect":
             self._device.disconnect()
 
+        elif mode == 'on':
+            self._device.send_on()
+
+        elif mode == 'off':
+            self._device.send_off()
+        
+        elif mode == "alarm":
+            number = data.get(PARAM_NUMBER)
+            time = data.get(PARAM_VALUE)
+            weekdays = data.get(PARAM_WEEKDAY)
+            alarm_mode = data.get(PARAM_ALARMMODE)
+            trigger_mode = data.get(PARAM_TRIGGERMODE)
+            frequency = data.get(PARAM_FREQUENCY)
+            volume = data.get(PARAM_VOLUME)
+            self._device.show_alarm(number=number, time=time, weekdays=weekdays, alarmMode=alarm_mode, triggerMode=trigger_mode, frequency=frequency, volume=volume)
+
         elif mode == "brightness":
             value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
             self._device.send_brightness(value=value)
 
-        elif mode == "volume":
-            value = data.get(PARAM_VOLUME) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
-            self._device.send_volume(value=value)
+        elif mode == "clock":
+            clock = data.get(PARAM_CLOCK)
+            twentyfour = data.get(PARAM_TWENTYFOUR)
+            weather = data.get(PARAM_WEATHER)
+            temp = data.get(PARAM_TEMP)
+            calendar = data.get(PARAM_CALENDAR)
+            color = data.get(PARAM_COLOR)
+            hot = data.get(PARAM_HOT)
+            self._device.show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
+
+        elif mode == "countdown":
+            value = data.get(PARAM_VALUE)
+            countdown = data.get(PARAM_COUNTDOWN)
+            self._device.show_countdown(value=value, countdown=countdown)
+
+        elif mode == "datetime":
+            value = data.get(PARAM_VALUE)
+            self._device.send_datetime(value=value)
+
+        elif mode == "design":
+            number = data.get(PARAM_NUMBER)
+            self._device.show_design(number=number)
+
+        elif mode == "effects":
+            number = data.get(PARAM_NUMBER)
+            self._device.show_effects(number=number)
+
+        elif mode == "equalizer":
+            number = data.get(PARAM_NUMBER)
+            audioMode = data.get(PARAM_AUDIOMODE)
+            backgroundMode = data.get(PARAM_BACKGROUNDMODE)
+            streamMode = data.get(PARAM_STREAMMODE)
+            self._device.show_equalizer(number=number, audioMode=audioMode, backgroundMode=backgroundMode, streamMode=streamMode)
+
+        elif mode == "game":
+            value = data.get(PARAM_VALUE)
+            self._device.show_game(value=value)
+
+        elif mode == "gamecontrol":
+            value = data.get(PARAM_VALUE)
+            self._device.send_gamecontrol(value=value)
+
+        elif mode == "image":
+            image_file = data.get(PARAM_FILE)
+            image_path = os.path.join(self._media_directory, image_file)
+            time = data.get(PARAM_TIME)
+            self._device.show_image(image_path, time=time)
 
         elif mode == "keyboard":
             value = data.get(PARAM_VALUE)
             self._device.send_keyboard(value=value)
 
+        elif mode == "light":
+            brightness = data.get(PARAM_BRIGHTNESS)
+            color = data.get(PARAM_COLOR)
+            self._device.show_light(color=color, brightness=brightness, power=True)
+
+        elif mode == "lyrics":
+            self._device.show_lyrics()
+
+        elif mode == "memorial":
+            number = data.get(PARAM_NUMBER)
+            value = data.get(PARAM_VALUE)
+            text = data.get(PARAM_TEXT)
+            self._device.show_memorial(number=number, value=value, text=text, animate=True)
+
+        elif mode == "noise":
+            value = data.get(PARAM_VALUE)
+            self._device.show_noise(value=value)
+
         elif mode == "playstate":
             value = data.get(PARAM_VALUE)
             self._device.send_playstate(value=value)
 
-        elif mode == "datetime":
+        elif mode == "radio":
             value = data.get(PARAM_VALUE)
-            self._device.send_datetime(value=value)
+            frequency = data.get(PARAM_FREQUENCY)
+            self._device.show_radio(value=value, frequency=frequency)
+
+        elif mode == "raw":
+            raw = data.get(PARAM_RAW)
+            self._device.send_command(command=raw[0], args=raw[1:])
+
+        elif mode == "scoreboard":
+            player1 = data.get(PARAM_PLAYER1)
+            player2 = data.get(PARAM_PLAYER2)
+            self._device.show_scoreboard(blue=player1, red=player2)
+
+        elif mode == "sleep":
+            sleepvalue = data.get(PARAM_VALUE)
+            sleeptime = data.get(PARAM_TIME)
+            sleepmode = data.get(PARAM_SLEEPMODE)
+            volume = data.get(PARAM_VOLUME)
+            color = data.get(PARAM_COLOR)
+            brightness = data.get(PARAM_BRIGHTNESS)
+            frequency = data.get(PARAM_FREQUENCY)
+            self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency)
+
+        elif mode == "temperature":
+            value = data.get(PARAM_TEMP) or data.get(PARAM_VALUE)
+            color = data.get(PARAM_COLOR)
+            self._device.show_temperature(value=value, color=color)
+
+        elif mode == "timer":
+            value = data.get(PARAM_VALUE)
+            self._device.show_timer(value=value)
+
+        elif mode == "visualization" or mode == "signal":
+            number = data.get(PARAM_NUMBER)
+            color = data.get(PARAM_COLOR)
+            self._device.show_visualization(number=number, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
+
+        elif mode == "volume":
+            value = data.get(PARAM_VOLUME) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
+            self._device.send_volume(value=value)
 
         elif mode == "weather":
             value = data.get(PARAM_VALUE)
@@ -288,116 +398,6 @@ class DivoomNotificationService(BaseNotificationService):
                 weathernum = WEATHER_MODES.get(weather) or None
 
             self._device.send_weather(value=value, weather=weathernum)
-
-        elif mode == "clock":
-            clock = data.get(PARAM_CLOCK)
-            twentyfour = data.get(PARAM_TWENTYFOUR)
-            weather = data.get(PARAM_WEATHER)
-            temp = data.get(PARAM_TEMP)
-            calendar = data.get(PARAM_CALENDAR)
-            color = data.get(PARAM_COLOR)
-            hot = data.get(PARAM_HOT)
-            self._device.show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
-
-        elif mode == "temperature":
-            value = data.get(PARAM_TEMP) or data.get(PARAM_VALUE)
-            color = data.get(PARAM_COLOR)
-            self._device.show_temperature(value=value, color=color)
-
-        elif mode == "light":
-            brightness = data.get(PARAM_BRIGHTNESS)
-            color = data.get(PARAM_COLOR)
-            self._device.show_light(color=color, brightness=brightness, power=True)
-
-        elif mode == "effects":
-            number = data.get(PARAM_NUMBER)
-            self._device.show_effects(number=number)
-
-        elif mode == "signal" or mode == "visualization":
-            number = data.get(PARAM_NUMBER)
-            color = data.get(PARAM_COLOR)
-            self._device.show_visualization(number=number, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
-
-        elif mode == "scoreboard":
-            player1 = data.get(PARAM_PLAYER1)
-            player2 = data.get(PARAM_PLAYER2)
-            self._device.show_scoreboard(blue=player1, red=player2)
-
-        elif mode == "lyrics":
-            self._device.show_lyrics()
-
-        elif mode == "equalizer":
-            number = data.get(PARAM_NUMBER)
-            audioMode = data.get(PARAM_AUDIOMODE)
-            backgroundMode = data.get(PARAM_BACKGROUNDMODE)
-            streamMode = data.get(PARAM_STREAMMODE)
-            self._device.show_equalizer(number=number, audioMode=audioMode, backgroundMode=backgroundMode, streamMode=streamMode)
-
-        elif mode == "design":
-            number = data.get(PARAM_NUMBER)
-            self._device.show_design(number=number)
-
-        elif mode == "image":
-            image_file = data.get(PARAM_FILE)
-            image_path = os.path.join(self._media_directory, image_file)
-            time = data.get(PARAM_TIME)
-            self._device.show_image(image_path, time=time)
-
-        elif mode == "countdown":
-            value = data.get(PARAM_VALUE)
-            countdown = data.get(PARAM_COUNTDOWN)
-            self._device.show_countdown(value=value, countdown=countdown)
-
-        elif mode == "noise":
-            value = data.get(PARAM_VALUE)
-            self._device.show_noise(value=value)
-
-        elif mode == "timer":
-            value = data.get(PARAM_VALUE)
-            self._device.show_timer(value=value)
-
-        elif mode == "alarm":
-            number = data.get(PARAM_NUMBER)
-            time = data.get(PARAM_VALUE)
-            weekdays = data.get(PARAM_WEEKDAY)
-            alarm_mode = data.get(PARAM_ALARMMODE)
-            trigger_mode = data.get(PARAM_TRIGGERMODE)
-            frequency = data.get(PARAM_FREQUENCY)
-            volume = data.get(PARAM_VOLUME)
-            self._device.show_alarm(number=number, time=time, weekdays=weekdays, alarmMode=alarm_mode, triggerMode=trigger_mode, frequency=frequency, volume=volume)
-
-        elif mode == "memorial":
-            number = data.get(PARAM_NUMBER)
-            value = data.get(PARAM_VALUE)
-            text = data.get(PARAM_TEXT)
-            self._device.show_memorial(number=number, value=value, text=text, animate=True)
-
-        elif mode == "radio":
-            value = data.get(PARAM_VALUE)
-            frequency = data.get(PARAM_FREQUENCY)
-            self._device.show_radio(value=value, frequency=frequency)
-
-        elif mode == "sleep":
-            sleepvalue = data.get(PARAM_VALUE)
-            sleeptime = data.get(PARAM_TIME)
-            sleepmode = data.get(PARAM_SLEEPMODE)
-            volume = data.get(PARAM_VOLUME)
-            color = data.get(PARAM_COLOR)
-            brightness = data.get(PARAM_BRIGHTNESS)
-            frequency = data.get(PARAM_FREQUENCY)
-            self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency)
-
-        elif mode == "game":
-            value = data.get(PARAM_VALUE)
-            self._device.show_game(value=value)
-
-        elif mode == "gamecontrol":
-            value = data.get(PARAM_VALUE)
-            self._device.send_gamecontrol(value=value)
-
-        elif mode == "raw":
-            raw = data.get(PARAM_RAW)
-            self._device.send_command(command=raw[0], args=raw[1:])
 
         else:
             validModes = ""
