@@ -341,8 +341,10 @@ class Divoom:
         if color2 is None or len(color2) < 3: color2 = [0x01, 0x01, 0x01]
 
         frames = []
-        text_margin = 2
-        picture_time = 100
+        picture_time = 50
+        text_margin = int(math.ceil(self.screensize / 8))
+        text_speed_fast = int(math.ceil(self.screensize / 8))
+        text_speed_slow = int(math.ceil(self.screensize / 16))
         needsFlags = True if self.screensize == 32 else False
         frameSize = (self.screensize, self.screensize)
 
@@ -358,22 +360,32 @@ class Divoom:
         img_draw = Image.new('RGB', (self.screensize * 100, self.screensize))
         drw = ImageDraw.Draw(img_draw)
         drw.fontmode = "1"
-        txt = drw.textbbox((1, 1), text, font=fnt)
+        txt = drw.textbbox((0, 0), text, font=fnt)
 
-        img_width = self.screensize + txt[2] + self.screensize
+        font_width = txt[2]
+        if font is not None and 'divoom.ttf' in font: font_width = int(font_width * 1.1) # font calculation is a bit off sometimes
+
+        img_width = self.screensize + font_width + self.screensize + text_margin
         img = Image.new('RGB', (img_width, self.screensize), tuple(color2))
         drw = ImageDraw.Draw(img)
         drw.fontmode = "1"
         drw.text((self.screensize, text_margin), text, font=fnt, fill=tuple(color1))
 
-        framesCount = img_width - self.screensize
+        text_speed = text_speed_slow
+        framesCount = int(math.floor((img_width - self.screensize) / text_speed))
+        if framesCount > 60: # frames are limited, therefore we need to do bigger jumps
+            text_speed = text_speed_fast
+            picture_time = int(picture_time * 2)
+            framesCount = int(math.floor((img_width - self.screensize) / text_speed))
+        if framesCount > 60: self.logger.warning("{0}: text animation is too wide and is very likely cut off.".format(self.type))
+        
         for offset in range(framesCount):
             colors = []
             pixels = [None] * frameSize[0] * frameSize[1]
 
             for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
                 y, x = pos
-                r, g, b = img.getpixel((x + offset, y))
+                r, g, b = img.getpixel((x + (offset * text_speed), y))
                 if [r, g, b] not in colors:
                     colors.append([r, g, b])
                 color_index = colors.index([r, g, b])

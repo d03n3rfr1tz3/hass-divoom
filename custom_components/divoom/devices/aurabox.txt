@@ -51,7 +51,7 @@ data:
 # activate a scrolling text animation with the Divoom font
 message: 'text'
 data:
-  text: 'Hello Divoom'
+  text: 'Hi Divoom'
   font: 'divoom.ttf'
 
 # update date and time
