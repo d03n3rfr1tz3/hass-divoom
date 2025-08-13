@@ -1,7 +1,7 @@
 """Provides class Divoom that encapsulates the Divoom Bluetooth communication."""
 
-import logging, math, itertools, select, socket, time, datetime
-from PIL import Image
+import logging, math, itertools, os, select, socket, time, datetime
+from PIL import Image, ImageDraw, ImageFont
 
 class Divoom:
     """Class Divoom encapsulates the Divoom Bluetooth communication."""
@@ -289,8 +289,8 @@ class Divoom:
             
             try:
                 while True:
-                    new_frame = Image.new('RGBA', img.size)
-                    new_frame.paste(img, (0, 0), img.convert('RGBA'))
+                    new_frame = Image.new('RGB', img.size)
+                    new_frame.paste(img, (0, 0))
 
                     if needsResize:
                         new_frame = new_frame.resize(frameSize, Image.Resampling.NEAREST)
@@ -311,7 +311,7 @@ class Divoom:
                 
                 for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
                     y, x = pos
-                    r, g, b, a = picture_frame.getpixel((x, y))
+                    r, g, b = picture_frame.getpixel((x, y))
                     if [r, g, b] not in colors:
                         colors.append([r, g, b])
                     color_index = colors.index([r, g, b])
@@ -324,6 +324,66 @@ class Divoom:
                 
                 frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
                 frames.append(frame)
+        
+        result = []
+
+        if needsFlags: # Pixoo-Max expects two empty frames with flags 0x05 and 0x06 at the start
+            result.append(self.make_frame([0x00, 0x00, 0x05, 0x00, 0x00]))
+            result.append(self.make_frame([0x00, 0x00, 0x06, 0x00, 0x00, 0x00]))
+
+        for frame in frames:
+            result.append(self.make_frame(frame))
+        
+        return [result, framesCount]
+    
+    def process_text(self, text, font, time=None, color1=None, color2=None):
+        if color1 is None or len(color1) < 3: color1 = [0xff, 0xff, 0xff]
+        if color2 is None or len(color2) < 3: color2 = [0x01, 0x01, 0x01]
+
+        frames = []
+        text_margin = 2
+        picture_time = 100
+        needsFlags = True if self.screensize == 32 else False
+        frameSize = (self.screensize, self.screensize)
+
+        fnt = ImageFont.load_default(self.screensize - (text_margin * 2))
+        try:
+            try:
+                if font is not None: fnt = ImageFont.truetype(font, self.screensize - (text_margin * 2))
+            except OSError:
+                if font is not None: fnt = ImageFont.truetype(os.path.basename(font), self.screensize - (text_margin * 2))
+        except OSError:
+            pass
+        
+        img_draw = Image.new('RGB', (self.screensize * 100, self.screensize))
+        drw = ImageDraw.Draw(img_draw)
+        drw.fontmode = "1"
+        txt = drw.textbbox((1, 1), text, font=fnt)
+
+        img_width = self.screensize + txt[2] + self.screensize
+        img = Image.new('RGB', (img_width, self.screensize), tuple(color2))
+        drw = ImageDraw.Draw(img)
+        drw.fontmode = "1"
+        drw.text((self.screensize, text_margin), text, font=fnt, fill=tuple(color1))
+
+        framesCount = img_width - self.screensize
+        for offset in range(framesCount):
+            colors = []
+            pixels = [None] * frameSize[0] * frameSize[1]
+
+            for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
+                y, x = pos
+                r, g, b = img.getpixel((x + offset, y))
+                if [r, g, b] not in colors:
+                    colors.append([r, g, b])
+                color_index = colors.index([r, g, b])
+                pixels[x + frameSize[1] * y] = color_index
+            
+            colorCount = len(colors)
+            if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
+
+            frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
+            frames.append(frame)
         
         result = []
 
@@ -448,7 +508,7 @@ class Divoom:
         args += [0x01 if weather == True or weather == 1 else 0x00]
         args += [0x01 if temp == True or temp == 1 else 0x00]
         args += [0x01 if calendar == True or calendar == 1 else 0x00]
-        if not color is None:
+        if color is not None and len(color) == 3:
             args += self.convert_color(color)
         result = self.send_command("set view", args)
 
@@ -580,7 +640,7 @@ class Divoom:
         if isinstance(brightness, str): brightness = int(brightness)
 
         args = [0x01]
-        if color is None:
+        if color is None or len(color) < 3:
             args += [0xFF, 0xFF, 0xFF]
             args += brightness.to_bytes(1, byteorder='big')
             args += [0x01]
@@ -671,7 +731,7 @@ class Divoom:
         args += self._parse_frequency(frequency)
         args += volume.to_bytes(1, byteorder='big')
 
-        if color is None:
+        if color is None or len(color) < 3:
             args += [0x00, 0x00, 0x00]
         else:
             args += self.convert_color(color)
@@ -683,6 +743,33 @@ class Divoom:
         """Show temperature on the Divoom device in the color"""
         result = self.show_clock(clock=None, twentyfour=None, weather=None, temp=True, calendar=None, color=color, hot=None)
         self.send_command("set temp type", [0x01 if value == True or value == 1 else 0x00])
+        return result
+
+    def show_text(self, text, font, time=None, color1=None, color2=None):
+        """Show image or animation on the Divoom device"""
+        frames, framesCount = self.process_text(text, font, time=time, color1=color1, color2=color2)
+        
+        result = None
+        if framesCount > 1:
+            """Sending as Animation"""
+            frameParts = []
+            framePartsSize = 0
+            
+            for pair in frames:
+                frameParts += pair[0]
+                framePartsSize += pair[1]
+            
+            index = 0
+            for framePart in self.chunks(frameParts, self.chunksize):
+                frame = self.make_framepart(framePartsSize, index, framePart)
+                result = self.send_command("set animation frame", frame, skipRead=True)
+                index += 1
+        
+        elif framesCount == 1:
+            """Sending as Image"""
+            pair = frames[-1]
+            frame = self.make_framepart(pair[1], -1, pair[0])
+            result = self.send_command("set image", frame, skipRead=True)
         return result
 
     def show_timer(self, value=None):

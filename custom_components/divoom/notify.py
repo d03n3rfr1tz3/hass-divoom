@@ -5,6 +5,7 @@ import voluptuous as vol
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import config_validation as cv
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
+from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 
 from homeassistant.components.notify import (
     ATTR_DATA,
@@ -48,6 +49,7 @@ PARAM_PLAYER1 = 'player1'
 PARAM_PLAYER2 = 'player2'
 
 PARAM_FILE = 'file'
+PARAM_FONT = 'font'
 
 PARAM_RAW = 'raw'
 
@@ -79,6 +81,7 @@ VALID_MODES = [
     'signal',
     'sleep',
     'temperature',
+    'text',
     'timer',
     'visualization',
     'volume',
@@ -142,7 +145,8 @@ async def async_get_service(
         if CONF_MEDIA_DIR in config: media_directory = hass.config.path(config[CONF_MEDIA_DIR])
         if CONF_ESCAPE_PAYLOAD in config: escape_payload = config[CONF_ESCAPE_PAYLOAD]
     
-    notificationService = DivoomNotificationService(host, mac, port, device_type, media_directory, escape_payload)
+    font_directory = hass.config.path(f"{DATA_CUSTOM_COMPONENTS}/{DOMAIN}/fonts/")
+    notificationService = DivoomNotificationService(host, mac, port, device_type, media_directory, font_directory, escape_payload)
 
     hass.data.setdefault(DOMAIN, {})
     domainConfig = hass.data.get(DOMAIN)
@@ -165,14 +169,16 @@ async def async_get_service(
 class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
 
-    def __init__(self, host, mac, port, device_type, media_directory, escape_payload):
+    def __init__(self, host, mac, port, device_type, media_directory, font_directory, escape_payload):
         assert mac is not None
         assert port is not None
         assert device_type is not None
         assert media_directory is not None
+        assert font_directory is not None
 
         self._device = None
         self._media_directory = media_directory
+        self._font_directory = font_directory
 
         if device_type == 'aurabox':
             from .devices.aurabox import Aurabox
@@ -371,6 +377,14 @@ class DivoomNotificationService(BaseNotificationService):
             value = data.get(PARAM_TEMP) or data.get(PARAM_VALUE)
             color = data.get(PARAM_COLOR)
             self._device.show_temperature(value=value, color=color)
+
+        elif mode == "text":
+            text = data.get(PARAM_TEXT) or data.get(PARAM_VALUE)
+            font_file = data.get(PARAM_FONT)
+            font_path = os.path.join(self._font_directory, font_file) if font_file is not None else None
+            time = data.get(PARAM_TIME)
+            color = data.get(PARAM_COLOR)
+            self._device.show_text(text, font_path, time=time, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
 
         elif mode == "timer":
             value = data.get(PARAM_VALUE)

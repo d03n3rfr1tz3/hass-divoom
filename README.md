@@ -49,6 +49,7 @@ a Notification Service. Just send controls/animations to your Divoom device thro
       - [MODE signal](#mode-signal)
       - [MODE sleep](#mode-sleep)
       - [MODE temperature](#mode-temperature)
+      - [MODE text](#mode-text)
       - [MODE timer](#mode-timer)
       - [MODE visualization](#mode-visualization)
       - [MODE volume](#mode-volume)
@@ -611,6 +612,24 @@ data:
   color: [250, 0, 0]
 ```
 
+#### MODE text
+Shows text as a scrolling animation.
+
+| Parameter | Description |
+| ---       | ---         |
+| `text`    | The text that will be animated. |
+| `font`    | The font name or filename of the font that should be used. Defaults to a generic font. |
+| `time`    | The time in milliseconds between each frame. Defaults to 100ms per frame. |
+| `color`   | The colors for foreground and background. Accepts an array of an array of RGB color values. Defaults to white text on black background. |
+
+```
+message: 'text'
+data:
+  text: 'Hello Divoom'
+  font: 'divoom.ttf'
+  color: [[250, 0, 0], [0, 0, 0]]
+```
+
 #### MODE timer
 Shows the timer tool.
 
@@ -630,11 +649,13 @@ Shows the visualization channel.
 | Parameter | Description |
 | ---       | ---         |
 | `number`  | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
+| `color`   | The colors for foreground and background. Accepts an array of an array of RGB color values. Only supported by the oldest devices. |
 
 ```
 message: 'visualization'
 data:
   number: 2
+  color: [[250, 0, 0], [0, 0, 0]]
 ```
 
 #### MODE volume

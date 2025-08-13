@@ -61,6 +61,12 @@ message: 'image'
 data:
   file: 'ha16.gif'
 
+# activate a scrolling text animation with the Divoom font
+message: 'text'
+data:
+  text: 'Hello Divoom'
+  font: 'divoom.ttf'
+
 # update date and time
 message: 'datetime'
 data:
