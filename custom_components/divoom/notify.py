@@ -41,6 +41,7 @@ PARAM_FREQUENCY = 'frequency'
 PARAM_NUMBER = 'number'
 PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
+PARAM_SIZE = 'size'
 
 PARAM_SLEEPMODE = 'sleepmode'
 PARAM_TIME = 'time'
@@ -382,9 +383,10 @@ class DivoomNotificationService(BaseNotificationService):
             text = data.get(PARAM_TEXT) or data.get(PARAM_VALUE)
             font_file = data.get(PARAM_FONT)
             font_path = os.path.join(self._font_directory, font_file) if font_file is not None else None
+            size = data.get(PARAM_SIZE)
             time = data.get(PARAM_TIME)
             color = data.get(PARAM_COLOR)
-            self._device.show_text(text, font_path, time=time, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
+            self._device.show_text(text, font_path, size=size, time=time, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
 
         elif mode == "timer":
             value = data.get(PARAM_VALUE)

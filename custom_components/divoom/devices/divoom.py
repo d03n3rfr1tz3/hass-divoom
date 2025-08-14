@@ -336,66 +336,77 @@ class Divoom:
         
         return [result, framesCount]
     
-    def process_text(self, text, font, time=None, color1=None, color2=None):
+    def process_text(self, text, font, size=None, time=None, color1=None, color2=None):
         if color1 is None or len(color1) < 3: color1 = [0xff, 0xff, 0xff]
         if color2 is None or len(color2) < 3: color2 = [0x01, 0x01, 0x01]
 
         frames = []
         picture_time = 50
-        text_margin = int(math.ceil(self.screensize / 8))
-        text_speed_fast = int(math.ceil(self.screensize / 8))
+        text_margin = 0 if size is None else int((self.screensize - size) / 2)
+        text_speed_fast = int(math.ceil(self.screensize / 4))
+        text_speed_medium = int(math.ceil(self.screensize / 8))
         text_speed_slow = int(math.ceil(self.screensize / 16))
         needsFlags = True if self.screensize == 32 else False
         frameSize = (self.screensize, self.screensize)
+        fontSize = self.screensize - (text_margin * 2) if size is None else size
 
-        fnt = ImageFont.load_default(self.screensize - (text_margin * 2))
+        if font is None or 'divoom.ttf' in font: # font calculation is a bit off for divoom.ttf
+            fontSize = int(math.ceil(fontSize * 1.2))
+            text_margin = int((self.screensize - fontSize) / 2)
+
+        fnt = ImageFont.load_default(fontSize)
         try:
             try:
-                if font is not None: fnt = ImageFont.truetype(font, self.screensize - (text_margin * 2))
+                if font is not None: fnt = ImageFont.truetype(font, fontSize)
             except OSError:
-                if font is not None: fnt = ImageFont.truetype(os.path.basename(font), self.screensize - (text_margin * 2))
+                fnt = ImageFont.truetype("divoom.ttf", fontSize)
         except OSError:
             pass
         
-        img_draw = Image.new('RGB', (self.screensize * 100, self.screensize))
-        drw = ImageDraw.Draw(img_draw)
-        drw.fontmode = "1"
-        txt = drw.textbbox((0, 0), text, font=fnt)
-
-        font_width = txt[2]
-        if font is not None and 'divoom.ttf' in font: font_width = int(font_width * 1.1) # font calculation is a bit off sometimes
+        font_width = 60
+        with Image.new('RGB', (self.screensize * 100, self.screensize)) as img_draw:
+            drw = ImageDraw.Draw(img_draw)
+            drw.fontmode = "1"
+            txt = drw.textbbox((0, 0), text, font=fnt)
+            font_width = txt[2]
+        if font is None or 'divoom.ttf' in font: # font calculation is a bit off for divoom.ttf
+            font_width = int(math.ceil(font_width * 1.2))
 
         img_width = self.screensize + font_width + self.screensize + text_margin
-        img = Image.new('RGB', (img_width, self.screensize), tuple(color2))
-        drw = ImageDraw.Draw(img)
-        drw.fontmode = "1"
-        drw.text((self.screensize, text_margin), text, font=fnt, fill=tuple(color1))
+        with Image.new('RGB', (img_width, self.screensize), tuple(color2)) as img:
+            drw = ImageDraw.Draw(img)
+            drw.fontmode = "1"
+            drw.text((self.screensize, text_margin), text, font=fnt, fill=tuple(color1))
 
-        text_speed = text_speed_slow
-        framesCount = int(math.floor((img_width - self.screensize) / text_speed))
-        if framesCount > 60: # frames are limited, therefore we need to do bigger jumps
-            text_speed = text_speed_fast
-            picture_time = int(picture_time * 2)
+            text_speed = text_speed_slow
             framesCount = int(math.floor((img_width - self.screensize) / text_speed))
-        if framesCount > 60: self.logger.warning("{0}: text animation is too wide and is very likely cut off.".format(self.type))
-        
-        for offset in range(framesCount):
-            colors = []
-            pixels = [None] * frameSize[0] * frameSize[1]
-
-            for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
-                y, x = pos
-                r, g, b = img.getpixel((x + (offset * text_speed), y))
-                if [r, g, b] not in colors:
-                    colors.append([r, g, b])
-                color_index = colors.index([r, g, b])
-                pixels[x + frameSize[1] * y] = color_index
+            if framesCount > 60: # frames are limited, therefore we need to do bigger jumps
+                text_speed = text_speed_medium
+                picture_time = int(picture_time * (text_speed_medium / text_speed_slow))
+                framesCount = int(math.floor((img_width - self.screensize) / text_speed))
+                if framesCount > 60: # frames are limited, therefore we need to do even bigger jumps
+                    text_speed = text_speed_fast
+                    picture_time = int(picture_time * (text_speed_fast / text_speed_medium))
+                    framesCount = int(math.floor((img_width - self.screensize) / text_speed))
+            if framesCount > 60: self.logger.warning("{0}: text animation is too wide and is very likely cut off.".format(self.type))
             
-            colorCount = len(colors)
-            if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
+            for offset in range(framesCount):
+                colors = []
+                pixels = [None] * frameSize[0] * frameSize[1]
 
-            frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
-            frames.append(frame)
+                for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
+                    y, x = pos
+                    r, g, b = img.getpixel((x + (offset * text_speed), y))
+                    if [r, g, b] not in colors:
+                        colors.append([r, g, b])
+                    color_index = colors.index([r, g, b])
+                    pixels[x + frameSize[1] * y] = color_index
+                
+                colorCount = len(colors)
+                if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
+
+                frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
+                frames.append(frame)
         
         result = []
 
@@ -757,9 +768,9 @@ class Divoom:
         self.send_command("set temp type", [0x01 if value == True or value == 1 else 0x00])
         return result
 
-    def show_text(self, text, font, time=None, color1=None, color2=None):
+    def show_text(self, text, font, size=None, time=None, color1=None, color2=None):
         """Show image or animation on the Divoom device"""
-        frames, framesCount = self.process_text(text, font, time=time, color1=color1, color2=color2)
+        frames, framesCount = self.process_text(text, font, size=size, time=time, color1=color1, color2=color2)
         
         result = None
         if framesCount > 1:
