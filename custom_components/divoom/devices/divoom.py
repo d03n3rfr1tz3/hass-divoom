@@ -350,16 +350,14 @@ class Divoom:
         frameSize = (self.screensize, self.screensize)
         fontSize = self.screensize - (text_margin * 2) if size is None else size
 
-        if font is None or 'divoom.ttf' in font: # font calculation is a bit off for divoom.ttf
+        if font is not None and 'divoom.ttf' in font: # font calculation is a bit off for divoom.ttf
             fontSize = int(math.ceil(fontSize * 1.2))
             text_margin = int((self.screensize - fontSize) / 2)
 
+        self.logger.info("{0}: FONT: {1}".format(self.type, font))
         fnt = ImageFont.load_default(fontSize)
         try:
-            try:
-                if font is not None: fnt = ImageFont.truetype(font, fontSize)
-            except OSError:
-                fnt = ImageFont.truetype("divoom.ttf", fontSize)
+            if font is not None: fnt = ImageFont.truetype(font, fontSize)
         except OSError:
             pass
         
@@ -369,7 +367,7 @@ class Divoom:
             drw.fontmode = "1"
             txt = drw.textbbox((0, 0), text, font=fnt)
             font_width = txt[2]
-        if font is None or 'divoom.ttf' in font: # font calculation is a bit off for divoom.ttf
+        if font is not None and 'divoom.ttf' in font: # font calculation is a bit off for divoom.ttf
             font_width = int(math.ceil(font_width * 1.2))
 
         img_width = self.screensize + font_width + self.screensize + text_margin
