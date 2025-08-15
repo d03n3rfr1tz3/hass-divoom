@@ -289,8 +289,8 @@ class Divoom:
             
             try:
                 while True:
-                    new_frame = Image.new('RGB', img.size)
-                    new_frame.paste(img, (0, 0))
+                    new_frame = Image.new('RGBA', img.size)
+                    new_frame.paste(img, (0, 0), img.convert('RGBA'))
 
                     if needsResize:
                         new_frame = new_frame.resize(frameSize, Image.Resampling.NEAREST)
@@ -311,10 +311,11 @@ class Divoom:
                 
                 for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
                     y, x = pos
-                    r, g, b = picture_frame.getpixel((x, y))
-                    if [r, g, b] not in colors:
-                        colors.append([r, g, b])
-                    color_index = colors.index([r, g, b])
+                    r, g, b, a = picture_frame.getpixel((x, y))
+                    color = [r, g, b] if a > 32 else [0, 0, 0]
+                    if color not in colors:
+                        colors.append(color)
+                    color_index = colors.index(color)
                     pixels[x + frameSize[1] * y] = color_index
                 
                 if picture_time is None: picture_time = 0
@@ -362,7 +363,7 @@ class Divoom:
             pass
         
         font_width = 60
-        with Image.new('RGB', (self.screensize * 100, self.screensize)) as img_draw:
+        with Image.new('RGBA', (self.screensize * 100, self.screensize)) as img_draw:
             drw = ImageDraw.Draw(img_draw)
             drw.fontmode = "1"
             txt = drw.textbbox((0, 0), text, font=fnt)
@@ -371,10 +372,10 @@ class Divoom:
             font_width = int(math.ceil(font_width * 1.2))
 
         img_width = self.screensize + font_width + self.screensize + text_margin
-        with Image.new('RGB', (img_width, self.screensize), tuple(color2)) as img:
+        with Image.new('RGBA', (img_width, self.screensize), tuple(color2 + [0x00])) as img:
             drw = ImageDraw.Draw(img)
             drw.fontmode = "1"
-            drw.text((self.screensize, text_margin), text, font=fnt, fill=tuple(color1))
+            drw.text((self.screensize, text_margin), text, font=fnt, fill=tuple(color1 + [0xff]))
 
             text_speed = text_speed_slow
             framesCount = int(math.floor((img_width - self.screensize) / text_speed))
@@ -394,10 +395,11 @@ class Divoom:
 
                 for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
                     y, x = pos
-                    r, g, b = img.getpixel((x + (offset * text_speed), y))
-                    if [r, g, b] not in colors:
-                        colors.append([r, g, b])
-                    color_index = colors.index([r, g, b])
+                    r, g, b, a = img.getpixel((x + (offset * text_speed), y))
+                    color = [r, g, b] if a > 32 else [0, 0, 0]
+                    if color not in colors:
+                        colors.append(color)
+                    color_index = colors.index(color)
                     pixels[x + frameSize[1] * y] = color_index
                 
                 colorCount = len(colors)
