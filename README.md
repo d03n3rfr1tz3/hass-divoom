@@ -613,7 +613,7 @@ data:
 ```
 
 #### MODE text
-Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `divoom.ttf`, `gamepaused.otf`, `impact.ttf`, `pixelpowerline.ttf` and `rasterforge.ttf`. Be aware, that a longer text or wide font might not fit into the frame limitation of ~60 frames.
+Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the frame limitation of ~60 frames.
 
 | Parameter | Description |
 | ---       | ---         |
