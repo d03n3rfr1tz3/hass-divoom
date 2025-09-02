@@ -1,6 +1,6 @@
 """Provides class Divoom that encapsulates the Divoom Bluetooth communication."""
 
-import logging, math, itertools, os, select, socket, time, datetime
+import datetime, errno, itertools, logging, math, os, select, socket, time
 from PIL import Image, ImageDraw, ImageFont
 
 class Divoom:
@@ -91,6 +91,9 @@ class Divoom:
                 self.socket_errno = 0
             except socket.error as error:
                 self.socket_errno = error.errno
+            except IOError as error:
+                if error.errno == errno.EPIPE:
+                    self.socket_errno = error.errno
         
         if (self.socket != None and self.host != None):
             time.sleep(0.5)
@@ -136,6 +139,9 @@ class Divoom:
                     self.socket_errno = 696
         except socket.error as error:
             self.socket_errno = error.errno
+        except IOError as error:
+            if error.errno == errno.EPIPE:
+                self.socket_errno = error.errno
         
         retries = 1
         while self.socket_errno != None and self.socket_errno > 0 and retries <= 5:
@@ -159,6 +165,9 @@ class Divoom:
                 return len(data)
             except socket.error as error:
                 self.socket_errno = error.errno
+            except IOError as error:
+                if error.errno == errno.EPIPE:
+                    self.socket_errno = error.errno
         else:
             return 0
 
@@ -170,6 +179,10 @@ class Divoom:
             return self.socket.send(data)
         except socket.error as error:
             self.socket_errno = error.errno
+            raise
+        except IOError as error:
+            if error.errno == errno.EPIPE:
+                self.socket_errno = error.errno
             raise
 
     def send_command(self, command, args=None, skipRead=None):
@@ -200,6 +213,10 @@ class Divoom:
                 result = self.socket.send(bytes(request))
             except socket.error as error:
                 self.socket_errno = error.errno
+                raise
+            except IOError as error:
+                if error.errno == errno.EPIPE:
+                    self.socket_errno = error.errno
                 raise
         else:
             self.socket_errno = 98
