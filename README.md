@@ -274,7 +274,7 @@ Shows the clock channel. Be aware, that this mode is very limited on older devic
 | Parameter | Description |
 | ---       | ---         |
 | `clock` | The style of the clock. Accepts a number between 0 and 9. <br/> `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen |
-| `twentyfour` | Changes between 12h or 24h format. <br/> `0` = 12h, `1` = 24h. Defaults to 24h. Doesn't actually change the current time. |
+| `twentyfour` | Changes between 12h or 24h format. <br/> `0` = 12h, `1` = 24h. |
 | `weather` | Actives or deactivates showing the weather with `0` or `1`. |
 | `temp`    | Actives or deactivates showing the temperature with `0` or `1`. |
 | `calendar` | Actives or deactivates showing the calendar date with `0` or `1`. |

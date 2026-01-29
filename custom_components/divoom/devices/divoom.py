@@ -533,10 +533,13 @@ class Divoom:
     def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""
         if clock == None: clock = 0
-        if twentyfour == None: twentyfour = True
         if weather == None: weather = False
         if temp == None: temp = False
         if calendar == None: calendar = False
+
+        if twentyfour != None:
+            args = [0x01 if twentyfour == True or twentyfour == 1 else 0x00]
+            self.send_command("set time type", args, skipRead=True)
 
         args = [0x00]
         args += [0x01 if twentyfour == True or twentyfour == 1 else 0x00]
