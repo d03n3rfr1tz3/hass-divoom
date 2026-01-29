@@ -16,7 +16,7 @@ class Divoom:
         "set keyboard": 0x23,
         "set hot": 0x26,
         "set temp type": 0x2b,
-        "set time type": 0x2c,
+        "set time type": 0x2d,
         "set lightness": 0x32,
         "set sleeptime": 0x40,
         "set alarm": 0x43,
