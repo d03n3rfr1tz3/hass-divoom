@@ -76,3 +76,25 @@ def format_golden(messages: list[bytes]) -> str:
 def parse_golden(text: str) -> list[bytes]:
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     return [bytes.fromhex(line.replace(" ", "")) for line in lines]
+
+
+def unescape_message(message: bytes) -> bytes:
+    """Reverse Divoom.escape_payload's 0x03,X -> X-0x03 substitution.
+
+    Devices with escapePayload=True (e.g. TimeboxMini) escape every 0x01-0x03
+    byte in the checksummed payload as a 2-byte sequence, so the *wire*
+    length of an otherwise-identical message varies with how many payload
+    bytes happen to fall in that range. Comparing messages after unescaping
+    removes that variance while still catching any real structural
+    difference (frame count, command, sizes)."""
+    result = bytearray()
+    i = 0
+    while i < len(message):
+        b = message[i]
+        if b == 0x03 and i + 1 < len(message) and message[i + 1] in (0x04, 0x05, 0x06):
+            result.append(message[i + 1] - 0x03)
+            i += 2
+        else:
+            result.append(b)
+            i += 1
+    return bytes(result)

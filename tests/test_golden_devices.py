@@ -18,6 +18,13 @@ bytes within animation frames that actually contain the glyph, never the
 protocol framing or frame count, so the structural check below still catches
 real regressions (wrong command, wrong frame count, wrong message sizes)
 without being flaky across platforms.
+TimeboxMini also has escapePayload=True, so a shifted pixel byte can additionally
+land in the 0x01-0x03 range and get escaped to 2 bytes on one platform but not
+the other, changing the *wire* message length by exactly that much even though
+the underlying frame is identical. Messages are therefore unescaped (only
+when the device actually escapes, i.e. device.escapePayload) before the
+length/header comparison, which removes exactly that variance without
+loosening the check any further.
 """
 from __future__ import annotations
 
@@ -26,7 +33,13 @@ import os
 import pytest
 
 from tests.cases import DEVICE_CLASSES, all_cases
-from tests.support import GOLDEN_DIR, format_golden, make_connected_device, parse_golden
+from tests.support import (
+    GOLDEN_DIR,
+    format_golden,
+    make_connected_device,
+    parse_golden,
+    unescape_message,
+)
 
 CASE_IDS = [
     (device_type, case_name)
@@ -65,6 +78,9 @@ def test_golden_master(device_type, case_name):
         expected_messages = parse_golden(expected)
         actual_messages = recorder.sent_messages
         assert len(actual_messages) == len(expected_messages)
+        if device.escapePayload:
+            expected_messages = [unescape_message(m) for m in expected_messages]
+            actual_messages = [unescape_message(m) for m in actual_messages]
         for expected_message, actual_message in zip(expected_messages, actual_messages):
             assert len(actual_message) == len(expected_message)
             assert actual_message[:HEADER_LENGTH] == expected_message[:HEADER_LENGTH]
