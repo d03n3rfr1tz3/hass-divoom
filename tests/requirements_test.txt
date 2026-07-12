@@ -1,7 +1,7 @@
 pytest==9.0.3
 pytest-asyncio==1.4.0
 pytest-homeassistant-custom-component==0.13.346
-Pillow==12.3.0
+Pillow==12.2.0
 
 # config_flow.py imports homeassistant.components.bluetooth, which in turn
 # imports homeassistant.components.usb - both pull in these requirements at
