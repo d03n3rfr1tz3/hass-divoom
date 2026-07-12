@@ -118,12 +118,20 @@ def test_send_weather_celsius_sends_set_temp_type_zero():
         server_sock.close()
 
     assert len(recorder.sent_messages) == 2
+    temp_message = recorder.sent_messages[0]
+    assert temp_message[3] == 0x5f  # "set temp" command byte
+    assert temp_message[4] == 22  # Celsius value sent as-is
     temp_type_message = recorder.sent_messages[1]
     assert temp_type_message[3] == 0x2b  # "set temp type" command byte
     assert temp_type_message[4] == 0x00  # Celsius
 
 
 def test_send_weather_fahrenheit_sends_set_temp_type_one():
+    """The device always interprets the "set temp" value as Celsius (the
+    "set temp type" flag only controls how it is *displayed*), so a
+    Fahrenheit input must be converted to Celsius before being sent -
+    confirmed by a BT snoop of the official app, which sends the same
+    Celsius reading regardless of the selected display unit."""
     device, recorder, server_sock = make_connected_device(Pixoo)
     try:
         device.send_weather("70°F", weather=3)
@@ -132,6 +140,9 @@ def test_send_weather_fahrenheit_sends_set_temp_type_one():
         server_sock.close()
 
     assert len(recorder.sent_messages) == 2
+    temp_message = recorder.sent_messages[0]
+    assert temp_message[3] == 0x5f
+    assert temp_message[4] == round((70 - 32) * 5 / 9)  # 21, converted to Celsius
     temp_type_message = recorder.sent_messages[1]
     assert temp_type_message[3] == 0x2b
     assert temp_type_message[4] == 0x01

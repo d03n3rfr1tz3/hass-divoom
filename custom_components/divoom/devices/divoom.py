@@ -879,14 +879,19 @@ class Divoom:
         if weather == None: weather = 0
         if isinstance(weather, str): weather = int(weather)
 
+        unit = value[-2:]
+        number = float(value[0:-2])
+        if unit == "°F":
+            number = (number - 32) * 5 / 9
+
         args = []
-        args += int(round(float(value[0:-2]))).to_bytes(1, byteorder='big', signed=True)
+        args += int(round(number)).to_bytes(1, byteorder='big', signed=True)
         args += weather.to_bytes(1, byteorder='big')
         result = self.send_command("set temp", args)
 
-        if value[-2:] == "°C":
+        if unit == "°C":
             self.send_command("set temp type", [0x00])
-        if value[-2:] == "°F":
+        if unit == "°F":
             self.send_command("set temp type", [0x01])
         return result
 
