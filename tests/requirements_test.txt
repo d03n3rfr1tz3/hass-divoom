@@ -16,3 +16,10 @@ bluetooth-auto-recovery==1.6.4
 bluetooth-data-tools==1.29.18
 dbus-fast==5.0.22
 habluetooth==6.26.5
+
+# homeassistant.components.usb.serial_proxy_stub unconditionally imports
+# serialx.platforms.serial_esphome, which requires aioesphomeapi. HA's own
+# usb/manifest.json does not declare this (only esphome/manifest.json does,
+# which real installs always have alongside usb). Pinned to the version from
+# esphome/manifest.json for homeassistant==2026.7.2.
+aioesphomeapi==45.3.1
