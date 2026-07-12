@@ -1,0 +1,18 @@
+pytest==9.0.0
+pytest-asyncio==1.3.0
+pytest-homeassistant-custom-component==0.13.316
+pillow==12.0.0
+
+# config_flow.py imports homeassistant.components.bluetooth, which in turn
+# imports homeassistant.components.usb - both pull in these requirements at
+# module level. Matches manifest.json's "bluetooth" trigger / "bluetooth_adapters"
+# dependency, so this mirrors what a real HA instance installs for this integration.
+aiousbwatcher==1.1.1
+pyserial==3.5
+bleak==2.1.1
+bleak-retry-connector==4.4.3
+bluetooth-adapters==2.1.0
+bluetooth-auto-recovery==1.5.3
+bluetooth-data-tools==1.28.4
+dbus-fast==3.1.2
+habluetooth==5.8.0
