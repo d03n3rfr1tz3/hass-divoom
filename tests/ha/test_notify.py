@@ -1,10 +1,9 @@
-"""HA integration tests for notify.py, per the plan's Paket 1c: service
-setup via async_get_service, and send_message's mode dispatch. The dispatch
-tests swap in a unittest.mock.Mock() for DivoomNotificationService._device,
-skipping DivoomNotificationService.__init__ entirely (it picks a real device
-class and constructs a real socket-backed object) - so these run with no
-socket involved at all, only asserting which show_*/send_* call reaches the
-mock and with what arguments.
+"""HA integration tests for notify.py: service setup via async_get_service,
+and send_message's mode dispatch. The dispatch tests swap in a unittest.mock.Mock()
+for DivoomNotificationService._device, skipping DivoomNotificationService.__init__
+entirely (it picks a real device class and constructs a real socket-backed object).
+So these run with no socket involved at all, only asserting which show_*/send_* call
+reaches the mock and with what arguments.
 """
 from __future__ import annotations
 

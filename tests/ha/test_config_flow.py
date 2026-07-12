@@ -1,10 +1,4 @@
-"""HA integration tests for the divoom config flow (user step + zeroconf
-step), per the plan's Paket 1c. The zeroconf cases with a missing
-device_mac/device_name property used to be marked xfail: the original code
-crashed on them (unguarded .get(...).lower()). Paket 2 changes this to a
-graceful abort/fallback (see async_step_zeroconf), so these now assert the
-new behaviour directly.
-"""
+"""HA integration tests for the divoom config flow (user step + zeroconf step)."""
 from __future__ import annotations
 
 import ipaddress
