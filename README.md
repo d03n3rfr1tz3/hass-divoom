@@ -59,6 +59,8 @@ a Notification Service. Just send controls/animations to your Divoom device thro
   * [Troubleshooting](#troubleshooting)
     + [Cannot connect](#cannot-connect)
     + [GIF does not work](#gif-does-not-work)
+  * [Development](#development)
+    + [Running Tests](#running-tests)
   * [Credits](#credits)
 
 ## Requirements
@@ -395,7 +397,7 @@ Sends controlling commands to the currently open game.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value`   | `0` or `go` = go, <br/> `1` or `left` = left, <br/> `2` or `right` = right, <br/> `3` or `up` = up, <br/> `4` or `bottom` = bottom, <br/> `5` or `ok` = ok |
+| `value`   | `0` or `go` = go, <br/> `1` or `left` = left, <br/> `2` or `right` = right, <br/> `3` or `up` = up, <br/> `4` or `down` = down, <br/> `5` or `ok` = ok |
 
 ```
 message: 'gamecontrol'
@@ -737,6 +739,24 @@ The most common problem is, that the GIF does not have the correct size or forma
 Your GIF needs to be exactly the size of your Divoom screen (*16x16* in case of a Pixoo or similar sized device), *non-interlaced* and with a *global color palette*.
 
 I can recommend resizing and converting your GIFs with GIMP. Of course other software might also work, depending on the export/format options. When resizing a GIF downloaded from the Divoom app with GIMP, you better choose no interpolation to not blur your GIF. When exporting with GIMP, make sure to mark the animation checkbox and don't mark the interlace checkbox. For a few more details and an example look into the following comment: https://github.com/d03n3rfr1tz3/hass-divoom/issues/19#issuecomment-1982059358
+
+## Development
+### Running Tests
+Open a terminal in the repository's root folder before running the commands below.
+Requires Python 3.14 or newer, since that's what `tests/requirements_test.txt` is pinned against.
+
+bash/Linux/macOS:
+```bash
+pip install -r tests/requirements_test.txt
+PYTHONPATH=tests pytest tests
+```
+
+PowerShell (Windows):
+```powershell
+pip install -r tests/requirements_test.txt
+$env:PYTHONPATH = "tests"
+pytest tests
+```
 
 ## Credits
 A lot of the bluetooth communication with the Divoom device is based on gathering information from multiple sources, that already
