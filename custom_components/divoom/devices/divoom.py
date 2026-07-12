@@ -338,15 +338,20 @@ class Divoom:
                 picture_time = pair[1]
                 
                 colors = []
+                palette_index = {}
                 pixels = [None] * frameSize[0] * frameSize[1]
-                
+                pix = picture_frame.load()
+
                 for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
                     y, x = pos
-                    r, g, b, a = picture_frame.getpixel((x, y))
+                    r, g, b, a = pix[x, y]
                     color = [r, g, b] if a > 32 else [0, 0, 0]
-                    if color not in colors:
+                    color_t = (r, g, b) if a > 32 else (0, 0, 0)
+                    color_index = palette_index.get(color_t)
+                    if color_index is None:
+                        color_index = len(colors)
+                        palette_index[color_t] = color_index
                         colors.append(color)
-                    color_index = colors.index(color)
                     pixels[x + frameSize[1] * y] = color_index
                 
                 if picture_time is None: picture_time = 0
@@ -419,18 +424,23 @@ class Divoom:
                     picture_time = int(picture_time * (text_speed_fast / text_speed_medium))
                     framesCount = int(math.floor((img_width - self.screensize) / text_speed))
             if framesCount > 60: self.logger.warning("{0}: text animation is too wide and is very likely cut off.".format(self.type))
-            
+
+            pix = img.load()
             for offset in range(framesCount):
                 colors = []
+                palette_index = {}
                 pixels = [None] * frameSize[0] * frameSize[1]
 
                 for pos in itertools.product(range(frameSize[1]), range(frameSize[0])):
                     y, x = pos
-                    r, g, b, a = img.getpixel((x + (offset * text_speed), y))
+                    r, g, b, a = pix[x + (offset * text_speed), y]
                     color = [r, g, b] if a > 32 else [0, 0, 0]
-                    if color not in colors:
+                    color_t = (r, g, b) if a > 32 else (0, 0, 0)
+                    color_index = palette_index.get(color_t)
+                    if color_index is None:
+                        color_index = len(colors)
+                        palette_index[color_t] = color_index
                         colors.append(color)
-                    color_index = colors.index(color)
                     pixels[x + frameSize[1] * y] = color_index
                 
                 colorCount = len(colors)
@@ -472,17 +482,22 @@ class Divoom:
         bitsPerPixel = math.ceil(math.log(len(colors)) / math.log(2))
         if bitsPerPixel == 0:
             bitsPerPixel = 1
-        
-        pixelString = ""
+
+        mask = (1 << bitsPerPixel) - 1
+        acc = 0
+        nbits = 0
+        result = bytearray()
         for pixel in pixels:
-            pixelBits = "{0:b}".format(pixel).zfill(8)
-            pixelString += pixelBits[::-1][:bitsPerPixel:]
-        
-        result = []
-        for pixel in self.chunks(pixelString, 8):
-            result += [int(pixel[::-1], 2)]
-        
-        return result
+            acc |= (pixel & mask) << nbits
+            nbits += bitsPerPixel
+            while nbits >= 8:
+                result.append(acc & 0xff)
+                acc >>= 8
+                nbits -= 8
+        if nbits > 0:
+            result.append(acc & 0xff)
+
+        return list(result)
 
     def send_ping(self):
         """Send a ping (actually it's requesting current view) to the Divoom device to check connectivity"""
