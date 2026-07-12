@@ -8,9 +8,21 @@ import errno
 import logging
 import socket
 
+import pytest
+
 from custom_components.divoom.devices import divoom as divoom_module
 from custom_components.divoom.devices.pixoo import Pixoo
 from tests.support import make_connected_device
+
+
+@pytest.fixture(autouse=True)
+def _ensure_bluetooth_socket_constants(monkeypatch):
+    """AF_BLUETOOTH/BTPROTO_RFCOMM are missing on some Python builds without
+    bluetooth headers (e.g. some CI runners). These tests mock socket.socket()
+    entirely, so a placeholder value is enough to keep the attribute access
+    from raising."""
+    monkeypatch.setattr(socket, "AF_BLUETOOTH", getattr(socket, "AF_BLUETOOTH", 31), raising=False)
+    monkeypatch.setattr(socket, "BTPROTO_RFCOMM", getattr(socket, "BTPROTO_RFCOMM", 3), raising=False)
 
 
 class _FailingConnectSocket:

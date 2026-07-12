@@ -1,5 +1,5 @@
 """Switching states and sending images or animations to a divoom device."""
-import logging, os, socket
+import logging, os, socket, threading
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant
@@ -180,6 +180,7 @@ class DivoomNotificationService(BaseNotificationService):
         self._device = None
         self._media_directory = media_directory
         self._font_directory = font_directory
+        self._lock = threading.RLock()
 
         if device_type == 'aurabox':
             from .devices.aurabox import Aurabox
@@ -235,10 +236,12 @@ class DivoomNotificationService(BaseNotificationService):
             self._device.disconnect()
 
     def connect(self):
-        self._device.connect()
+        with self._lock:
+            self._device.connect()
 
     def disconnect(self):
-        self._device.disconnect()
+        with self._lock:
+            self._device.disconnect()
 
     def _resolve_path(self, base_directory, filename):
         joined = os.path.join(base_directory, filename)
@@ -249,203 +252,204 @@ class DivoomNotificationService(BaseNotificationService):
         return joined
 
     def send_message(self, message="", **kwargs):
-        if message == "" and kwargs.get(ATTR_DATA) is None:
-            _LOGGER.error("Service call needs more information")
-            return False
-        
-        data = kwargs.get(ATTR_DATA) or {}
-        mode = data.get(PARAM_MODE) or message
-        
-        if mode != "connect" and mode != "disconnect":
-            skipPing = True if mode == "gamecontrol" or mode == "raw" else False
-            self._device.reconnect(skipPing=skipPing)
-
-        if mode == "connect":
-            self._device.connect()
-
-        elif mode == "disconnect":
-            self._device.disconnect()
-
-        elif mode == 'on':
-            self._device.send_on()
-
-        elif mode == 'off':
-            self._device.send_off()
-        
-        elif mode == "alarm":
-            number = data.get(PARAM_NUMBER)
-            time = data.get(PARAM_VALUE)
-            weekdays = data.get(PARAM_WEEKDAY)
-            alarm_mode = data.get(PARAM_ALARMMODE)
-            trigger_mode = data.get(PARAM_TRIGGERMODE)
-            frequency = data.get(PARAM_FREQUENCY)
-            volume = data.get(PARAM_VOLUME)
-            self._device.show_alarm(number=number, time=time, weekdays=weekdays, alarmMode=alarm_mode, triggerMode=trigger_mode, frequency=frequency, volume=volume)
-
-        elif mode == "brightness":
-            value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
-            self._device.send_brightness(value=value)
-
-        elif mode == "clock":
-            clock = data.get(PARAM_CLOCK)
-            twentyfour = data.get(PARAM_TWENTYFOUR)
-            weather = data.get(PARAM_WEATHER)
-            temp = data.get(PARAM_TEMP)
-            calendar = data.get(PARAM_CALENDAR)
-            color = data.get(PARAM_COLOR)
-            hot = data.get(PARAM_HOT)
-            self._device.show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
-
-        elif mode == "countdown":
-            value = data.get(PARAM_VALUE)
-            countdown = data.get(PARAM_COUNTDOWN)
-            self._device.show_countdown(value=value, countdown=countdown)
-
-        elif mode == "datetime":
-            value = data.get(PARAM_VALUE)
-            self._device.send_datetime(value=value)
-
-        elif mode == "design":
-            number = data.get(PARAM_NUMBER)
-            self._device.show_design(number=number)
-
-        elif mode == "effects":
-            number = data.get(PARAM_NUMBER)
-            self._device.show_effects(number=number)
-
-        elif mode == "equalizer":
-            number = data.get(PARAM_NUMBER)
-            audioMode = data.get(PARAM_AUDIOMODE)
-            backgroundMode = data.get(PARAM_BACKGROUNDMODE)
-            streamMode = data.get(PARAM_STREAMMODE)
-            self._device.show_equalizer(number=number, audioMode=audioMode, backgroundMode=backgroundMode, streamMode=streamMode)
-
-        elif mode == "game":
-            value = data.get(PARAM_VALUE)
-            self._device.show_game(value=value)
-
-        elif mode == "gamecontrol":
-            value = data.get(PARAM_VALUE)
-            self._device.send_gamecontrol(value=value)
-
-        elif mode == "image":
-            image_file = data.get(PARAM_FILE)
-            if image_file is None:
-                _LOGGER.error("Service call needs a file")
+        with self._lock:
+            if message == "" and kwargs.get(ATTR_DATA) is None:
+                _LOGGER.error("Service call needs more information")
                 return False
-            image_path = self._resolve_path(self._media_directory, image_file)
-            if image_path is None:
-                _LOGGER.error("file '{0}' is outside of the configured media directory".format(image_file))
-                return False
-            time = data.get(PARAM_TIME)
-            self._device.show_image(image_path, time=time)
+        
+            data = kwargs.get(ATTR_DATA) or {}
+            mode = data.get(PARAM_MODE) or message
+        
+            if mode != "connect" and mode != "disconnect":
+                skipPing = True if mode == "gamecontrol" or mode == "raw" else False
+                self._device.reconnect(skipPing=skipPing)
 
-        elif mode == "keyboard":
-            value = data.get(PARAM_VALUE)
-            self._device.send_keyboard(value=value)
+            if mode == "connect":
+                self._device.connect()
 
-        elif mode == "light":
-            brightness = data.get(PARAM_BRIGHTNESS)
-            color = data.get(PARAM_COLOR)
-            self._device.show_light(color=color, brightness=brightness, power=True)
+            elif mode == "disconnect":
+                self._device.disconnect()
 
-        elif mode == "lyrics":
-            self._device.show_lyrics()
+            elif mode == 'on':
+                self._device.send_on()
 
-        elif mode == "memorial":
-            number = data.get(PARAM_NUMBER)
-            value = data.get(PARAM_VALUE)
-            text = data.get(PARAM_TEXT)
-            self._device.show_memorial(number=number, value=value, text=text, animate=True)
+            elif mode == 'off':
+                self._device.send_off()
+        
+            elif mode == "alarm":
+                number = data.get(PARAM_NUMBER)
+                time = data.get(PARAM_VALUE)
+                weekdays = data.get(PARAM_WEEKDAY)
+                alarm_mode = data.get(PARAM_ALARMMODE)
+                trigger_mode = data.get(PARAM_TRIGGERMODE)
+                frequency = data.get(PARAM_FREQUENCY)
+                volume = data.get(PARAM_VOLUME)
+                self._device.show_alarm(number=number, time=time, weekdays=weekdays, alarmMode=alarm_mode, triggerMode=trigger_mode, frequency=frequency, volume=volume)
 
-        elif mode == "noise":
-            value = data.get(PARAM_VALUE)
-            self._device.show_noise(value=value)
+            elif mode == "brightness":
+                value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
+                self._device.send_brightness(value=value)
 
-        elif mode == "playstate":
-            value = data.get(PARAM_VALUE)
-            self._device.send_playstate(value=value)
+            elif mode == "clock":
+                clock = data.get(PARAM_CLOCK)
+                twentyfour = data.get(PARAM_TWENTYFOUR)
+                weather = data.get(PARAM_WEATHER)
+                temp = data.get(PARAM_TEMP)
+                calendar = data.get(PARAM_CALENDAR)
+                color = data.get(PARAM_COLOR)
+                hot = data.get(PARAM_HOT)
+                self._device.show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
 
-        elif mode == "radio":
-            value = data.get(PARAM_VALUE)
-            frequency = data.get(PARAM_FREQUENCY)
-            self._device.show_radio(value=value, frequency=frequency)
+            elif mode == "countdown":
+                value = data.get(PARAM_VALUE)
+                countdown = data.get(PARAM_COUNTDOWN)
+                self._device.show_countdown(value=value, countdown=countdown)
 
-        elif mode == "raw":
-            raw = data.get(PARAM_RAW)
-            if not raw:
-                _LOGGER.error("Service call needs a raw command")
-                return False
-            self._device.send_command(command=raw[0], args=raw[1:])
+            elif mode == "datetime":
+                value = data.get(PARAM_VALUE)
+                self._device.send_datetime(value=value)
 
-        elif mode == "scoreboard":
-            player1 = data.get(PARAM_PLAYER1)
-            player2 = data.get(PARAM_PLAYER2)
-            self._device.show_scoreboard(blue=player1, red=player2)
+            elif mode == "design":
+                number = data.get(PARAM_NUMBER)
+                self._device.show_design(number=number)
 
-        elif mode == "sleep":
-            sleepvalue = data.get(PARAM_VALUE)
-            sleeptime = data.get(PARAM_TIME)
-            sleepmode = data.get(PARAM_SLEEPMODE)
-            volume = data.get(PARAM_VOLUME)
-            color = data.get(PARAM_COLOR)
-            brightness = data.get(PARAM_BRIGHTNESS)
-            frequency = data.get(PARAM_FREQUENCY)
-            self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency)
+            elif mode == "effects":
+                number = data.get(PARAM_NUMBER)
+                self._device.show_effects(number=number)
 
-        elif mode == "temperature":
-            value = data.get(PARAM_TEMP) or data.get(PARAM_VALUE)
-            color = data.get(PARAM_COLOR)
-            self._device.show_temperature(value=value, color=color)
+            elif mode == "equalizer":
+                number = data.get(PARAM_NUMBER)
+                audioMode = data.get(PARAM_AUDIOMODE)
+                backgroundMode = data.get(PARAM_BACKGROUNDMODE)
+                streamMode = data.get(PARAM_STREAMMODE)
+                self._device.show_equalizer(number=number, audioMode=audioMode, backgroundMode=backgroundMode, streamMode=streamMode)
 
-        elif mode == "text":
-            text = data.get(PARAM_TEXT) or data.get(PARAM_VALUE)
-            font_file = data.get(PARAM_FONT)
-            font_path = None
-            if font_file is not None:
-                font_path = self._resolve_path(self._font_directory, font_file)
-                if font_path is None:
-                    _LOGGER.error("font '{0}' is outside of the configured font directory".format(font_file))
+            elif mode == "game":
+                value = data.get(PARAM_VALUE)
+                self._device.show_game(value=value)
+
+            elif mode == "gamecontrol":
+                value = data.get(PARAM_VALUE)
+                self._device.send_gamecontrol(value=value)
+
+            elif mode == "image":
+                image_file = data.get(PARAM_FILE)
+                if image_file is None:
+                    _LOGGER.error("Service call needs a file")
                     return False
-            size = data.get(PARAM_SIZE)
-            time = data.get(PARAM_TIME)
-            color = data.get(PARAM_COLOR)
-            self._device.show_text(text, font_path, size=size, time=time, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
+                image_path = self._resolve_path(self._media_directory, image_file)
+                if image_path is None:
+                    _LOGGER.error("file '{0}' is outside of the configured media directory".format(image_file))
+                    return False
+                time = data.get(PARAM_TIME)
+                self._device.show_image(image_path, time=time)
 
-        elif mode == "timer":
-            value = data.get(PARAM_VALUE)
-            self._device.show_timer(value=value)
+            elif mode == "keyboard":
+                value = data.get(PARAM_VALUE)
+                self._device.send_keyboard(value=value)
 
-        elif mode == "visualization" or mode == "signal":
-            number = data.get(PARAM_NUMBER)
-            color = data.get(PARAM_COLOR)
-            self._device.show_visualization(number=number, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
+            elif mode == "light":
+                brightness = data.get(PARAM_BRIGHTNESS)
+                color = data.get(PARAM_COLOR)
+                self._device.show_light(color=color, brightness=brightness, power=True)
 
-        elif mode == "volume":
-            value = data.get(PARAM_VOLUME) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
-            self._device.send_volume(value=value)
+            elif mode == "lyrics":
+                self._device.show_lyrics()
 
-        elif mode == "weather":
-            value = data.get(PARAM_VALUE)
-            weather = data.get(PARAM_WEATHER)
+            elif mode == "memorial":
+                number = data.get(PARAM_NUMBER)
+                value = data.get(PARAM_VALUE)
+                text = data.get(PARAM_TEXT)
+                self._device.show_memorial(number=number, value=value, text=text, animate=True)
 
-            weathernum = None
-            if isinstance(weather, int):
-                weathernum = weather
-            elif isinstance(weather, float):
-                weathernum = round(weather)
-            elif isinstance(weather, str):
-                weathernum = WEATHER_MODES.get(weather) or None
+            elif mode == "noise":
+                value = data.get(PARAM_VALUE)
+                self._device.show_noise(value=value)
 
-            self._device.send_weather(value=value, weather=weathernum)
+            elif mode == "playstate":
+                value = data.get(PARAM_VALUE)
+                self._device.send_playstate(value=value)
 
-        else:
-            validModes = ""
-            for validMode in VALID_MODES:
-                if len(validModes) > 0: validModes += ", "
-                validModes += "'{0}'".format(validMode)
+            elif mode == "radio":
+                value = data.get(PARAM_VALUE)
+                frequency = data.get(PARAM_FREQUENCY)
+                self._device.show_radio(value=value, frequency=frequency)
 
-            _LOGGER.error("Invalid mode '{0}'. Must be one of: {1}".format(mode, validModes))
-            return False
+            elif mode == "raw":
+                raw = data.get(PARAM_RAW)
+                if not raw:
+                    _LOGGER.error("Service call needs a raw command")
+                    return False
+                self._device.send_command(command=raw[0], args=raw[1:])
+
+            elif mode == "scoreboard":
+                player1 = data.get(PARAM_PLAYER1)
+                player2 = data.get(PARAM_PLAYER2)
+                self._device.show_scoreboard(blue=player1, red=player2)
+
+            elif mode == "sleep":
+                sleepvalue = data.get(PARAM_VALUE)
+                sleeptime = data.get(PARAM_TIME)
+                sleepmode = data.get(PARAM_SLEEPMODE)
+                volume = data.get(PARAM_VOLUME)
+                color = data.get(PARAM_COLOR)
+                brightness = data.get(PARAM_BRIGHTNESS)
+                frequency = data.get(PARAM_FREQUENCY)
+                self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency)
+
+            elif mode == "temperature":
+                value = data.get(PARAM_TEMP) or data.get(PARAM_VALUE)
+                color = data.get(PARAM_COLOR)
+                self._device.show_temperature(value=value, color=color)
+
+            elif mode == "text":
+                text = data.get(PARAM_TEXT) or data.get(PARAM_VALUE)
+                font_file = data.get(PARAM_FONT)
+                font_path = None
+                if font_file is not None:
+                    font_path = self._resolve_path(self._font_directory, font_file)
+                    if font_path is None:
+                        _LOGGER.error("font '{0}' is outside of the configured font directory".format(font_file))
+                        return False
+                size = data.get(PARAM_SIZE)
+                time = data.get(PARAM_TIME)
+                color = data.get(PARAM_COLOR)
+                self._device.show_text(text, font_path, size=size, time=time, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
+
+            elif mode == "timer":
+                value = data.get(PARAM_VALUE)
+                self._device.show_timer(value=value)
+
+            elif mode == "visualization" or mode == "signal":
+                number = data.get(PARAM_NUMBER)
+                color = data.get(PARAM_COLOR)
+                self._device.show_visualization(number=number, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
+
+            elif mode == "volume":
+                value = data.get(PARAM_VOLUME) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
+                self._device.send_volume(value=value)
+
+            elif mode == "weather":
+                value = data.get(PARAM_VALUE)
+                weather = data.get(PARAM_WEATHER)
+
+                weathernum = None
+                if isinstance(weather, int):
+                    weathernum = weather
+                elif isinstance(weather, float):
+                    weathernum = round(weather)
+                elif isinstance(weather, str):
+                    weathernum = WEATHER_MODES.get(weather) or None
+
+                self._device.send_weather(value=value, weather=weathernum)
+
+            else:
+                validModes = ""
+                for validMode in VALID_MODES:
+                    if len(validModes) > 0: validModes += ", "
+                    validModes += "'{0}'".format(validMode)
+
+                _LOGGER.error("Invalid mode '{0}'. Must be one of: {1}".format(mode, validModes))
+                return False
         
-        return True
+            return True

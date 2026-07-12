@@ -9,6 +9,8 @@ from __future__ import annotations
 
 import logging
 import os
+import threading
+import time
 from unittest.mock import Mock, patch
 
 import pytest
@@ -41,6 +43,7 @@ def make_mocked_service(media_directory="pixelart", font_directory="fonts"):
     service._device = Mock()
     service._media_directory = media_directory
     service._font_directory = font_directory
+    service._lock = threading.RLock()
     return service
 
 
@@ -271,3 +274,84 @@ def test_send_message_empty_message_and_no_data_returns_false():
 
     assert result is False
     assert service._device.mock_calls == []
+
+
+def test_send_message_serializes_concurrent_calls_to_same_device():
+    """Two service calls against the same DivoomNotificationService (the
+    situation HA creates by running each service call in its own executor
+    thread) used to share the underlying device's socket/buffer without any
+    synchronisation. self._lock must serialize them."""
+    service = make_mocked_service()
+    active = 0
+    max_active = 0
+    state_lock = threading.Lock()
+    first_call_entered = threading.Event()
+    release_first_call = threading.Event()
+
+    def reconnect(skipPing=False):
+        nonlocal active, max_active
+        with state_lock:
+            active += 1
+            max_active = max(max_active, active)
+        first_call_entered.set()
+        release_first_call.wait(timeout=2)
+        with state_lock:
+            active -= 1
+
+    service._device.reconnect.side_effect = reconnect
+
+    thread1 = threading.Thread(
+        target=lambda: service.send_message(data={PARAM_MODE: "on"})
+    )
+    thread1.start()
+    assert first_call_entered.wait(timeout=2)
+
+    second_call_done = threading.Event()
+    thread2 = threading.Thread(
+        target=lambda: (
+            service.send_message(data={PARAM_MODE: "on"}),
+            second_call_done.set(),
+        )
+    )
+    thread2.start()
+
+    time.sleep(0.1)
+    assert not second_call_done.is_set()
+
+    release_first_call.set()
+    thread1.join(timeout=2)
+    thread2.join(timeout=2)
+
+    assert max_active == 1
+    assert service._device.send_on.call_count == 2
+
+
+def test_send_message_different_devices_do_not_block_each_other():
+    """The lock lives on the DivoomNotificationService instance, so it must
+    not serialize calls across two different devices."""
+    service_a = make_mocked_service()
+    service_b = make_mocked_service()
+
+    a_entered = threading.Event()
+    release_a = threading.Event()
+
+    def reconnect_a(skipPing=False):
+        a_entered.set()
+        release_a.wait(timeout=2)
+
+    service_a._device.reconnect.side_effect = reconnect_a
+
+    thread_a = threading.Thread(
+        target=lambda: service_a.send_message(data={PARAM_MODE: "on"})
+    )
+    thread_a.start()
+    assert a_entered.wait(timeout=2)
+
+    # service_b's send_message must complete promptly even though service_a
+    # is still blocked inside its own reconnect().
+    result_b = service_b.send_message(data={PARAM_MODE: "on"})
+    assert result_b is True
+    service_b._device.send_on.assert_called_once_with()
+
+    release_a.set()
+    thread_a.join(timeout=2)
