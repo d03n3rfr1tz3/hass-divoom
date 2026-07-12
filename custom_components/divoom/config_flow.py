@@ -128,9 +128,13 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     ) -> FlowResult:
         """Handle a flow initialized by zeroconf discovery."""
 
+        device_mac = discovery_info.properties.get("device_mac")
+        if device_mac is None:
+            return self.async_abort(reason="invalid_discovery_info")
+
         self._device_host = discovery_info.host
-        self._device_mac = discovery_info.properties.get("device_mac").lower()
-        self._device_name = discovery_info.properties.get("device_name")
+        self._device_mac = device_mac.lower()
+        self._device_name = discovery_info.properties.get("device_name") or "Device"
 
         await self.async_set_unique_id(self._device_mac)
         await self.async_check_uniqueness()

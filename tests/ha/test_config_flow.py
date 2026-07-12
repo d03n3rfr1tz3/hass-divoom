@@ -1,8 +1,9 @@
 """HA integration tests for the divoom config flow (user step + zeroconf
 step), per the plan's Paket 1c. The zeroconf cases with a missing
-device_mac/device_name property are marked xfail: today's code crashes on
-them (unguarded .get(...).lower()); Paket 2 changes this to a graceful abort/
-fallback and these tests get flipped to asserting the new behaviour.
+device_mac/device_name property used to be marked xfail: the original code
+crashed on them (unguarded .get(...).lower()). Paket 2 changes this to a
+graceful abort/fallback (see async_step_zeroconf), so these now assert the
+new behaviour directly.
 """
 from __future__ import annotations
 
@@ -89,29 +90,25 @@ async def test_zeroconf_step_with_properties_creates_entry(hass):
     assert result["data"][CONF_MAC] == "11:22:33:44:55:66"
 
 
-@pytest.mark.xfail(
-    reason="today's code does discovery_info.properties.get('device_mac').lower() "
-    "unguarded; a missing device_mac crashes with AttributeError. Fixed in Paket 2.",
-    strict=True,
-)
 async def test_zeroconf_step_missing_device_mac_is_handled(hass):
+    """A missing device_mac property can't be recovered from - the flow
+    aborts instead of crashing on discovery_info.properties.get(...).lower()."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_ZEROCONF},
         data=make_zeroconf_info({"device_name": "Pixoo-573A"}),
     )
     assert result["type"] == FlowResultType.ABORT
+    assert result["reason"] == "invalid_discovery_info"
 
 
-@pytest.mark.xfail(
-    reason="today's code does self._device_name.lower() in async_step_device_port "
-    "unguarded; a missing device_name crashes with AttributeError. Fixed in Paket 2.",
-    strict=True,
-)
 async def test_zeroconf_step_missing_device_name_is_handled(hass):
+    """A missing device_name property falls back to "Device" instead of
+    crashing on self._device_name.lower() in async_step_device_port."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_ZEROCONF},
         data=make_zeroconf_info({"device_mac": "11:22:33:44:55:66"}),
     )
     assert result["type"] == FlowResultType.FORM
+    assert result["step_id"] == "device_port"

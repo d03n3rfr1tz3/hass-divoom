@@ -8,6 +8,7 @@ mock and with what arguments.
 """
 from __future__ import annotations
 
+import logging
 import os
 from unittest.mock import Mock, patch
 
@@ -19,8 +20,10 @@ from custom_components.divoom.const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, DOM
 from custom_components.divoom.notify import (
     PARAM_COLOR,
     PARAM_FILE,
+    PARAM_FONT,
     PARAM_MODE,
     PARAM_NUMBER,
+    PARAM_RAW,
     PARAM_TEXT,
     PARAM_TIME,
     PARAM_VALUE,
@@ -62,6 +65,36 @@ async def test_async_get_service_registers_and_picks_device_class(hass):
 
     assert type(service._device).__name__ == "Pixoo"
     assert hass.data[DOMAIN]["loaded"]["11:22:33:44:55:66"] is service
+
+
+async def test_async_get_service_invalid_device_type_logs_device_type(hass, caplog):
+    """The error message used to format media_directory into the
+    "device_type {0} does not exist" string instead of device_type itself."""
+    caplog.set_level(logging.ERROR)
+    with patch.object(DivoomNotificationService, "connect"):
+        service = await async_get_service(
+            hass,
+            {
+                CONF_MAC: "11:22:33:44:55:66",
+                CONF_PORT: 1,
+                CONF_DEVICE_TYPE: "not-a-real-device-type",
+                CONF_MEDIA_DIR: "pixelart",
+            },
+        )
+
+    assert service._device is None
+    assert "not-a-real-device-type" in caplog.text
+
+
+def test_del_and_exit_are_noop_when_device_is_none():
+    """__init__ leaves _device as None for an unrecognised device_type;
+    __del__/__exit__ used to call self._device.disconnect() unconditionally
+    and crash with AttributeError in that case."""
+    service = DivoomNotificationService.__new__(DivoomNotificationService)
+    service._device = None
+
+    service.__del__()
+    service.__exit__(None, None, None)
 
 
 def test_send_message_text_mode_splits_color_and_calls_show_text():
@@ -133,6 +166,62 @@ def test_send_message_image_mode_joins_media_directory_and_calls_show_image():
     service._device.show_image.assert_called_once_with(
         os.path.join("/media/pixelart", "smiley32.gif"), time=5
     )
+
+
+def test_send_message_image_mode_without_file_logs_and_returns_false():
+    service = make_mocked_service(media_directory="/media/pixelart")
+
+    result = service.send_message(data={PARAM_MODE: "image"})
+
+    assert result is False
+    service._device.show_image.assert_not_called()
+
+
+def test_send_message_image_mode_rejects_path_traversal():
+    """os.path.join drops the base directory entirely for an absolute
+    filename, and '../' can walk back out of a relative one - both used to
+    let a service call read any file the HA process can access."""
+    service = make_mocked_service(media_directory="/media/pixelart")
+
+    result = service.send_message(
+        data={PARAM_MODE: "image", PARAM_FILE: "../../../etc/passwd"}
+    )
+
+    assert result is False
+    service._device.show_image.assert_not_called()
+
+
+def test_send_message_text_mode_without_font_still_calls_show_text():
+    """font is optional - PARAM_FONT absent must not be treated as a
+    traversal rejection."""
+    service = make_mocked_service()
+
+    result = service.send_message(data={PARAM_MODE: "text", PARAM_TEXT: "hello"})
+
+    assert result is True
+    service._device.show_text.assert_called_once_with(
+        "hello", None, size=None, time=None, color1=None, color2=None
+    )
+
+
+def test_send_message_text_mode_rejects_font_path_traversal():
+    service = make_mocked_service(font_directory="/opt/divoom/fonts")
+
+    result = service.send_message(
+        data={PARAM_MODE: "text", PARAM_TEXT: "hello", PARAM_FONT: "../../../etc/passwd"}
+    )
+
+    assert result is False
+    service._device.show_text.assert_not_called()
+
+
+def test_send_message_raw_mode_without_raw_logs_and_returns_false():
+    service = make_mocked_service()
+
+    result = service.send_message(data={PARAM_MODE: "raw"})
+
+    assert result is False
+    service._device.send_command.assert_not_called()
 
 
 def test_send_message_connect_mode_does_not_reconnect_first():

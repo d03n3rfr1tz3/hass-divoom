@@ -10,6 +10,7 @@ import os
 from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
+from tests.support import make_connected_device
 
 PIXELART_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "pixelart"))
 
@@ -103,3 +104,83 @@ def test_make_message_with_escaping():
     assert device.make_message([0x01, 0x02, 0x03]) == [
         0x01, 0x03, 0x04, 0x03, 0x05, 0x03, 0x06, 0x06, 0x00, 0x02,
     ]
+
+
+def test_send_weather_celsius_sends_set_temp_type_zero():
+    """value[-2] == "°C" compares a single character against a 2-character
+    string and is never true - value[-2:] is required for the "set temp
+    type" follow-up command to ever be sent."""
+    device, recorder, server_sock = make_connected_device(Pixoo)
+    try:
+        device.send_weather("22°C", weather=3)
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert len(recorder.sent_messages) == 2
+    temp_type_message = recorder.sent_messages[1]
+    assert temp_type_message[3] == 0x2b  # "set temp type" command byte
+    assert temp_type_message[4] == 0x00  # Celsius
+
+
+def test_send_weather_fahrenheit_sends_set_temp_type_one():
+    device, recorder, server_sock = make_connected_device(Pixoo)
+    try:
+        device.send_weather("70°F", weather=3)
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert len(recorder.sent_messages) == 2
+    temp_type_message = recorder.sent_messages[1]
+    assert temp_type_message[3] == 0x2b
+    assert temp_type_message[4] == 0x01
+
+
+def test_show_clock_string_clock_matches_int_clock():
+    """clock arrives as a string from HA service calls; show_clock must
+    accept it the same way show_alarm already does."""
+    device_str, recorder_str, server_str = make_connected_device(Pixoo)
+    device_int, recorder_int, server_int = make_connected_device(Pixoo)
+    try:
+        device_str.show_clock(clock="3", twentyfour=True)
+        device_int.show_clock(clock=3, twentyfour=True)
+    finally:
+        device_str.disconnect()
+        server_str.close()
+        device_int.disconnect()
+        server_int.close()
+
+    assert recorder_str.sent_messages == recorder_int.sent_messages
+
+
+def test_send_gamecontrol_invalid_string_logs_and_sends_nothing():
+    device, recorder, server_sock = make_connected_device(Pixoo)
+    try:
+        result = device.send_gamecontrol(value="not-a-value")
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert result is None
+    assert recorder.sent_messages == []
+
+
+def test_disconnect_swallows_socket_errors_and_clears_socket():
+    """The bare `except:` in disconnect() used to also swallow
+    BaseException subclasses like SystemExit/KeyboardInterrupt; narrowing it
+    to `except Exception:` must not change behaviour for ordinary socket
+    errors raised from shutdown()."""
+    device = Pixoo(mac="11:22:33:44:55:66")
+
+    class RaisingSocket:
+        def shutdown(self, *args, **kwargs):
+            raise OSError("shutdown failed")
+
+        def close(self):
+            pass
+
+    device.socket = RaisingSocket()
+    device.disconnect()
+
+    assert device.socket is None

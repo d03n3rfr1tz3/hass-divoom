@@ -113,7 +113,7 @@ class Divoom:
                 self.socket.send(bytes(conn))
 
             self.socket.shutdown(socket.SHUT_RDWR)
-        except:
+        except Exception:
             pass
         finally:
             self.socket.close()
@@ -238,7 +238,7 @@ class Divoom:
         """Compute the payload checksum. Returned as list with LSM, MSB"""
         length = sum(payload)
         csum = []
-        csum += length.to_bytes(4 if length >= 65535 else 2, byteorder='little')
+        csum += length.to_bytes(4 if length >= 65535 else 2, byteorder='little') # Pixoo-Max expects more sometimes
         return csum
 
     def chunks(self, lst, n):
@@ -536,6 +536,7 @@ class Divoom:
         if weather == None: weather = False
         if temp == None: temp = False
         if calendar == None: calendar = False
+        if isinstance(clock, str): clock = int(clock)
 
         if twentyfour != None:
             args = [0x01 if twentyfour == True or twentyfour == 1 else 0x00]
@@ -634,6 +635,7 @@ class Divoom:
             elif value == "right": value = 2
             elif value == "up": value = 3
             elif value == "down": value = 4
+            else: return None
 
         result = None
         args = []
@@ -853,9 +855,9 @@ class Divoom:
         args += weather.to_bytes(1, byteorder='big')
         result = self.send_command("set temp", args)
 
-        if value[-2] == "°C":
+        if value[-2:] == "°C":
             self.send_command("set temp type", [0x00])
-        if value[-2] == "°F":
+        if value[-2:] == "°F":
             self.send_command("set temp type", [0x01])
         return result
 

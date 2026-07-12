@@ -36,7 +36,8 @@
     },
     "abort": {
       "already_in_progress": "There is already a Divoom device with that MAC address in progress.",
-      "already_configured": "There is already a Divoom device with that MAC address configured."
+      "already_configured": "There is already a Divoom device with that MAC address configured.",
+      "invalid_discovery_info": "The discovered device did not provide the information needed to configure it."
     }
   }
 }

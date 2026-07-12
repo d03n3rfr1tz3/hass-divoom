@@ -222,21 +222,31 @@ class DivoomNotificationService(BaseNotificationService):
             self._device = Tivoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if self._device is None:
-            _LOGGER.error("device_type {0} does not exist, divoom will not work".format(media_directory))
+            _LOGGER.error("device_type {0} does not exist, divoom will not work".format(device_type))
         elif not os.path.isdir(media_directory):
             _LOGGER.error("media_directory {0} does not exist, divoom may not work properly".format(media_directory))
 
     def __del__(self):
-        self._device.disconnect()
+        if self._device is not None:
+            self._device.disconnect()
 
     def __exit__(self, type, value, traceback):
-        self._device.disconnect()
+        if self._device is not None:
+            self._device.disconnect()
 
     def connect(self):
         self._device.connect()
 
     def disconnect(self):
         self._device.disconnect()
+
+    def _resolve_path(self, base_directory, filename):
+        joined = os.path.join(base_directory, filename)
+        real_base = os.path.realpath(base_directory)
+        real_joined = os.path.realpath(joined)
+        if os.path.commonpath([real_joined, real_base]) != real_base:
+            return None
+        return joined
 
     def send_message(self, message="", **kwargs):
         if message == "" and kwargs.get(ATTR_DATA) is None:
@@ -320,7 +330,13 @@ class DivoomNotificationService(BaseNotificationService):
 
         elif mode == "image":
             image_file = data.get(PARAM_FILE)
-            image_path = os.path.join(self._media_directory, image_file)
+            if image_file is None:
+                _LOGGER.error("Service call needs a file")
+                return False
+            image_path = self._resolve_path(self._media_directory, image_file)
+            if image_path is None:
+                _LOGGER.error("file '{0}' is outside of the configured media directory".format(image_file))
+                return False
             time = data.get(PARAM_TIME)
             self._device.show_image(image_path, time=time)
 
@@ -357,6 +373,9 @@ class DivoomNotificationService(BaseNotificationService):
 
         elif mode == "raw":
             raw = data.get(PARAM_RAW)
+            if not raw:
+                _LOGGER.error("Service call needs a raw command")
+                return False
             self._device.send_command(command=raw[0], args=raw[1:])
 
         elif mode == "scoreboard":
@@ -382,7 +401,12 @@ class DivoomNotificationService(BaseNotificationService):
         elif mode == "text":
             text = data.get(PARAM_TEXT) or data.get(PARAM_VALUE)
             font_file = data.get(PARAM_FONT)
-            font_path = os.path.join(self._font_directory, font_file) if font_file is not None else None
+            font_path = None
+            if font_file is not None:
+                font_path = self._resolve_path(self._font_directory, font_file)
+                if font_path is None:
+                    _LOGGER.error("font '{0}' is outside of the configured font directory".format(font_file))
+                    return False
             size = data.get(PARAM_SIZE)
             time = data.get(PARAM_TIME)
             color = data.get(PARAM_COLOR)
