@@ -1,7 +1,6 @@
 pytest==9.0.3
 pytest-asyncio==1.4.0
-pytest-homeassistant-custom-component==0.13.346
-Pillow==12.2.0
+pytest-homeassistant-custom-component==0.13.347
 
 # config_flow.py imports homeassistant.components.bluetooth, which in turn
 # imports homeassistant.components.usb - both pull in these requirements at
@@ -21,5 +20,5 @@ habluetooth==6.26.5
 # serialx.platforms.serial_esphome, which requires aioesphomeapi. HA's own
 # usb/manifest.json does not declare this (only esphome/manifest.json does,
 # which real installs always have alongside usb). Pinned to the version from
-# esphome/manifest.json for homeassistant==2026.7.2.
+# esphome/manifest.json for homeassistant==2026.7.3.
 aioesphomeapi==45.3.1
