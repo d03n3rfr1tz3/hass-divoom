@@ -743,17 +743,26 @@ I can recommend resizing and converting your GIFs with GIMP. Of course other sof
 ## Development
 ### Running Tests
 Open a terminal in the repository's root folder before running the commands below.
-Requires Python 3.14 or newer, since that's what `tests/requirements_test.txt` is pinned against.
+Requires Python 3.14 or newer, since that's what the Home Assistant version behind
+`pytest-homeassistant-custom-component` in `tests/requirements_test.txt` needs.
+
+The second step resolves the requirements that Home Assistant itself pins for the components
+this integration imports, straight from the manifests of the installed HA version. The
+resulting `requirements_ha.txt` is generated.
 
 bash/Linux/macOS:
 ```bash
 pip install -r tests/requirements_test.txt
+python tests/gen_requirements.py --output requirements_ha.txt
+pip install -r requirements_ha.txt
 PYTHONPATH=tests pytest tests
 ```
 
 PowerShell (Windows):
 ```powershell
 pip install -r tests/requirements_test.txt
+python tests/gen_requirements.py --output requirements_ha.txt
+pip install -r requirements_ha.txt
 $env:PYTHONPATH = "tests"
 pytest tests
 ```
