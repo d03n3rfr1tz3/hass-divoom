@@ -1,0 +1,43 @@
+{
+  "config": {
+    "flow_title": "{name} ({mac}{host_text})",
+    "title": "Divoom (BT)",
+    "step": {
+      "user": {
+        "title": "Dispositivo Divoom",
+        "description": "Seleziona il tuo dispositivo Divoom.",
+        "data": {
+          "mac": "Dispositivo Divoom",
+          "port": "Canale/porta Bluetooth",
+          "host": "Nome host/IP di ESP32-Divoom"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom è un firmware complementare opzionale che funge da proxy Bluetooth Classic. Se lo utilizzi, puoi indicarlo qui invece di collegarti direttamente al tuo dispositivo Divoom via Bluetooth. In caso contrario, lascia il campo vuoto e Home Assistant si collegherà direttamente via Bluetooth."
+        }
+      },
+      "device_port": {
+        "title": "Dispositivo Divoom: porta",
+        "description": "Seleziona il canale/porta del tuo dispositivo Divoom.",
+        "data": {
+          "port": "Porta"
+        }
+      },
+      "device_type": {
+        "title": "Dispositivo Divoom: tipo",
+        "description": "Seleziona il tipo del tuo dispositivo Divoom.",
+        "data": {
+          "type": "Tipo"
+        }
+      },
+      "confirm": {
+        "title": "Conferma",
+        "description": "Il tuo dispositivo Divoom è configurato."
+      }
+    },
+    "abort": {
+      "already_in_progress": "È già in corso la configurazione di un dispositivo Divoom con questo indirizzo MAC.",
+      "already_configured": "Esiste già un dispositivo Divoom configurato con questo indirizzo MAC.",
+      "invalid_discovery_info": "Il dispositivo rilevato non ha fornito le informazioni necessarie per configurarlo."
+    }
+  }
+}

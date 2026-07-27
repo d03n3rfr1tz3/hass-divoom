@@ -1,42 +1,43 @@
 {
-    "config": {
-      "flow_title": "{name} ({mac}{host_text})",
-      "title": "Divoom (BT)",
-      "step": {
-        "user": {
-          "title": "Divoom Gerät",
-          "description": "Wähle dein Divoom Gerät aus.",
-          "data": {
-            "mac": "Divoom Gerät",
-            "port": "Bluetooth Kanal/Port",
-            "host": "ESP32-Divoom Host/IP"
-          },
-          "data_description": {
-            "host": "ESP32-Divoom ist eine zusätzliche begleitende Firmware, die als Bluetooth (classic) Proxy fungiert. Falls du das hast, kannst du das anstatt einer direkten Bluetooth-Verbindung zu deinem Divoom Gerät nutzen. Falls nicht, lass das Feld einfach leer und dein Home Assistant wird sich direkt per Bluetooth verbinden."
-          }
+  "config": {
+    "flow_title": "{name} ({mac}{host_text})",
+    "title": "Divoom (BT)",
+    "step": {
+      "user": {
+        "title": "Divoom-Gerät",
+        "description": "Wähle dein Divoom-Gerät aus.",
+        "data": {
+          "mac": "Divoom-Gerät",
+          "port": "Bluetooth-Kanal/-Port",
+          "host": "ESP32-Divoom Host/IP"
         },
-        "device_port": {
-          "title": "Divoom Gerät: Port",
-          "description": "Wähle den Kanal/Port deines Divoom Geräts aus.",
-          "data": {
-            "port": "Port"
-          }
-        },
-        "device_type": {
-          "title": "Divoom Gerät: Typ",
-          "description": "Wähle den Typ deines Divoom Geräts aus.",
-          "data": {
-            "type": "Typ"
-          }
-        },
-        "confirm": {
-          "title": "Zustimmung",
-          "description": "Dein Divoom Gerät ist nun konfiguriert."
+        "data_description": {
+          "host": "ESP32-Divoom ist eine optionale Begleit-Firmware, die als Bluetooth-Classic-Proxy fungiert. Falls du sie einsetzt, kannst du sie anstelle einer direkten Bluetooth-Verbindung zu deinem Divoom-Gerät nutzen. Falls nicht, lass das Feld einfach leer und Home Assistant verbindet sich direkt per Bluetooth."
         }
       },
-      "abort": {
-        "already_in_progress": "Es ist bereits ein Divoom Gerät mit dieser MAC-Adresse erkannt.",
-        "already_configured": "Es ist bereits ein Divoom Gerät mit dieser MAC-Adresse konfiguriert."
+      "device_port": {
+        "title": "Divoom-Gerät: Port",
+        "description": "Wähle den Kanal/Port deines Divoom-Geräts aus.",
+        "data": {
+          "port": "Port"
+        }
+      },
+      "device_type": {
+        "title": "Divoom-Gerät: Typ",
+        "description": "Wähle den Typ deines Divoom-Geräts aus.",
+        "data": {
+          "type": "Typ"
+        }
+      },
+      "confirm": {
+        "title": "Bestätigung",
+        "description": "Dein Divoom-Gerät ist nun konfiguriert."
       }
+    },
+    "abort": {
+      "already_in_progress": "Ein Divoom-Gerät mit dieser MAC-Adresse wird bereits eingerichtet.",
+      "already_configured": "Es ist bereits ein Divoom-Gerät mit dieser MAC-Adresse konfiguriert.",
+      "invalid_discovery_info": "Das gefundene Gerät hat nicht die Informationen geliefert, die zur Einrichtung nötig sind."
     }
   }
+}

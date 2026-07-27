@@ -12,7 +12,7 @@
           "host": "Nome de anfitrião/IP ESP32-Divoom"
         },
         "data_description": {
-          "host": "O ESP32-Divoom é um firmware complementar adicional que atua como um Proxy Bluetooth (clássico). Se o tiver, pode usá-lo em vez de se ligar diretamente ao seu dispositivo Divoom via Bluetooth. Se não, basta deixá-lo vazio e o Home Assistant ligar-se-á diretamente via Bluetooth."
+          "host": "O ESP32-Divoom é um firmware complementar opcional que atua como proxy Bluetooth Classic. Se o tiver, pode usá-lo em vez de se ligar diretamente ao seu dispositivo Divoom via Bluetooth. Se não, basta deixá-lo vazio e o Home Assistant ligar-se-á diretamente via Bluetooth."
         }
       },
       "device_port": {
@@ -36,7 +36,8 @@
     },
     "abort": {
       "already_in_progress": "Já existe um dispositivo Divoom com esse endereço MAC em progresso.",
-      "already_configured": "Já existe um dispositivo Divoom com esse endereço MAC configurado."
+      "already_configured": "Já existe um dispositivo Divoom com esse endereço MAC configurado.",
+      "invalid_discovery_info": "O dispositivo detetado não forneceu as informações necessárias para o configurar."
     }
   }
 }

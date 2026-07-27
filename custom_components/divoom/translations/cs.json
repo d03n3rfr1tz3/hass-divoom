@@ -1,0 +1,43 @@
+{
+  "config": {
+    "flow_title": "{name} ({mac}{host_text})",
+    "title": "Divoom (BT)",
+    "step": {
+      "user": {
+        "title": "Zařízení Divoom",
+        "description": "Vyberte své zařízení Divoom.",
+        "data": {
+          "mac": "Zařízení Divoom",
+          "port": "Kanál/port Bluetooth",
+          "host": "Název hostitele/IP ESP32-Divoom"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom je volitelný doprovodný firmware, který funguje jako proxy Bluetooth Classic. Pokud jej používáte, můžete jej zadat zde místo přímého připojení k zařízení Divoom přes Bluetooth. Pokud ne, ponechte pole prázdné a Home Assistant se připojí přímo přes Bluetooth."
+        }
+      },
+      "device_port": {
+        "title": "Zařízení Divoom: port",
+        "description": "Vyberte kanál/port svého zařízení Divoom.",
+        "data": {
+          "port": "Port"
+        }
+      },
+      "device_type": {
+        "title": "Zařízení Divoom: typ",
+        "description": "Vyberte typ svého zařízení Divoom.",
+        "data": {
+          "type": "Typ"
+        }
+      },
+      "confirm": {
+        "title": "Potvrzení",
+        "description": "Vaše zařízení Divoom je nakonfigurováno."
+      }
+    },
+    "abort": {
+      "already_in_progress": "Zařízení Divoom s touto MAC adresou se již nastavuje.",
+      "already_configured": "Zařízení Divoom s touto MAC adresou je již nakonfigurováno.",
+      "invalid_discovery_info": "Nalezené zařízení neposkytlo informace potřebné k jeho konfiguraci."
+    }
+  }
+}

@@ -12,7 +12,7 @@
           "host": "ESP32-Divoom hostname/IP"
         },
         "data_description": {
-          "host": "ESP32-Divoom is an additional companion firmware acting as a Bluetooth (classic) Proxy. If you have it, you can use it instead of directly connecting to your Divoom device via Bluetooth. If not, just leave it empty and Home Assistant will connect directly via Bluetooth."
+          "host": "ESP32-Divoom is an optional companion firmware that acts as a Bluetooth Classic proxy. If you have it, you can use it instead of connecting to your Divoom device directly via Bluetooth. If not, just leave this empty and Home Assistant will connect directly via Bluetooth."
         }
       },
       "device_port": {
@@ -35,8 +35,8 @@
       }
     },
     "abort": {
-      "already_in_progress": "There is already a Divoom device with that MAC address in progress.",
-      "already_configured": "There is already a Divoom device with that MAC address configured.",
+      "already_in_progress": "A Divoom device with that MAC address is already being set up.",
+      "already_configured": "A Divoom device with that MAC address is already configured.",
       "invalid_discovery_info": "The discovered device did not provide the information needed to configure it."
     }
   }

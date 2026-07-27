@@ -1,0 +1,43 @@
+{
+  "config": {
+    "flow_title": "{name} ({mac}{host_text})",
+    "title": "Divoom (BT)",
+    "step": {
+      "user": {
+        "title": "Divoom-apparaat",
+        "description": "Selecteer je Divoom-apparaat.",
+        "data": {
+          "mac": "Divoom-apparaat",
+          "port": "Bluetooth-kanaal/-poort",
+          "host": "ESP32-Divoom hostnaam/IP"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom is optionele begeleidende firmware die als Bluetooth Classic-proxy werkt. Als je die gebruikt, kun je hem hier invullen in plaats van rechtstreeks via Bluetooth met je Divoom-apparaat te verbinden. Zo niet, laat dit veld dan leeg en maakt Home Assistant rechtstreeks verbinding via Bluetooth."
+        }
+      },
+      "device_port": {
+        "title": "Divoom-apparaat: poort",
+        "description": "Selecteer het kanaal/de poort van je Divoom-apparaat.",
+        "data": {
+          "port": "Poort"
+        }
+      },
+      "device_type": {
+        "title": "Divoom-apparaat: type",
+        "description": "Selecteer het type van je Divoom-apparaat.",
+        "data": {
+          "type": "Type"
+        }
+      },
+      "confirm": {
+        "title": "Bevestiging",
+        "description": "Je Divoom-apparaat is geconfigureerd."
+      }
+    },
+    "abort": {
+      "already_in_progress": "Er wordt al een Divoom-apparaat met dit MAC-adres ingesteld.",
+      "already_configured": "Er is al een Divoom-apparaat met dit MAC-adres geconfigureerd.",
+      "invalid_discovery_info": "Het gevonden apparaat heeft niet de informatie geleverd die nodig is om het te configureren."
+    }
+  }
+}
