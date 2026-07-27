@@ -1,0 +1,37 @@
+clock:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    clock:
+      example: 1
+      selector:
+        number:
+          min: 0
+          mode: box
+    twentyfour:
+      example: true
+      selector:
+        boolean:
+    weather:
+      example: false
+      selector:
+        boolean:
+    temp:
+      example: false
+      selector:
+        boolean:
+    calendar:
+      example: true
+      selector:
+        boolean:
+    color:
+      example: [250, 0, 0]
+      selector:
+        color_rgb:
+    hot:
+      example: false
+      selector:
+        boolean:

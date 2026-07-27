@@ -12,6 +12,7 @@ from homeassistant.util import slugify
 
 from homeassistant.const import CONF_NAME, CONF_MAC, CONF_PORT, Platform
 from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN, PLATFORMS  # pylint:disable=unused-import
+from .services import async_setup_services
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -35,6 +36,7 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     """Set up Divoom from a config."""
 
     hass.data.setdefault(DOMAIN, {})
+    async_setup_services(hass)
 
     _LOGGER.debug("Divoom: successfully setup a config")
     return True

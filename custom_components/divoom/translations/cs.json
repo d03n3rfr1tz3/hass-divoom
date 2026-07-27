@@ -39,5 +39,56 @@
       "already_configured": "Zařízení Divoom s touto MAC adresou je již nakonfigurováno.",
       "invalid_discovery_info": "Nalezené zařízení neposkytlo informace potřebné k jeho konfiguraci."
     }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Pro konfigurační záznam {entry_id} nebylo nalezeno žádné zařízení Divoom."
+    },
+    "entry_not_loaded": {
+      "message": "Zařízení Divoom {title} není načteno. Zkontrolujte, zda se integrace správně nastavila."
+    },
+    "mode_failed": {
+      "message": "Akce {mode} se nezdařila. Podrobnosti najdete v protokolu Home Assistanta."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Hodiny",
+      "description": "Zobrazí kanál s hodinami na zařízení Divoom. Na starších zařízeních, jako je Aurabox nebo Timebox Mini, je tento režim značně omezený.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "clock": {
+          "name": "Styl hodin",
+          "description": "Styl hodin, který se má zobrazit, jako číslo od 0 výše až po hodnotu, kterou zařízení Divoom podporuje. Dostupné styly najdete v oficiální aplikaci Divoom."
+        },
+        "twentyfour": {
+          "name": "24hodinový formát",
+          "description": "Zobrazí čas ve 24hodinovém formátu místo 12hodinového."
+        },
+        "weather": {
+          "name": "Zobrazit počasí",
+          "description": "Zobrazí aktuální počasí."
+        },
+        "temp": {
+          "name": "Zobrazit teplotu",
+          "description": "Zobrazí aktuální teplotu."
+        },
+        "calendar": {
+          "name": "Zobrazit datum",
+          "description": "Zobrazí aktuální datum."
+        },
+        "color": {
+          "name": "Barva",
+          "description": "Barva číslic hodin."
+        },
+        "hot": {
+          "name": "Zobrazit oblíbené obrázky",
+          "description": "Postupně prochází oblíbené obrázky komunity Divoom."
+        }
+      }
+    }
   }
 }

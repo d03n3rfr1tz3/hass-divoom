@@ -1,4 +1,4 @@
-"""Switching states and sending images or animations to a divoom device."""
+"""Legacy notify service for divoom devices."""
 import logging, os, socket, threading
 import voluptuous as vol
 
@@ -252,14 +252,16 @@ class DivoomNotificationService(BaseNotificationService):
         return joined
 
     def send_message(self, message="", **kwargs):
+        if message == "" and kwargs.get(ATTR_DATA) is None:
+            _LOGGER.error("Service call needs more information")
+            return False
+
+        data = kwargs.get(ATTR_DATA) or {}
+        return self.call_mode(data.get(PARAM_MODE) or message, data)
+
+    def call_mode(self, mode, data):
+        """Execute a single mode. Shared by send_message() and the divoom.* services."""
         with self._lock:
-            if message == "" and kwargs.get(ATTR_DATA) is None:
-                _LOGGER.error("Service call needs more information")
-                return False
-        
-            data = kwargs.get(ATTR_DATA) or {}
-            mode = data.get(PARAM_MODE) or message
-        
             if mode != "connect" and mode != "disconnect":
                 skipPing = True if mode == "gamecontrol" or mode == "raw" else False
                 self._device.reconnect(skipPing=skipPing)

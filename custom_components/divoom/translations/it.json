@@ -39,5 +39,56 @@
       "already_configured": "Esiste già un dispositivo Divoom configurato con questo indirizzo MAC.",
       "invalid_discovery_info": "Il dispositivo rilevato non ha fornito le informazioni necessarie per configurarlo."
     }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Nessun dispositivo Divoom trovato per la voce di configurazione {entry_id}."
+    },
+    "entry_not_loaded": {
+      "message": "Il dispositivo Divoom {title} non è caricato. Verifica che l'integrazione sia stata configurata correttamente."
+    },
+    "mode_failed": {
+      "message": "L'azione {mode} non è riuscita. Consulta il registro di Home Assistant per i dettagli."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Orologio",
+      "description": "Mostra il canale orologio su un dispositivo Divoom. Questa modalità è molto limitata sui dispositivi più vecchi come l'Aurabox o il Timebox Mini.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "clock": {
+          "name": "Stile dell'orologio",
+          "description": "Lo stile dell'orologio da mostrare, come numero a partire da 0 fino al massimo supportato dal dispositivo Divoom. Consulta l'app ufficiale Divoom per vedere gli stili disponibili."
+        },
+        "twentyfour": {
+          "name": "Formato 24 ore",
+          "description": "Mostra l'ora nel formato 24 ore invece che nel formato 12 ore."
+        },
+        "weather": {
+          "name": "Mostra il meteo",
+          "description": "Mostra il meteo attuale."
+        },
+        "temp": {
+          "name": "Mostra la temperatura",
+          "description": "Mostra la temperatura attuale."
+        },
+        "calendar": {
+          "name": "Mostra la data",
+          "description": "Mostra la data attuale."
+        },
+        "color": {
+          "name": "Colore",
+          "description": "Il colore delle cifre dell'orologio."
+        },
+        "hot": {
+          "name": "Mostra le immagini popolari",
+          "description": "Scorre le immagini popolari della comunità Divoom."
+        }
+      }
+    }
   }
 }

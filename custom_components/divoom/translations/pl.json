@@ -39,5 +39,56 @@
       "already_configured": "Urządzenie Divoom o tym adresie MAC jest już skonfigurowane.",
       "invalid_discovery_info": "Wykryte urządzenie nie dostarczyło informacji potrzebnych do jego skonfigurowania."
     }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Nie znaleziono urządzenia Divoom dla wpisu konfiguracyjnego {entry_id}."
+    },
+    "entry_not_loaded": {
+      "message": "Urządzenie Divoom {title} nie jest załadowane. Sprawdź, czy integracja została poprawnie skonfigurowana."
+    },
+    "mode_failed": {
+      "message": "Akcja {mode} nie powiodła się. Szczegóły znajdziesz w dzienniku Home Assistanta."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Zegar",
+      "description": "Wyświetla kanał zegara na urządzeniu Divoom. Na starszych urządzeniach, takich jak Aurabox czy Timebox Mini, ten tryb jest mocno ograniczony.",
+      "fields": {
+        "entry_id": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "clock": {
+          "name": "Styl zegara",
+          "description": "Styl zegara do wyświetlenia, jako liczba od 0 w górę, aż do wartości obsługiwanej przez urządzenie Divoom. Dostępne style można obejrzeć w oficjalnej aplikacji Divoom."
+        },
+        "twentyfour": {
+          "name": "Format 24-godzinny",
+          "description": "Wyświetla godzinę w formacie 24-godzinnym zamiast 12-godzinnego."
+        },
+        "weather": {
+          "name": "Pokaż pogodę",
+          "description": "Wyświetla aktualną pogodę."
+        },
+        "temp": {
+          "name": "Pokaż temperaturę",
+          "description": "Wyświetla aktualną temperaturę."
+        },
+        "calendar": {
+          "name": "Pokaż datę",
+          "description": "Wyświetla aktualną datę."
+        },
+        "color": {
+          "name": "Kolor",
+          "description": "Kolor cyfr zegara."
+        },
+        "hot": {
+          "name": "Pokaż popularne obrazy",
+          "description": "Przewija popularne obrazy społeczności Divoom."
+        }
+      }
+    }
   }
 }

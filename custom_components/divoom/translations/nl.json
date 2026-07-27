@@ -39,5 +39,56 @@
       "already_configured": "Er is al een Divoom-apparaat met dit MAC-adres geconfigureerd.",
       "invalid_discovery_info": "Het gevonden apparaat heeft niet de informatie geleverd die nodig is om het te configureren."
     }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Er is geen Divoom-apparaat gevonden voor configuratie-item {entry_id}."
+    },
+    "entry_not_loaded": {
+      "message": "Het Divoom-apparaat {title} is niet geladen. Controleer of de integratie correct is ingesteld."
+    },
+    "mode_failed": {
+      "message": "De actie {mode} is mislukt. Bekijk het Home Assistant-logboek voor details."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Klok",
+      "description": "Toont het klokkanaal op een Divoom-apparaat. Op oudere apparaten zoals de Aurabox of de Timebox Mini is deze modus sterk beperkt.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "clock": {
+          "name": "Klokstijl",
+          "description": "De klokstijl die getoond wordt, als getal vanaf 0 tot wat het Divoom-apparaat ondersteunt. Bekijk de officiële Divoom-app voor de beschikbare stijlen."
+        },
+        "twentyfour": {
+          "name": "24-uursnotatie",
+          "description": "Toont de tijd in 24-uursnotatie in plaats van 12-uursnotatie."
+        },
+        "weather": {
+          "name": "Weer tonen",
+          "description": "Toont het huidige weer."
+        },
+        "temp": {
+          "name": "Temperatuur tonen",
+          "description": "Toont de huidige temperatuur."
+        },
+        "calendar": {
+          "name": "Datum tonen",
+          "description": "Toont de huidige datum."
+        },
+        "color": {
+          "name": "Kleur",
+          "description": "De kleur van de cijfers van de klok."
+        },
+        "hot": {
+          "name": "Populaire afbeeldingen tonen",
+          "description": "Doorloopt de populaire afbeeldingen van de Divoom-community."
+        }
+      }
+    }
   }
 }

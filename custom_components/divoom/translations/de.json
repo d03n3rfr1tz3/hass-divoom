@@ -39,5 +39,56 @@
       "already_configured": "Es ist bereits ein Divoom-Gerät mit dieser MAC-Adresse konfiguriert.",
       "invalid_discovery_info": "Das gefundene Gerät hat nicht die Informationen geliefert, die zur Einrichtung nötig sind."
     }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "Für den Konfigurationseintrag {entry_id} wurde kein Divoom-Gerät gefunden."
+    },
+    "entry_not_loaded": {
+      "message": "Das Divoom-Gerät {title} ist nicht geladen. Prüfe, ob die Integration erfolgreich eingerichtet wurde."
+    },
+    "mode_failed": {
+      "message": "Die Aktion {mode} ist fehlgeschlagen. Details stehen im Home-Assistant-Protokoll."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Uhr",
+      "description": "Zeigt den Uhr-Kanal auf einem Divoom-Gerät an. Auf älteren Geräten wie der Aurabox oder der Timebox Mini ist dieser Modus stark eingeschränkt.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "clock": {
+          "name": "Uhren-Stil",
+          "description": "Der anzuzeigende Uhren-Stil als Zahl ab 0 bis zu dem, was das Divoom-Gerät unterstützt. Die verfügbaren Stile sind in der offiziellen Divoom-App zu sehen."
+        },
+        "twentyfour": {
+          "name": "24-Stunden-Format",
+          "description": "Zeigt die Uhrzeit im 24-Stunden- statt im 12-Stunden-Format an."
+        },
+        "weather": {
+          "name": "Wetter anzeigen",
+          "description": "Zeigt das aktuelle Wetter an."
+        },
+        "temp": {
+          "name": "Temperatur anzeigen",
+          "description": "Zeigt die aktuelle Temperatur an."
+        },
+        "calendar": {
+          "name": "Datum anzeigen",
+          "description": "Zeigt das aktuelle Datum an."
+        },
+        "color": {
+          "name": "Farbe",
+          "description": "Die Farbe der Ziffern der Uhr."
+        },
+        "hot": {
+          "name": "Beliebte Bilder anzeigen",
+          "description": "Zeigt nacheinander die beliebten Bilder der Divoom-Community an."
+        }
+      }
+    }
   }
 }

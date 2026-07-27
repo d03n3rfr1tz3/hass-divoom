@@ -39,5 +39,56 @@
       "already_configured": "A Divoom device with that MAC address is already configured.",
       "invalid_discovery_info": "The discovered device did not provide the information needed to configure it."
     }
+  },
+  "exceptions": {
+    "entry_not_found": {
+      "message": "No Divoom device found for the config entry {entry_id}."
+    },
+    "entry_not_loaded": {
+      "message": "The Divoom device {title} is not loaded. Check whether the integration was set up successfully."
+    },
+    "mode_failed": {
+      "message": "The {mode} action failed. See the Home Assistant log for details."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Clock",
+      "description": "Shows the clock channel on a Divoom device. This mode is very limited on older devices such as the Aurabox or the Timebox Mini.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "clock": {
+          "name": "Clock style",
+          "description": "The clock style to show, as a number starting from 0 up to what the Divoom device supports. Check the official Divoom app to see the available styles."
+        },
+        "twentyfour": {
+          "name": "24-hour format",
+          "description": "Shows the time in 24-hour format instead of 12-hour format."
+        },
+        "weather": {
+          "name": "Show weather",
+          "description": "Shows the current weather."
+        },
+        "temp": {
+          "name": "Show temperature",
+          "description": "Shows the current temperature."
+        },
+        "calendar": {
+          "name": "Show date",
+          "description": "Shows the current date."
+        },
+        "color": {
+          "name": "Color",
+          "description": "The color of the clock numbers."
+        },
+        "hot": {
+          "name": "Show trending images",
+          "description": "Cycles through the trending images of the Divoom community."
+        }
+      }
+    }
   }
 }
