@@ -35,3 +35,182 @@ clock:
       example: false
       selector:
         boolean:
+
+light:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    brightness:
+      example: 75
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+    color:
+      example: [250, 0, 0]
+      selector:
+        color_rgb:
+
+"on":
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+
+"off":
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+
+brightness:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    brightness:
+      required: true
+      example: 100
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+
+image:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    file:
+      required: true
+      example: "ha16.gif"
+      selector:
+        text:
+    time:
+      example: 100
+      selector:
+        number:
+          min: 0
+          unit_of_measurement: ms
+          mode: box
+
+text:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    text:
+      required: true
+      example: "Hi Divoom"
+      selector:
+        text:
+    font:
+      example: "divoom.ttf"
+      selector:
+        text:
+    size:
+      example: 16
+      selector:
+        number:
+          min: 1
+          unit_of_measurement: px
+          mode: box
+    time:
+      example: 100
+      selector:
+        number:
+          min: 0
+          unit_of_measurement: ms
+          mode: box
+    foreground_color:
+      example: [250, 0, 0]
+      selector:
+        color_rgb:
+    background_color:
+      example: [0, 0, 0]
+      selector:
+        color_rgb:
+
+design:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    number:
+      example: 2
+      selector:
+        number:
+          min: 0
+          mode: box
+
+effects:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    number:
+      required: true
+      example: 2
+      selector:
+        number:
+          min: 0
+          mode: box
+
+visualization:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    number:
+      required: true
+      example: 2
+      selector:
+        number:
+          min: 0
+          mode: box
+    foreground_color:
+      example: [250, 0, 0]
+      selector:
+        color_rgb:
+    background_color:
+      example: [0, 0, 0]
+      selector:
+        color_rgb:
+
+signal:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    number:
+      required: true
+      example: 2
+      selector:
+        number:
+          min: 0
+          mode: box

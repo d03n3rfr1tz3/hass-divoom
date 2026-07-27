@@ -8,6 +8,7 @@ failures.
 from __future__ import annotations
 
 import json
+import os
 import threading
 from pathlib import Path
 from unittest.mock import Mock
@@ -21,6 +22,7 @@ from homeassistant.setup import async_setup_component
 from homeassistant.util.yaml import load_yaml
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
+from custom_components.divoom import notify as notify_module
 from custom_components.divoom.const import CONF_ENTRY_ID, DOMAIN
 from custom_components.divoom.notify import VALID_MODES
 from custom_components.divoom.services import SERVICE_SCHEMAS, _resolve_target
@@ -102,13 +104,13 @@ async def test_clock_service_requires_entry_id(hass):
         await hass.services.async_call(DOMAIN, "clock", {"clock": 1}, blocking=True)
 
 
-async def test_clock_service_rejects_out_of_range_style(hass):
+async def test_clock_service_rejects_negative_style(hass):
     assert await async_setup_component(hass, DOMAIN, {})
     entry, service = register_device(hass)
 
     with pytest.raises(vol.Invalid):
         await hass.services.async_call(
-            DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": 99}, blocking=True
+            DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": -1}, blocking=True
         )
 
     service._device.show_clock.assert_not_called()
@@ -208,6 +210,218 @@ async def test_notify_and_service_clock_paths_produce_identical_show_clock_call(
     via_notify.send_message(data={"mode": "clock", **params})
 
     assert via_service._device.mock_calls == via_notify._device.mock_calls
+
+
+# (mode, service params, notify data, device method, expected args, expected kwargs)
+# text/visualization deliberately use the packed `color` form on the notify
+# side, so the parity test also covers the legacy way of passing both colors.
+DISPATCH_CASES = [
+    (
+        "light",
+        {"brightness": 75, "color": [250, 0, 0]},
+        {"brightness": 75, "color": [250, 0, 0]},
+        "show_light", (), {"color": [250, 0, 0], "brightness": 75, "power": True},
+    ),
+    ("on", {}, {}, "send_on", (), {}),
+    ("off", {}, {}, "send_off", (), {}),
+    (
+        "brightness",
+        {"brightness": 100}, {"brightness": 100},
+        "send_brightness", (), {"value": 100},
+    ),
+    (
+        "image",
+        {"file": "ha16.gif", "time": 80}, {"file": "ha16.gif", "time": 80},
+        "show_image", (os.path.join("pixelart", "ha16.gif"),), {"time": 80},
+    ),
+    (
+        "text",
+        {"text": "Hi Divoom", "font": "divoom.ttf", "size": 16, "time": 100,
+         "foreground_color": [250, 0, 0], "background_color": [0, 0, 0]},
+        {"text": "Hi Divoom", "font": "divoom.ttf", "size": 16, "time": 100,
+         "color": [[250, 0, 0], [0, 0, 0]]},
+        "show_text", ("Hi Divoom", os.path.join("fonts", "divoom.ttf")),
+        {"size": 16, "time": 100, "color1": [250, 0, 0], "color2": [0, 0, 0]},
+    ),
+    (
+        "text",
+        {"text": "Hi Divoom", "background_color": [0, 0, 0]},
+        {"text": "Hi Divoom", "color": [None, [0, 0, 0]]},
+        "show_text", ("Hi Divoom", None),
+        {"size": None, "time": None, "color1": None, "color2": [0, 0, 0]},
+    ),
+    ("design", {"number": 2}, {"number": 2}, "show_design", (), {"number": 2}),
+    ("effects", {"number": 2}, {"number": 2}, "show_effects", (), {"number": 2}),
+    (
+        "visualization",
+        {"number": 2, "foreground_color": [250, 0, 0], "background_color": [0, 0, 0]},
+        {"number": 2, "color": [[250, 0, 0], [0, 0, 0]]},
+        "show_visualization", (), {"number": 2, "color1": [250, 0, 0], "color2": [0, 0, 0]},
+    ),
+    (
+        "signal",
+        {"number": 2}, {"number": 2},
+        "show_visualization", (), {"number": 2, "color1": None, "color2": None},
+    ),
+]
+
+DISPATCH_IDS = [
+    "{}-{}".format(case[0], index) for index, case in enumerate(DISPATCH_CASES)
+]
+
+
+@pytest.mark.parametrize(
+    "mode,params,notify_data,method,args,kwargs", DISPATCH_CASES, ids=DISPATCH_IDS
+)
+async def test_service_dispatches_to_device(hass, mode, params, notify_data, method, args, kwargs):
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, service = register_device(hass)
+
+    await hass.services.async_call(
+        DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id, **params}, blocking=True
+    )
+
+    getattr(service._device, method).assert_called_once_with(*args, **kwargs)
+
+
+@pytest.mark.parametrize(
+    "mode,params,notify_data,method,args,kwargs", DISPATCH_CASES, ids=DISPATCH_IDS
+)
+async def test_notify_and_service_paths_match(hass, mode, params, notify_data, method, args, kwargs):
+    """Both entry points go through call_mode, so the device must not be able
+    to tell them apart."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, via_service = register_device(hass)
+    via_notify = make_mocked_service()
+
+    await hass.services.async_call(
+        DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id, **params}, blocking=True
+    )
+    via_notify.send_message(data={"mode": mode, **notify_data})
+
+    assert via_service._device.mock_calls == via_notify._device.mock_calls
+
+
+@pytest.mark.parametrize(
+    "mode,params",
+    [
+        ("brightness", {}),
+        ("image", {}),
+        ("text", {}),
+        ("effects", {}),
+        ("visualization", {}),
+        ("signal", {}),
+    ],
+)
+async def test_service_requires_mandatory_field(hass, mode, params):
+    """Without these the device call would be a silent no-op, so the schema
+    has to reject the call instead of letting it look successful."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, service = register_device(hass)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id, **params}, blocking=True
+        )
+
+    assert service._device.mock_calls == []
+
+
+@pytest.mark.parametrize("mode", ["on", "off"])
+async def test_on_off_services_take_no_parameters(hass, mode):
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, _ = register_device(hass)
+
+    with pytest.raises(vol.Invalid):
+        await hass.services.async_call(
+            DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id, "brightness": 50}, blocking=True
+        )
+
+
+async def test_image_outside_media_directory_raises(hass):
+    """_resolve_path rejects the traversal, call_mode returns False - on the
+    service path that has to become a visible error, not just a log line."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, service = register_device(hass)
+
+    with pytest.raises(HomeAssistantError) as error:
+        await hass.services.async_call(
+            DOMAIN,
+            "image",
+            {CONF_ENTRY_ID: entry.entry_id, "file": "../../secrets.yaml"},
+            blocking=True,
+        )
+
+    assert error.value.translation_key == "mode_failed"
+    service._device.show_image.assert_not_called()
+
+
+async def test_brightness_zero_is_sent(hass):
+    """0 is a legitimate brightness. It used to fall through the truthy `or`
+    chain in notify.py down to None, where send_brightness returns silently."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, service = register_device(hass)
+
+    await hass.services.async_call(
+        DOMAIN, "brightness", {CONF_ENTRY_ID: entry.entry_id, "brightness": 0}, blocking=True
+    )
+
+    service._device.send_brightness.assert_called_once_with(value=0)
+
+
+@pytest.mark.parametrize("key", ["brightness", "number", "value"])
+def test_brightness_accepts_any_of_its_three_keys(key):
+    """The notify path deliberately tolerates the wrong key. Fixing the falsy-0
+    bug must not narrow that down to `brightness` only."""
+    service = make_mocked_service()
+
+    service.call_mode("brightness", {key: 0})
+
+    service._device.send_brightness.assert_called_once_with(value=0)
+
+
+@pytest.mark.parametrize(
+    "mode,method", [("text", "show_text"), ("visualization", "show_visualization")]
+)
+def test_notify_accepts_separate_color_params(mode, method):
+    """The service layer has one field per color, so call_mode has to take
+    them separately too - notify users get the same choice."""
+    service = make_mocked_service()
+
+    service.call_mode(mode, {
+        "text": "Hi Divoom", "number": 2,
+        "foreground_color": [250, 0, 0], "background_color": [0, 0, 0],
+    })
+
+    kwargs = getattr(service._device, method).call_args.kwargs
+    assert kwargs["color1"] == [250, 0, 0]
+    assert kwargs["color2"] == [0, 0, 0]
+
+
+def test_separate_color_params_win_over_packed_color():
+    service = make_mocked_service()
+
+    service.call_mode("visualization", {
+        "number": 2, "color": [[1, 1, 1], [2, 2, 2]], "background_color": [0, 0, 0],
+    })
+
+    service._device.show_visualization.assert_called_once_with(
+        number=2, color1=[1, 1, 1], color2=[0, 0, 0]
+    )
+
+
+def test_every_service_field_is_a_known_notify_param():
+    """Every service field is passed straight into call_mode's data dict. A
+    name call_mode doesn't know would be silently ignored - the call would
+    look successful and do nothing."""
+    notify_params = {
+        value for name, value in vars(notify_module).items()
+        if name.startswith("PARAM_") and isinstance(value, str)
+    }
+
+    for mode, schema in SERVICE_SCHEMAS.items():
+        fields = {str(marker) for marker in schema.schema} - {CONF_ENTRY_ID}
+        assert fields <= notify_params, (mode, fields - notify_params)
 
 
 def test_services_yaml_strings_and_translations_stay_in_sync():

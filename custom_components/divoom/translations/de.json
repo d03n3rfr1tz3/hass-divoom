@@ -89,6 +89,174 @@
           "description": "Zeigt nacheinander die beliebten Bilder der Divoom-Community an."
         }
       }
+    },
+    "light": {
+      "name": "Licht",
+      "description": "Zeigt den Licht-Kanal auf einem Divoom-Gerät an. Auf der Aurabox ist dieser Modus stark eingeschränkt, weil sie nur 8 Farben unterstützt.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "brightness": {
+          "name": "Helligkeit",
+          "description": "Der Helligkeitswert zwischen 0 und 100."
+        },
+        "color": {
+          "name": "Farbe",
+          "description": "Die Farbe des Lichts."
+        }
+      }
+    },
+    "on": {
+      "name": "Einschalten",
+      "description": "Schaltet die Anzeige ein, indem die Pixel auf Schwarz, die Helligkeit auf 100 und ein spezielles Power-Flag auf 1 gesetzt werden. Da die Pixel schwarz bleiben und es keinen automatischen Weg zurück zum zuvor angezeigten Modus gibt, sollte anschließend eine weitere Aktion wie „Uhr“ gesendet werden.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        }
+      }
+    },
+    "off": {
+      "name": "Ausschalten",
+      "description": "Schaltet die Anzeige aus, indem die Pixel auf Schwarz, die Helligkeit auf 0 und ein spezielles Power-Flag auf 0 gesetzt werden.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Helligkeit",
+      "description": "Stellt die Helligkeit eines Divoom-Geräts ein.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "brightness": {
+          "name": "Helligkeit",
+          "description": "Der Helligkeitswert zwischen 0 und 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Bild",
+      "description": "Zeigt ein statisches oder animiertes Bild auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "file": {
+          "name": "Bilddatei",
+          "description": "Die anzuzeigende Bilddatei, relativ zum konfigurierten Medienverzeichnis."
+        },
+        "time": {
+          "name": "Bildwechselzeit",
+          "description": "Die Zeit in Millisekunden zwischen den einzelnen Frames. Standardmäßig wird das Timing des GIFs verwendet."
+        }
+      }
+    },
+    "text": {
+      "name": "Text",
+      "description": "Zeigt Text als Lauftext-Animation auf einem Divoom-Gerät an. Ein längerer Text oder eine breite Schriftart passt möglicherweise nicht in die Beschränkung von ca. 60 Frames.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "text": {
+          "name": "Text",
+          "description": "Der Text, der animiert wird."
+        },
+        "font": {
+          "name": "Schriftart",
+          "description": "Der Name oder Dateiname der zu verwendenden Schriftart. Diese Schriftarten sind enthalten: arcade.ttf, arial.ttf, divoom.ttf, impact.ttf und pixelpowerline.ttf. Standardmäßig wird eine generische Schriftart verwendet."
+        },
+        "size": {
+          "name": "Schriftgröße",
+          "description": "Die Schriftgröße in Pixeln. Standardmäßig die Bildschirmgröße des Geräts."
+        },
+        "time": {
+          "name": "Bildwechselzeit",
+          "description": "Die Zeit in Millisekunden zwischen den einzelnen Frames. Standardmäßig 100 ms pro Frame."
+        },
+        "foreground_color": {
+          "name": "Textfarbe",
+          "description": "Die Farbe des Texts. Standardmäßig Weiß."
+        },
+        "background_color": {
+          "name": "Hintergrundfarbe",
+          "description": "Die Farbe des Hintergrunds. Standardmäßig Schwarz."
+        }
+      }
+    },
+    "design": {
+      "name": "Design",
+      "description": "Zeigt den Design-Kanal auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "number": {
+          "name": "Design",
+          "description": "Die Nummer des konkreten Designs, als Zahl ab 0 bis zu dem, was das Divoom-Gerät unterstützt."
+        }
+      }
+    },
+    "effects": {
+      "name": "Effekte",
+      "description": "Zeigt den Effekt-Kanal auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "number": {
+          "name": "Effekt",
+          "description": "Die Nummer des konkreten Effekts. Das kann sich bei manchen Divoom-Geräten unterscheiden. Schau in der Handy-App nach und zähle sie."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Visualisierung",
+      "description": "Zeigt den Visualisierungs-Kanal auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "number": {
+          "name": "Visualisierung",
+          "description": "Die Nummer der konkreten Visualisierung. Das kann sich bei manchen Divoom-Geräten unterscheiden. Schau in der Handy-App nach und zähle sie."
+        },
+        "foreground_color": {
+          "name": "Vordergrundfarbe",
+          "description": "Die Farbe des Vordergrunds. Wird nur von den ältesten Geräten unterstützt."
+        },
+        "background_color": {
+          "name": "Hintergrundfarbe",
+          "description": "Die Farbe des Hintergrunds. Wird nur von den ältesten Geräten unterstützt."
+        }
+      }
+    },
+    "signal": {
+      "name": "Signal",
+      "description": "Zeigt den Signal-Kanal auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "number": {
+          "name": "Signal",
+          "description": "Die Nummer des konkreten Signals. Schau in der Handy-App nach und zähle sie."
+        }
+      }
     }
   }
 }

@@ -89,6 +89,174 @@
           "description": "Postupně prochází oblíbené obrázky komunity Divoom."
         }
       }
+    },
+    "light": {
+      "name": "Světlo",
+      "description": "Zobrazí kanál se světlem na zařízení Divoom. Na Auraboxu je tento režim značně omezený, protože podporuje pouze 8 barev.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "brightness": {
+          "name": "Jas",
+          "description": "Hodnota jasu mezi 0 a 100."
+        },
+        "color": {
+          "name": "Barva",
+          "description": "Barva světla."
+        }
+      }
+    },
+    "on": {
+      "name": "Zapnout",
+      "description": "Zapne displej tak, že nastaví pixely na černou, jas na 100 a zvláštní příznak napájení na 1. Protože pixely zůstanou černé a neexistuje automatická cesta zpět k dříve zobrazenému režimu, měl by následovat další příkaz, například „Hodiny“.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        }
+      }
+    },
+    "off": {
+      "name": "Vypnout",
+      "description": "Vypne displej tak, že nastaví pixely na černou, jas na 0 a zvláštní příznak napájení na 0.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Jas",
+      "description": "Nastaví jas zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "brightness": {
+          "name": "Jas",
+          "description": "Hodnota jasu mezi 0 a 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Obrázek",
+      "description": "Zobrazí statický nebo animovaný obrázek na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "file": {
+          "name": "Soubor s obrázkem",
+          "description": "Soubor s obrázkem, který se má zobrazit, relativně k nastavenému adresáři médií."
+        },
+        "time": {
+          "name": "Čas snímku",
+          "description": "Čas v milisekundách mezi jednotlivými snímky. Ve výchozím nastavení se použije časování souboru GIF."
+        }
+      }
+    },
+    "text": {
+      "name": "Text",
+      "description": "Zobrazí text jako posouvající se animaci na zařízení Divoom. Delší text nebo široké písmo se nemusí vejít do limitu přibližně 60 snímků.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "text": {
+          "name": "Text",
+          "description": "Text, který se má animovat."
+        },
+        "font": {
+          "name": "Písmo",
+          "description": "Název nebo název souboru písma, které se má použít. Přiložena jsou tato písma: arcade.ttf, arial.ttf, divoom.ttf, impact.ttf a pixelpowerline.ttf. Ve výchozím nastavení se použije obecné písmo."
+        },
+        "size": {
+          "name": "Velikost písma",
+          "description": "Velikost písma v pixelech. Ve výchozím nastavení odpovídá velikosti obrazovky zařízení."
+        },
+        "time": {
+          "name": "Čas snímku",
+          "description": "Čas v milisekundách mezi jednotlivými snímky. Ve výchozím nastavení 100 ms na snímek."
+        },
+        "foreground_color": {
+          "name": "Barva textu",
+          "description": "Barva textu. Ve výchozím nastavení bílá."
+        },
+        "background_color": {
+          "name": "Barva pozadí",
+          "description": "Barva pozadí. Ve výchozím nastavení černá."
+        }
+      }
+    },
+    "design": {
+      "name": "Design",
+      "description": "Zobrazí kanál s designy na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "number": {
+          "name": "Design",
+          "description": "Číslo konkrétního designu, jako číslo od 0 výše až po hodnotu, kterou zařízení Divoom podporuje."
+        }
+      }
+    },
+    "effects": {
+      "name": "Efekty",
+      "description": "Zobrazí kanál s efekty na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "number": {
+          "name": "Efekt",
+          "description": "Číslo konkrétního efektu. U některých zařízení Divoom se může lišit. Podívejte se do aplikace v telefonu a spočítejte je."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Vizualizace",
+      "description": "Zobrazí kanál s vizualizacemi na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "number": {
+          "name": "Vizualizace",
+          "description": "Číslo konkrétní vizualizace. U některých zařízení Divoom se může lišit. Podívejte se do aplikace v telefonu a spočítejte je."
+        },
+        "foreground_color": {
+          "name": "Barva popředí",
+          "description": "Barva popředí. Podporují ji pouze nejstarší zařízení."
+        },
+        "background_color": {
+          "name": "Barva pozadí",
+          "description": "Barva pozadí. Podporují ji pouze nejstarší zařízení."
+        }
+      }
+    },
+    "signal": {
+      "name": "Signál",
+      "description": "Zobrazí kanál se signály na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "number": {
+          "name": "Signál",
+          "description": "Číslo konkrétního signálu. Podívejte se do aplikace v telefonu a spočítejte je."
+        }
+      }
     }
   }
 }

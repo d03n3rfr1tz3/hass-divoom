@@ -89,6 +89,174 @@
           "description": "Scorre le immagini popolari della comunità Divoom."
         }
       }
+    },
+    "light": {
+      "name": "Luce",
+      "description": "Mostra il canale luce su un dispositivo Divoom. Questa modalità è molto limitata sull'Aurabox, perché supporta solo 8 colori.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "brightness": {
+          "name": "Luminosità",
+          "description": "Il valore di luminosità tra 0 e 100."
+        },
+        "color": {
+          "name": "Colore",
+          "description": "Il colore della luce."
+        }
+      }
+    },
+    "on": {
+      "name": "Accendi",
+      "description": "Accende il display impostando i pixel su nero, la luminosità su 100 e un apposito flag di accensione su 1. Poiché i pixel restano neri e non esiste un modo automatico per tornare alla modalità mostrata in precedenza, conviene inviare subito dopo un'altra azione come «Orologio».",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        }
+      }
+    },
+    "off": {
+      "name": "Spegni",
+      "description": "Spegne il display impostando i pixel su nero, la luminosità su 0 e un apposito flag di accensione su 0.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Luminosità",
+      "description": "Imposta la luminosità di un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "brightness": {
+          "name": "Luminosità",
+          "description": "Il valore di luminosità tra 0 e 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Immagine",
+      "description": "Mostra un'immagine statica o animata su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "file": {
+          "name": "File immagine",
+          "description": "Il file immagine da mostrare, relativo alla cartella multimediale configurata."
+        },
+        "time": {
+          "name": "Durata per fotogramma",
+          "description": "Il tempo in millisecondi tra un fotogramma e l'altro. Per impostazione predefinita viene usata la temporizzazione della GIF."
+        }
+      }
+    },
+    "text": {
+      "name": "Testo",
+      "description": "Mostra un testo come animazione scorrevole su un dispositivo Divoom. Un testo lungo o un carattere largo potrebbe non rientrare nel limite di circa 60 fotogrammi.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "text": {
+          "name": "Testo",
+          "description": "Il testo che verrà animato."
+        },
+        "font": {
+          "name": "Carattere",
+          "description": "Il nome o il nome file del carattere da usare. Sono inclusi questi caratteri: arcade.ttf, arial.ttf, divoom.ttf, impact.ttf e pixelpowerline.ttf. Per impostazione predefinita viene usato un carattere generico."
+        },
+        "size": {
+          "name": "Dimensione del carattere",
+          "description": "La dimensione del carattere in pixel. Per impostazione predefinita corrisponde alla dimensione dello schermo del dispositivo."
+        },
+        "time": {
+          "name": "Durata per fotogramma",
+          "description": "Il tempo in millisecondi tra un fotogramma e l'altro. Per impostazione predefinita 100 ms per fotogramma."
+        },
+        "foreground_color": {
+          "name": "Colore del testo",
+          "description": "Il colore del testo. Bianco per impostazione predefinita."
+        },
+        "background_color": {
+          "name": "Colore di sfondo",
+          "description": "Il colore dello sfondo. Nero per impostazione predefinita."
+        }
+      }
+    },
+    "design": {
+      "name": "Design",
+      "description": "Mostra il canale design su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "number": {
+          "name": "Design",
+          "description": "Il numero del design specifico, come numero a partire da 0 fino al massimo supportato dal dispositivo Divoom."
+        }
+      }
+    },
+    "effects": {
+      "name": "Effetti",
+      "description": "Mostra il canale effetti su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "number": {
+          "name": "Effetto",
+          "description": "Il numero dell'effetto specifico. Può variare su alcuni dispositivi Divoom. Guarda nell'app del telefono e contali."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Visualizzazione",
+      "description": "Mostra il canale visualizzazione su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "number": {
+          "name": "Visualizzazione",
+          "description": "Il numero della visualizzazione specifica. Può variare su alcuni dispositivi Divoom. Guarda nell'app del telefono e contale."
+        },
+        "foreground_color": {
+          "name": "Colore in primo piano",
+          "description": "Il colore del primo piano. Supportato solo dai dispositivi più vecchi."
+        },
+        "background_color": {
+          "name": "Colore di sfondo",
+          "description": "Il colore dello sfondo. Supportato solo dai dispositivi più vecchi."
+        }
+      }
+    },
+    "signal": {
+      "name": "Segnale",
+      "description": "Mostra il canale segnale su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "number": {
+          "name": "Segnale",
+          "description": "Il numero del segnale specifico. Guarda nell'app del telefono e contali."
+        }
+      }
     }
   }
 }

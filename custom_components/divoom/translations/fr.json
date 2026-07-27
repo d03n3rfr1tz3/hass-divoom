@@ -89,6 +89,174 @@
           "description": "Fait défiler les images populaires de la communauté Divoom."
         }
       }
+    },
+    "light": {
+      "name": "Lumière",
+      "description": "Affiche le canal lumière sur un appareil Divoom. Ce mode est très limité sur l'Aurabox, car elle ne prend en charge que 8 couleurs.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "brightness": {
+          "name": "Luminosité",
+          "description": "La valeur de luminosité entre 0 et 100."
+        },
+        "color": {
+          "name": "Couleur",
+          "description": "La couleur de la lumière."
+        }
+      }
+    },
+    "on": {
+      "name": "Allumer",
+      "description": "Allume l'écran en mettant les pixels en noir, la luminosité à 100 et un indicateur d'alimentation spécifique à 1. Comme les pixels restent noirs et qu'il n'existe aucun moyen automatique de revenir au mode affiché précédemment, il convient d'envoyer ensuite une autre action, par exemple « Horloge ».",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        }
+      }
+    },
+    "off": {
+      "name": "Éteindre",
+      "description": "Éteint l'écran en mettant les pixels en noir, la luminosité à 0 et un indicateur d'alimentation spécifique à 0.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Luminosité",
+      "description": "Règle la luminosité d'un appareil Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "brightness": {
+          "name": "Luminosité",
+          "description": "La valeur de luminosité entre 0 et 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Image",
+      "description": "Affiche une image fixe ou animée sur un appareil Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "file": {
+          "name": "Fichier image",
+          "description": "Le fichier image à afficher, relatif au répertoire multimédia configuré."
+        },
+        "time": {
+          "name": "Durée par image",
+          "description": "Le temps en millisecondes entre chaque image. Par défaut, la synchronisation du GIF est utilisée."
+        }
+      }
+    },
+    "text": {
+      "name": "Texte",
+      "description": "Affiche du texte sous forme d'animation défilante sur un appareil Divoom. Un texte long ou une police large risque de ne pas tenir dans la limite d'environ 60 images.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "text": {
+          "name": "Texte",
+          "description": "Le texte qui sera animé."
+        },
+        "font": {
+          "name": "Police",
+          "description": "Le nom ou le nom de fichier de la police à utiliser. Ces polices sont incluses : arcade.ttf, arial.ttf, divoom.ttf, impact.ttf et pixelpowerline.ttf. Par défaut, une police générique est utilisée."
+        },
+        "size": {
+          "name": "Taille de police",
+          "description": "La taille de la police en pixels. Par défaut, la taille de l'écran de l'appareil."
+        },
+        "time": {
+          "name": "Durée par image",
+          "description": "Le temps en millisecondes entre chaque image. Par défaut, 100 ms par image."
+        },
+        "foreground_color": {
+          "name": "Couleur du texte",
+          "description": "La couleur du texte. Blanc par défaut."
+        },
+        "background_color": {
+          "name": "Couleur d'arrière-plan",
+          "description": "La couleur de l'arrière-plan. Noir par défaut."
+        }
+      }
+    },
+    "design": {
+      "name": "Design",
+      "description": "Affiche le canal design sur un appareil Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Design",
+          "description": "Le numéro du design concret, sous forme d'un nombre à partir de 0 jusqu'à la valeur maximale prise en charge par l'appareil Divoom."
+        }
+      }
+    },
+    "effects": {
+      "name": "Effets",
+      "description": "Affiche le canal effets sur un appareil Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Effet",
+          "description": "Le numéro de l'effet concret. Cela peut varier selon les appareils Divoom. Consultez l'application sur votre téléphone et comptez-les."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Visualisation",
+      "description": "Affiche le canal visualisation sur un appareil Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Visualisation",
+          "description": "Le numéro de la visualisation concrète. Cela peut varier selon les appareils Divoom. Consultez l'application sur votre téléphone et comptez-les."
+        },
+        "foreground_color": {
+          "name": "Couleur de premier plan",
+          "description": "La couleur du premier plan. Uniquement prise en charge par les appareils les plus anciens."
+        },
+        "background_color": {
+          "name": "Couleur d'arrière-plan",
+          "description": "La couleur de l'arrière-plan. Uniquement prise en charge par les appareils les plus anciens."
+        }
+      }
+    },
+    "signal": {
+      "name": "Signal",
+      "description": "Affiche le canal signal sur un appareil Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Signal",
+          "description": "Le numéro du signal concret. Consultez l'application sur votre téléphone et comptez-les."
+        }
+      }
     }
   }
 }

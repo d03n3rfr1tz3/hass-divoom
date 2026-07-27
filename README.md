@@ -333,7 +333,7 @@ Shows the design channel.
 
 | Parameter | Description |
 | ---       | ---         |
-| `number`  | The number of the concrete design. Ranging from 0-2 you can specify the design 1-3. |
+| `number`  | The number of the concrete design. Accepts a number starting from 0 up to what the Divoom device supports.<br/> Examples from Pixoo: `0`-`2` for the designs 1-3 |
 
 ```
 message: 'design'
@@ -621,8 +621,11 @@ Shows text as a scrolling animation. Font can be any TrueType or OpenType font i
 | ---       | ---         |
 | `text`    | The text that will be animated. |
 | `font`    | The font name or filename of the font that should be used. Defaults to a generic font. |
+| `size`    | The font size in pixels. Defaults to the screen size of the device. |
 | `time`    | The time in milliseconds between each frame. Defaults to 100ms per frame. |
 | `color`   | The colors for foreground and background. Accepts an array of an array of RGB color values. Defaults to white text on black background. |
+| `foreground_color` | The color of the text alone. Accepts an array of RGB color values. Takes precedence over `color`. |
+| `background_color` | The color of the background alone. Accepts an array of RGB color values. Takes precedence over `color`. |
 
 ```
 message: 'text'
@@ -652,6 +655,8 @@ Shows the visualization channel.
 | ---       | ---         |
 | `number`  | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
 | `color`   | The colors for foreground and background. Accepts an array of an array of RGB color values. Only supported by the oldest devices. |
+| `foreground_color` | The color of the foreground alone. Accepts an array of RGB color values. Takes precedence over `color`. |
+| `background_color` | The color of the background alone. Accepts an array of RGB color values. Takes precedence over `color`. |
 
 ```
 message: 'visualization'

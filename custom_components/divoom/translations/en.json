@@ -89,6 +89,174 @@
           "description": "Cycles through the trending images of the Divoom community."
         }
       }
+    },
+    "light": {
+      "name": "Light",
+      "description": "Shows the light channel on a Divoom device. This mode is very limited on the Aurabox, because it only supports 8 colors.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "brightness": {
+          "name": "Brightness",
+          "description": "The brightness value between 0 and 100."
+        },
+        "color": {
+          "name": "Color",
+          "description": "The color of the light."
+        }
+      }
+    },
+    "on": {
+      "name": "Turn on",
+      "description": "Turns the display on, by setting the pixels to black, the brightness to 100 and also switching a specific power flag to 1. Because the pixels stay black and there is no automatic way back to the previously shown mode, you should send another action such as Clock afterwards.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    },
+    "off": {
+      "name": "Turn off",
+      "description": "Turns the display off, by setting the pixels to black, the brightness to 0 and also switching a specific power flag to 0.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Brightness",
+      "description": "Sets the brightness of a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "brightness": {
+          "name": "Brightness",
+          "description": "The brightness value between 0 and 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Image",
+      "description": "Shows a static or animated image on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "file": {
+          "name": "Image file",
+          "description": "The image file to display, relative to the configured media directory."
+        },
+        "time": {
+          "name": "Frame time",
+          "description": "The time in milliseconds between each frame. Defaults to the timing of the GIF."
+        }
+      }
+    },
+    "text": {
+      "name": "Text",
+      "description": "Shows text as a scrolling animation on a Divoom device. A longer text or a wide font might not fit into the frame limitation of ~60 frames.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "text": {
+          "name": "Text",
+          "description": "The text that will be animated."
+        },
+        "font": {
+          "name": "Font",
+          "description": "The font name or filename of the font that should be used. These fonts are included: arcade.ttf, arial.ttf, divoom.ttf, impact.ttf and pixelpowerline.ttf. Defaults to a generic font."
+        },
+        "size": {
+          "name": "Font size",
+          "description": "The font size in pixels. Defaults to the screen size of the device."
+        },
+        "time": {
+          "name": "Frame time",
+          "description": "The time in milliseconds between each frame. Defaults to 100ms per frame."
+        },
+        "foreground_color": {
+          "name": "Text color",
+          "description": "The color of the text. Defaults to white."
+        },
+        "background_color": {
+          "name": "Background color",
+          "description": "The color of the background. Defaults to black."
+        }
+      }
+    },
+    "design": {
+      "name": "Design",
+      "description": "Shows the design channel on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Design",
+          "description": "The number of the concrete design, as a number starting from 0 up to what the Divoom device supports."
+        }
+      }
+    },
+    "effects": {
+      "name": "Effects",
+      "description": "Shows the effects channel on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Effect",
+          "description": "The number of the concrete effect. This might differ for some Divoom devices. Look into your phone app and count them."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Visualization",
+      "description": "Shows the visualization channel on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Visualization",
+          "description": "The number of the concrete visualization. This might differ for some Divoom devices. Look into your phone app and count them."
+        },
+        "foreground_color": {
+          "name": "Foreground color",
+          "description": "The color of the foreground. Only supported by the oldest devices."
+        },
+        "background_color": {
+          "name": "Background color",
+          "description": "The color of the background. Only supported by the oldest devices."
+        }
+      }
+    },
+    "signal": {
+      "name": "Signal",
+      "description": "Shows the signal channel on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Signal",
+          "description": "The number of the concrete signal. Look into your phone app and count them."
+        }
+      }
     }
   }
 }

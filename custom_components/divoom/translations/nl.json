@@ -89,6 +89,174 @@
           "description": "Doorloopt de populaire afbeeldingen van de Divoom-community."
         }
       }
+    },
+    "light": {
+      "name": "Licht",
+      "description": "Toont het lichtkanaal op een Divoom-apparaat. Op de Aurabox is deze modus sterk beperkt, omdat die maar 8 kleuren ondersteunt.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "brightness": {
+          "name": "Helderheid",
+          "description": "De helderheidswaarde tussen 0 en 100."
+        },
+        "color": {
+          "name": "Kleur",
+          "description": "De kleur van het licht."
+        }
+      }
+    },
+    "on": {
+      "name": "Inschakelen",
+      "description": "Schakelt het scherm in door de pixels op zwart, de helderheid op 100 en een specifieke power-vlag op 1 te zetten. Omdat de pixels zwart blijven en er geen automatische weg terug is naar de eerder getoonde modus, kun je daarna het beste nog een actie zoals 'Klok' sturen.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    },
+    "off": {
+      "name": "Uitschakelen",
+      "description": "Schakelt het scherm uit door de pixels op zwart, de helderheid op 0 en een specifieke power-vlag op 0 te zetten.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Helderheid",
+      "description": "Stelt de helderheid van een Divoom-apparaat in.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "brightness": {
+          "name": "Helderheid",
+          "description": "De helderheidswaarde tussen 0 en 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Afbeelding",
+      "description": "Toont een statische of geanimeerde afbeelding op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "file": {
+          "name": "Afbeeldingsbestand",
+          "description": "Het weer te geven afbeeldingsbestand, relatief ten opzichte van de ingestelde mediamap."
+        },
+        "time": {
+          "name": "Framewisseltijd",
+          "description": "De tijd in milliseconden tussen elk frame. Standaard wordt de timing van de GIF gebruikt."
+        }
+      }
+    },
+    "text": {
+      "name": "Tekst",
+      "description": "Toont tekst als schuivende animatie op een Divoom-apparaat. Een langere tekst of een breed lettertype past mogelijk niet binnen de limiet van ongeveer 60 frames.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "text": {
+          "name": "Tekst",
+          "description": "De tekst die geanimeerd wordt."
+        },
+        "font": {
+          "name": "Lettertype",
+          "description": "De naam of bestandsnaam van het te gebruiken lettertype. Deze lettertypen zijn meegeleverd: arcade.ttf, arial.ttf, divoom.ttf, impact.ttf en pixelpowerline.ttf. Standaard wordt een generiek lettertype gebruikt."
+        },
+        "size": {
+          "name": "Lettergrootte",
+          "description": "De lettergrootte in pixels. Standaard de schermgrootte van het apparaat."
+        },
+        "time": {
+          "name": "Framewisseltijd",
+          "description": "De tijd in milliseconden tussen elk frame. Standaard 100 ms per frame."
+        },
+        "foreground_color": {
+          "name": "Tekstkleur",
+          "description": "De kleur van de tekst. Standaard wit."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "De kleur van de achtergrond. Standaard zwart."
+        }
+      }
+    },
+    "design": {
+      "name": "Ontwerp",
+      "description": "Toont het ontwerpkanaal op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Ontwerp",
+          "description": "Het nummer van het concrete ontwerp, als getal vanaf 0 tot wat het Divoom-apparaat ondersteunt."
+        }
+      }
+    },
+    "effects": {
+      "name": "Effecten",
+      "description": "Toont het effectenkanaal op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Effect",
+          "description": "Het nummer van het concrete effect. Dit kan per Divoom-apparaat verschillen. Bekijk de app op je telefoon en tel ze."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Visualisatie",
+      "description": "Toont het visualisatiekanaal op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Visualisatie",
+          "description": "Het nummer van de concrete visualisatie. Dit kan per Divoom-apparaat verschillen. Bekijk de app op je telefoon en tel ze."
+        },
+        "foreground_color": {
+          "name": "Voorgrondkleur",
+          "description": "De kleur van de voorgrond. Wordt alleen door de oudste apparaten ondersteund."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "De kleur van de achtergrond. Wordt alleen door de oudste apparaten ondersteund."
+        }
+      }
+    },
+    "signal": {
+      "name": "Signaal",
+      "description": "Toont het signaalkanaal op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Signaal",
+          "description": "Het nummer van het concrete signaal. Bekijk de app op je telefoon en tel ze."
+        }
+      }
     }
   }
 }
