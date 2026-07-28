@@ -257,6 +257,336 @@
           "description": "Číslo konkrétního signálu. Podívejte se do aplikace v telefonu a spočítejte je."
         }
       }
+    },
+    "alarm": {
+      "name": "Budík",
+      "description": "Nastaví budík na zařízení Divoom. Možná budete muset vyzkoušet, které možnosti vaše zařízení Divoom podporuje a co skutečně mění. Nepodporované hodnoty se ignorují, případně se rovnou vynulují, aby nedocházelo k podivnému chování.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "number": {
+          "name": "Pozice budíku",
+          "description": "Konkrétní pozice pro budík. Kolik pozic je skutečně k dispozici, zjistíte případně v aplikaci v telefonu."
+        },
+        "value": {
+          "name": "Čas",
+          "description": "Konkrétní čas, kdy má budík zazvonit."
+        },
+        "weekday": {
+          "name": "Dny v týdnu",
+          "description": "Obvyklý seznam dnů v týdnu, kdy má budík zazvonit."
+        },
+        "alarmmode": {
+          "name": "Režim budíku",
+          "description": "Režim budíku. Podívejte se do aplikace v telefonu, co vaše zařízení Divoom podporuje."
+        },
+        "triggermode": {
+          "name": "Režim spouštění",
+          "description": "Režim spouštění. Podívejte se do aplikace v telefonu, co vaše zařízení Divoom podporuje."
+        },
+        "frequency": {
+          "name": "Rádiová frekvence",
+          "description": "Rádiová frekvence, která se má nastavit."
+        },
+        "volume": {
+          "name": "Hlasitost",
+          "description": "Hlasitost budíku."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Odpočet",
+      "description": "Zobrazí nástroj odpočtu na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Spustit",
+          "description": "Řídí stav spuštění/zastavení."
+        },
+        "countdown": {
+          "name": "Odpočet",
+          "description": "Konkrétní odpočet."
+        }
+      }
+    },
+    "timer": {
+      "name": "Stopky",
+      "description": "Zobrazí nástroj stopek na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Spustit",
+          "description": "Řídí stav spuštění/zastavení."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Výročí",
+      "description": "Nastaví výročí (připomínku) na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "number": {
+          "name": "Pozice výročí",
+          "description": "Konkrétní pozice pro výročí. Kolik pozic je skutečně k dispozici, zjistíte případně v aplikaci v telefonu."
+        },
+        "value": {
+          "name": "Datum a čas",
+          "description": "Datum a čas výročí. Rok se ignoruje."
+        },
+        "text": {
+          "name": "Název",
+          "description": "Název vašeho výročí, jak se zobrazí v aplikaci v telefonu. Omezeno na 16 znaků. Ve výchozím nastavení Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Ukazatel skóre",
+      "description": "Zobrazí kanál nebo nástroj ukazatele skóre na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "player1": {
+          "name": "První hráč",
+          "description": "Skóre prvního hráče, které se má zobrazit."
+        },
+        "player2": {
+          "name": "Druhý hráč",
+          "description": "Skóre druhého hráče, které se má zobrazit."
+        }
+      }
+    },
+    "noise": {
+      "name": "Hlukoměr",
+      "description": "Zobrazí hlukoměr na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Spustit",
+          "description": "Řídí stav spuštění/zastavení."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Režim spánku",
+      "description": "Zobrazí režim spánku na zařízení Divoom, který přehrává uklidňující zvuky, volitelně s časovačem a světlem.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Spustit",
+          "description": "Řídí stav spuštění/zastavení."
+        },
+        "time": {
+          "name": "Časovač spánku",
+          "description": "Čas v minutách, po kterém se režim spánku ukončí. Pokud není zadán, výchozí hodnota je 120."
+        },
+        "sleepmode": {
+          "name": "Zvukový efekt",
+          "description": "Zvukový efekt, který se má přehrát. V aplikaci zjistíte, kolik možností je k dispozici."
+        },
+        "frequency": {
+          "name": "Rádiová frekvence",
+          "description": "Rádiová frekvence, která se má nastavit."
+        },
+        "volume": {
+          "name": "Hlasitost",
+          "description": "Hodnota hlasitosti mezi 0 a 100."
+        },
+        "color": {
+          "name": "Barva",
+          "description": "Barva displeje."
+        },
+        "brightness": {
+          "name": "Jas",
+          "description": "Hodnota jasu mezi 0 a 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Datum a čas",
+      "description": "Nastaví datum a čas zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Datum a čas",
+          "description": "Datum a čas, které se mají nastavit. Ponechte prázdné, pokud se má použít aktuální datum a čas."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Ekvalizér",
+      "description": "Spustí hudební ekvalizér na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "number": {
+          "name": "Ekvalizér",
+          "description": "Číslo konkrétního ekvalizéru. Podívejte se do aplikace v telefonu a spočítejte je."
+        },
+        "audiomode": {
+          "name": "Původní režim zvuku",
+          "description": "Aktivuje původní režim zvuku."
+        },
+        "backgroundmode": {
+          "name": "Režim zvuku na pozadí",
+          "description": "Aktivuje režim zvuku na pozadí."
+        },
+        "streammode": {
+          "name": "Režim streamovaného zvuku",
+          "description": "Aktivuje režim streamovaného zvuku."
+        }
+      }
+    },
+    "volume": {
+      "name": "Hlasitost",
+      "description": "Nastaví hlasitost zařízení Divoom. Podporují to pouze zařízení Divoom se zvukovými funkcemi.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "volume": {
+          "name": "Hlasitost",
+          "description": "Hodnota hlasitosti mezi 0 a 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Stav přehrávání",
+      "description": "Nastaví stav přehrávání aktuálně přehrávané hudby na zařízení Divoom. Podporují to pouze zařízení Divoom se zvukovými funkcemi.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Přehrávat",
+          "description": "Řídí stav přehrávání/pozastavení."
+        }
+      }
+    },
+    "radio": {
+      "name": "Rádio",
+      "description": "Zobrazí a přehrává kanál rádia na zařízení Divoom. Podporují to pouze zařízení Divoom s funkcí rádia.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Zapnuto",
+          "description": "Řídí stav zapnuto/vypnuto."
+        },
+        "frequency": {
+          "name": "Rádiová frekvence",
+          "description": "Rádiová frekvence, která se má nastavit."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Texty písní",
+      "description": "Zobrazí kanál s texty písní na zařízení Divoom. Nemusí být podporováno každým zařízením Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Klávesnice",
+      "description": "Ovládá podsvícení klávesnice, konkrétně na zařízení Ditoo.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Efekt",
+          "description": "Změní efekt podsvícení klávesnice."
+        }
+      }
+    },
+    "game": {
+      "name": "Hra",
+      "description": "Zobrazí hru na zařízení Divoom. Teoreticky je možné otevřít i hry, které se v aplikaci v telefonu nezobrazují, nemusí ale fungovat dobře.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Hra",
+          "description": "Číslo konkrétní hry. V závislosti na zařízení může být počet her různý. Podívejte se do aplikace v telefonu a spočítejte je."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Ovládání hry",
+      "description": "Odesílá ovládací příkazy aktuálně otevřené hře na zařízení Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Příkaz",
+          "description": "Příkaz, který se odešle hře."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Pondělí",
+        "tue": "Úterý",
+        "wed": "Středa",
+        "thu": "Čtvrtek",
+        "fri": "Pátek",
+        "sat": "Sobota",
+        "sun": "Neděle"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Předchozí efekt",
+        "toggle": "Zapnout/vypnout",
+        "next": "Další efekt"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Start",
+        "left": "Doleva",
+        "right": "Doprava",
+        "up": "Nahoru",
+        "down": "Dolů",
+        "ok": "OK"
+      }
     }
   }
 }

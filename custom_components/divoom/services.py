@@ -9,22 +9,35 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.const import CONF_MAC
 from .const import CONF_ENTRY_ID, DOMAIN
 from .notify import (
+    PARAM_ALARMMODE,
+    PARAM_AUDIOMODE,
     PARAM_BACKGROUND_COLOR,
+    PARAM_BACKGROUNDMODE,
     PARAM_BRIGHTNESS,
     PARAM_CALENDAR,
     PARAM_CLOCK,
     PARAM_COLOR,
+    PARAM_COUNTDOWN,
     PARAM_FILE,
     PARAM_FONT,
     PARAM_FOREGROUND_COLOR,
+    PARAM_FREQUENCY,
     PARAM_HOT,
     PARAM_NUMBER,
+    PARAM_PLAYER1,
+    PARAM_PLAYER2,
     PARAM_SIZE,
+    PARAM_SLEEPMODE,
+    PARAM_STREAMMODE,
     PARAM_TEMP,
     PARAM_TEXT,
     PARAM_TIME,
+    PARAM_TRIGGERMODE,
     PARAM_TWENTYFOUR,
+    PARAM_VALUE,
+    PARAM_VOLUME,
     PARAM_WEATHER,
+    PARAM_WEEKDAY,
 )
 
 _LOGGER = logging.getLogger(__package__)
@@ -39,15 +52,24 @@ RGB = vol.All(
 
 PERCENT = vol.All(vol.Coerce(int), vol.Range(min=0, max=100))
 
-# no upper bound: how many styles/effects/designs exist is device specific
-COUNT = vol.All(vol.Coerce(int), vol.Range(min=0))
+# the upper bounds are what the protocol packs the value into, not how many
+# styles/effects/designs a concrete device offers
+BYTE = vol.All(vol.Coerce(int), vol.Range(min=0, max=255))
+WORD = vol.All(vol.Coerce(int), vol.Range(min=0, max=65535))
 
-MILLISECONDS = vol.All(vol.Coerce(int), vol.Range(min=0))
+# beyond 15 show_clock deactivates the clock instead of picking a style
+CLOCK = vol.All(vol.Coerce(int), vol.Range(min=0, max=15))
+
+# the FM broadcast bands in use worldwide, from OIRT up to ITU
+FREQUENCY = vol.All(vol.Coerce(float), vol.Range(min=64, max=108))
+
+KEYBOARD_VALUES = ["previous", "toggle", "next"]
+GAMECONTROL_VALUES = ["go", "left", "right", "up", "down", "ok"]
 
 SERVICE_SCHEMAS = {
     "clock": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Optional(PARAM_CLOCK): COUNT,
+        vol.Optional(PARAM_CLOCK): CLOCK,
         vol.Optional(PARAM_TWENTYFOUR): cv.boolean,
         vol.Optional(PARAM_WEATHER): cv.boolean,
         vol.Optional(PARAM_TEMP): cv.boolean,
@@ -73,34 +95,118 @@ SERVICE_SCHEMAS = {
     "image": vol.Schema({
         **TARGET_SCHEMA,
         vol.Required(PARAM_FILE): cv.string,
-        vol.Optional(PARAM_TIME): MILLISECONDS,
+        vol.Optional(PARAM_TIME): WORD,
     }),
     "text": vol.Schema({
         **TARGET_SCHEMA,
         vol.Required(PARAM_TEXT): cv.string,
         vol.Optional(PARAM_FONT): cv.string,
+        # the font size goes to PIL, not into a byte, so there is nothing to cap
         vol.Optional(PARAM_SIZE): vol.All(vol.Coerce(int), vol.Range(min=1)),
-        vol.Optional(PARAM_TIME): MILLISECONDS,
+        vol.Optional(PARAM_TIME): WORD,
         vol.Optional(PARAM_FOREGROUND_COLOR): RGB,
         vol.Optional(PARAM_BACKGROUND_COLOR): RGB,
     }),
     "design": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Optional(PARAM_NUMBER): COUNT,
+        vol.Optional(PARAM_NUMBER): BYTE,
     }),
     "effects": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Required(PARAM_NUMBER): COUNT,
+        vol.Required(PARAM_NUMBER): BYTE,
     }),
     "visualization": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Required(PARAM_NUMBER): COUNT,
+        vol.Required(PARAM_NUMBER): BYTE,
         vol.Optional(PARAM_FOREGROUND_COLOR): RGB,
         vol.Optional(PARAM_BACKGROUND_COLOR): RGB,
     }),
     "signal": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Required(PARAM_NUMBER): COUNT,
+        vol.Required(PARAM_NUMBER): BYTE,
+    }),
+    "alarm": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Optional(PARAM_NUMBER): BYTE,
+        vol.Optional(PARAM_VALUE): cv.string,
+        vol.Optional(PARAM_WEEKDAY): cv.weekdays,
+        vol.Optional(PARAM_ALARMMODE): BYTE,
+        vol.Optional(PARAM_TRIGGERMODE): BYTE,
+        vol.Optional(PARAM_FREQUENCY): FREQUENCY,
+        vol.Optional(PARAM_VOLUME): PERCENT,
+    }),
+    "countdown": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): cv.boolean,
+        vol.Optional(PARAM_COUNTDOWN): cv.string,
+    }),
+    "timer": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): cv.boolean,
+    }),
+    "memorial": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Optional(PARAM_NUMBER): BYTE,
+        vol.Optional(PARAM_VALUE): cv.string,
+        vol.Optional(PARAM_TEXT): cv.string,
+    }),
+    "scoreboard": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Optional(PARAM_PLAYER1): WORD,
+        vol.Optional(PARAM_PLAYER2): WORD,
+    }),
+    "noise": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): cv.boolean,
+    }),
+    "sleep": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): cv.boolean,
+        vol.Optional(PARAM_TIME): BYTE,
+        vol.Optional(PARAM_SLEEPMODE): BYTE,
+        vol.Optional(PARAM_FREQUENCY): FREQUENCY,
+        vol.Optional(PARAM_VOLUME): PERCENT,
+        vol.Optional(PARAM_COLOR): RGB,
+        vol.Optional(PARAM_BRIGHTNESS): PERCENT,
+    }),
+    "datetime": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Optional(PARAM_VALUE): cv.string,
+    }),
+    "equalizer": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_NUMBER): BYTE,
+        vol.Optional(PARAM_AUDIOMODE): cv.boolean,
+        vol.Optional(PARAM_BACKGROUNDMODE): cv.boolean,
+        vol.Optional(PARAM_STREAMMODE): cv.boolean,
+    }),
+    "volume": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VOLUME): PERCENT,
+    }),
+    "playstate": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): cv.boolean,
+    }),
+    "radio": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): cv.boolean,
+        vol.Optional(PARAM_FREQUENCY): FREQUENCY,
+    }),
+    "lyrics": vol.Schema({
+        **TARGET_SCHEMA,
+    }),
+    "keyboard": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): vol.In(KEYBOARD_VALUES),
+    }),
+    "game": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Optional(PARAM_VALUE): BYTE,
+    }),
+    "gamecontrol": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): vol.In(GAMECONTROL_VALUES),
     }),
 }
 

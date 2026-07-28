@@ -237,7 +237,7 @@ Sets an alarm. You might have to experiment with the options your Divoom device 
 | Parameter | Description |
 | ---       | ---         |
 | `number`  | The concrete slot for the alarm. For the actual amount of slots you might have to look into the phone app. |
-| `value`   | The concrete time for when the alarm should happen in the format `mm:ss`. |
+| `value`   | The concrete time for when the alarm should happen in the format `hh:mm`. The three-part format `hh:mm:ss` is accepted as well. |
 | `weekday` | The typical list of weekdays for when the alarm should happen. |
 | `alarmmode` | The alarm mode. Look into your phone app for what is supported by your Divoom device. |
 | `triggermode` | The trigger mode. Look into your phone app for what is supported by your Divoom device. |
@@ -424,7 +424,7 @@ Controls the keyboard LEDs specifically on the Ditoo.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value`   | Changes the keyboard LED effect. <br/> `-1` = previous effect, `0` = toggle on/off, `1` = next effect |
+| `value`   | Changes the keyboard LED effect. <br/> `-1` or `previous` = previous effect, <br/> `0` or `toggle` = toggle on/off, <br/> `1` or `next` = next effect |
 
 ```
 message: 'keyboard'
@@ -449,10 +449,6 @@ data:
 
 #### MODE lyrics
 Shows the lyrics channel. Might not be supported by every Divoom device.
-
-| Parameter | Description |
-| ---       | ---         |
-| `number`  | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
 
 ```
 message: 'lyrics'

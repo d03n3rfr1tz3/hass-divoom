@@ -62,7 +62,7 @@ class Aurabox(Divoom):
         args = []
         if time != None:
             args += int(time[0:2]).to_bytes(1, byteorder='big')
-            args += int(time[3:]).to_bytes(1, byteorder='big')
+            args += int(time[3:5]).to_bytes(1, byteorder='big')
         else:
             args += [0x00, 0x00]
         args += [0x01]

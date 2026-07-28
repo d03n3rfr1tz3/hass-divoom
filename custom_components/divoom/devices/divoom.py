@@ -528,7 +528,7 @@ class Divoom:
 
         if time != None:
             args += int(time[0:2]).to_bytes(1, byteorder='big')
-            args += int(time[3:]).to_bytes(1, byteorder='big')
+            args += int(time[3:5]).to_bytes(1, byteorder='big')
         else:
             args += [0x00, 0x00]
         if weekdays != None:
@@ -599,7 +599,7 @@ class Divoom:
         args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
         if countdown != None:
             args += int(countdown[0:2]).to_bytes(1, byteorder='big')
-            args += int(countdown[3:]).to_bytes(1, byteorder='big')
+            args += int(countdown[3:5]).to_bytes(1, byteorder='big')
         else:
             args += [0x00, 0x00]
         return self.send_command("set tool", args)

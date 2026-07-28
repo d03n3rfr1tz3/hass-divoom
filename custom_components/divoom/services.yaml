@@ -10,6 +10,7 @@ clock:
       selector:
         number:
           min: 0
+          max: 15
           mode: box
     twentyfour:
       example: true
@@ -106,6 +107,7 @@ image:
       selector:
         number:
           min: 0
+          max: 65535
           unit_of_measurement: ms
           mode: box
 
@@ -137,6 +139,7 @@ text:
       selector:
         number:
           min: 0
+          max: 65535
           unit_of_measurement: ms
           mode: box
     foreground_color:
@@ -160,6 +163,7 @@ design:
       selector:
         number:
           min: 0
+          max: 255
           mode: box
 
 effects:
@@ -175,6 +179,7 @@ effects:
       selector:
         number:
           min: 0
+          max: 255
           mode: box
 
 visualization:
@@ -190,6 +195,7 @@ visualization:
       selector:
         number:
           min: 0
+          max: 255
           mode: box
     foreground_color:
       example: [250, 0, 0]
@@ -213,4 +219,368 @@ signal:
       selector:
         number:
           min: 0
+          max: 255
           mode: box
+
+alarm:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    number:
+      example: 0
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    value:
+      example: "07:30:00"
+      selector:
+        time:
+    weekday:
+      example: [mon, tue, wed, thu, fri]
+      selector:
+        select:
+          multiple: true
+          translation_key: weekday
+          options:
+            - mon
+            - tue
+            - wed
+            - thu
+            - fri
+            - sat
+            - sun
+    alarmmode:
+      example: 0
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    triggermode:
+      example: 0
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    frequency:
+      example: 100.3
+      selector:
+        number:
+          min: 64
+          max: 108
+          step: 0.1
+          unit_of_measurement: MHz
+          mode: box
+    volume:
+      example: 75
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+
+countdown:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: true
+      selector:
+        boolean:
+    countdown:
+      example: "01:30:00"
+      selector:
+        time:
+
+timer:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: true
+      selector:
+        boolean:
+
+memorial:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    number:
+      example: 0
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    value:
+      example: "2000-12-31 00:00:00"
+      selector:
+        datetime:
+    text:
+      example: "Happy New Year!"
+      selector:
+        text:
+
+scoreboard:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    player1:
+      example: 2
+      selector:
+        number:
+          min: 0
+          max: 65535
+          mode: box
+    player2:
+      example: 1
+      selector:
+        number:
+          min: 0
+          max: 65535
+          mode: box
+
+noise:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: true
+      selector:
+        boolean:
+
+sleep:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: true
+      selector:
+        boolean:
+    time:
+      example: 30
+      selector:
+        number:
+          min: 0
+          max: 255
+          unit_of_measurement: min
+          mode: box
+    sleepmode:
+      example: 4
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    frequency:
+      example: 100.3
+      selector:
+        number:
+          min: 64
+          max: 108
+          step: 0.1
+          unit_of_measurement: MHz
+          mode: box
+    volume:
+      example: 10
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+    color:
+      example: [255, 255, 0]
+      selector:
+        color_rgb:
+    brightness:
+      example: 50
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+
+datetime:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      example: "2024-12-31 18:30:00"
+      selector:
+        datetime:
+
+equalizer:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    number:
+      required: true
+      example: 2
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+    audiomode:
+      example: true
+      selector:
+        boolean:
+    backgroundmode:
+      example: false
+      selector:
+        boolean:
+    streammode:
+      example: false
+      selector:
+        boolean:
+
+volume:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    volume:
+      required: true
+      example: 75
+      selector:
+        number:
+          min: 0
+          max: 100
+          unit_of_measurement: "%"
+          mode: slider
+
+playstate:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: true
+      selector:
+        boolean:
+
+radio:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: true
+      selector:
+        boolean:
+    frequency:
+      example: 100.3
+      selector:
+        number:
+          min: 64
+          max: 108
+          step: 0.1
+          unit_of_measurement: MHz
+          mode: box
+
+lyrics:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+
+keyboard:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: next
+      selector:
+        select:
+          translation_key: keyboard_value
+          options:
+            - previous
+            - toggle
+            - next
+
+game:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      example: 2
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
+
+gamecontrol:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: go
+      selector:
+        select:
+          translation_key: gamecontrol_value
+          options:
+            - go
+            - left
+            - right
+            - up
+            - down
+            - ok

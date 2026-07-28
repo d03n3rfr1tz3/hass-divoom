@@ -257,6 +257,336 @@
           "description": "Het nummer van het concrete signaal. Bekijk de app op je telefoon en tel ze."
         }
       }
+    },
+    "alarm": {
+      "name": "Wekker",
+      "description": "Stelt een wekker in op een Divoom-apparaat. Je moet mogelijk uitproberen welke opties je Divoom-apparaat ondersteunt en wat ze werkelijk veranderen. Niet-ondersteunde waarden worden genegeerd of, indien mogelijk, direct op nul gezet om vreemd gedrag te voorkomen.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Wekkerplek",
+          "description": "De concrete plek voor de wekker. Hoeveel plekken er werkelijk zijn, zie je eventueel in de app op je telefoon."
+        },
+        "value": {
+          "name": "Tijd",
+          "description": "Het concrete tijdstip waarop de wekker moet afgaan."
+        },
+        "weekday": {
+          "name": "Weekdagen",
+          "description": "De gebruikelijke lijst met weekdagen waarop de wekker moet afgaan."
+        },
+        "alarmmode": {
+          "name": "Wekkermodus",
+          "description": "De wekkermodus. Bekijk de app op je telefoon voor wat je Divoom-apparaat ondersteunt."
+        },
+        "triggermode": {
+          "name": "Triggermodus",
+          "description": "De triggermodus. Bekijk de app op je telefoon voor wat je Divoom-apparaat ondersteunt."
+        },
+        "frequency": {
+          "name": "Radiofrequentie",
+          "description": "De in te stellen radiofrequentie."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Het volume van de wekker."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Aftelklok",
+      "description": "Toont het aftelhulpmiddel op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Regelt de start/stop-status."
+        },
+        "countdown": {
+          "name": "Aftelklok",
+          "description": "De concrete aftelklok."
+        }
+      }
+    },
+    "timer": {
+      "name": "Stopwatch",
+      "description": "Toont het stopwatch-hulpmiddel op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Regelt de start/stop-status."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Gedenkdag",
+      "description": "Stelt een gedenkdag (herinnering) in op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Gedenkdagplek",
+          "description": "De concrete plek voor de gedenkdag. Hoeveel plekken er werkelijk zijn, zie je eventueel in de app op je telefoon."
+        },
+        "value": {
+          "name": "Datum en tijd",
+          "description": "De datum en tijd van de gedenkdag. Het jaar wordt genegeerd."
+        },
+        "text": {
+          "name": "Naam",
+          "description": "De naam van je gedenkdag, zoals die in de app op je telefoon verschijnt. Beperkt tot 16 tekens. Standaard Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Scorebord",
+      "description": "Toont het scorebordkanaal of -hulpmiddel op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "player1": {
+          "name": "Speler een",
+          "description": "De te tonen score van speler een."
+        },
+        "player2": {
+          "name": "Speler twee",
+          "description": "De te tonen score van speler twee."
+        }
+      }
+    },
+    "noise": {
+      "name": "Geluidsmeter",
+      "description": "Toont de geluidsmeter op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Regelt de start/stop-status."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Slaapstand",
+      "description": "Toont de slaapstand op een Divoom-apparaat, die rustgevende geluiden afspeelt, optioneel met timer en licht.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Regelt de start/stop-status."
+        },
+        "time": {
+          "name": "Slaaptimer",
+          "description": "De tijd in minuten waarna de slaapstand stopt. Standaard 120 als er niets wordt opgegeven."
+        },
+        "sleepmode": {
+          "name": "Geluidseffect",
+          "description": "Het af te spelen geluidseffect. Kijk in de app hoeveel opties beschikbaar zijn."
+        },
+        "frequency": {
+          "name": "Radiofrequentie",
+          "description": "De in te stellen radiofrequentie."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "De volumewaarde tussen 0 en 100."
+        },
+        "color": {
+          "name": "Kleur",
+          "description": "De kleur van het scherm."
+        },
+        "brightness": {
+          "name": "Helderheid",
+          "description": "De helderheidswaarde tussen 0 en 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Datum en tijd",
+      "description": "Stelt de datum en tijd van een Divoom-apparaat in.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Datum en tijd",
+          "description": "De in te stellen datum en tijd. Laat leeg om simpelweg de huidige datum en tijd te gebruiken."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Equalizer",
+      "description": "Start de muziekequalizer op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Equalizer",
+          "description": "Het nummer van de concrete equalizer. Bekijk de app op je telefoon en tel ze."
+        },
+        "audiomode": {
+          "name": "Originele audiomodus",
+          "description": "Activeert de originele audiomodus."
+        },
+        "backgroundmode": {
+          "name": "Achtergrond-audiomodus",
+          "description": "Activeert de achtergrond-audiomodus."
+        },
+        "streammode": {
+          "name": "Streaming-audiomodus",
+          "description": "Activeert de streaming-audiomodus."
+        }
+      }
+    },
+    "volume": {
+      "name": "Volume",
+      "description": "Stelt het volume van een Divoom-apparaat in. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "De volumewaarde tussen 0 en 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Afspeelstatus",
+      "description": "Stelt de afspeelstatus van de momenteel afgespeelde muziek op een Divoom-apparaat in. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Afspelen",
+          "description": "Regelt de afspelen/pauze-status."
+        }
+      }
+    },
+    "radio": {
+      "name": "Radio",
+      "description": "Toont en speelt het radiokanaal op een Divoom-apparaat. Wordt alleen ondersteund door Divoom-apparaten met radiofunctie.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Aan",
+          "description": "Regelt de aan/uit-status."
+        },
+        "frequency": {
+          "name": "Radiofrequentie",
+          "description": "De in te stellen radiofrequentie."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Songteksten",
+      "description": "Toont het songtekstkanaal op een Divoom-apparaat. Wordt mogelijk niet door elk Divoom-apparaat ondersteund.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Toetsenbord",
+      "description": "Bestuurt de toetsenbordverlichting, specifiek op de Ditoo.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Effect",
+          "description": "Wijzigt het verlichtingseffect van het toetsenbord."
+        }
+      }
+    },
+    "game": {
+      "name": "Spel",
+      "description": "Toont een spel op een Divoom-apparaat. Het is theoretisch mogelijk om spellen te openen die niet in de app op je telefoon staan, maar die werken mogelijk niet goed.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Spel",
+          "description": "Het nummer van het concrete spel. Afhankelijk van je apparaat kan het aantal spellen verschillen. Bekijk de app op je telefoon en tel ze."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Spelbesturing",
+      "description": "Stuurt bedieningsopdrachten naar het momenteel geopende spel op een Divoom-apparaat.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Opdracht",
+          "description": "De opdracht die naar het spel wordt gestuurd."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Maandag",
+        "tue": "Dinsdag",
+        "wed": "Woensdag",
+        "thu": "Donderdag",
+        "fri": "Vrijdag",
+        "sat": "Zaterdag",
+        "sun": "Zondag"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Vorig effect",
+        "toggle": "In-/uitschakelen",
+        "next": "Volgend effect"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Go",
+        "left": "Links",
+        "right": "Rechts",
+        "up": "Omhoog",
+        "down": "Omlaag",
+        "ok": "OK"
+      }
     }
   }
 }

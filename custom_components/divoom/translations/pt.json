@@ -257,6 +257,336 @@
           "description": "O número do sinal concreto. Consulta a aplicação do teu telemóvel e conta-os."
         }
       }
+    },
+    "alarm": {
+      "name": "Alarme",
+      "description": "Define um alarme num dispositivo Divoom. Poderás ter de experimentar quais as opções que o teu dispositivo Divoom suporta e o que realmente alteram. Os valores não suportados são ignorados ou, se possível, colocados diretamente a zero, para evitar comportamentos estranhos.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "number": {
+          "name": "Posição do alarme",
+          "description": "A posição concreta do alarme. Para saberes quantas posições existem realmente, poderás ter de consultar a aplicação do telemóvel."
+        },
+        "value": {
+          "name": "Hora",
+          "description": "A hora concreta a que o alarme deve tocar."
+        },
+        "weekday": {
+          "name": "Dias da semana",
+          "description": "A habitual lista de dias da semana em que o alarme deve tocar."
+        },
+        "alarmmode": {
+          "name": "Modo de alarme",
+          "description": "O modo de alarme. Consulta a aplicação do teu telemóvel para saber o que o teu dispositivo Divoom suporta."
+        },
+        "triggermode": {
+          "name": "Modo de acionamento",
+          "description": "O modo de acionamento. Consulta a aplicação do teu telemóvel para saber o que o teu dispositivo Divoom suporta."
+        },
+        "frequency": {
+          "name": "Frequência de rádio",
+          "description": "A frequência de rádio a definir."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "O volume do alarme."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Contagem decrescente",
+      "description": "Mostra a ferramenta de contagem decrescente num dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Iniciar",
+          "description": "Controla o estado de início/paragem."
+        },
+        "countdown": {
+          "name": "Contagem decrescente",
+          "description": "A contagem decrescente concreta."
+        }
+      }
+    },
+    "timer": {
+      "name": "Cronómetro",
+      "description": "Mostra a ferramenta de cronómetro num dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Iniciar",
+          "description": "Controla o estado de início/paragem."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Efeméride",
+      "description": "Define uma efeméride (lembrete) num dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "number": {
+          "name": "Posição da efeméride",
+          "description": "A posição concreta da efeméride. Para saberes quantas posições existem realmente, poderás ter de consultar a aplicação do telemóvel."
+        },
+        "value": {
+          "name": "Data e hora",
+          "description": "A data e a hora da efeméride. O ano é ignorado."
+        },
+        "text": {
+          "name": "Nome",
+          "description": "O nome da tua efeméride, tal como aparecerá na aplicação do telemóvel. Limitado a 16 caracteres. Por predefinição, Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Marcador",
+      "description": "Mostra o canal ou a ferramenta de marcador num dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "player1": {
+          "name": "Jogador um",
+          "description": "A pontuação do jogador um a mostrar."
+        },
+        "player2": {
+          "name": "Jogador dois",
+          "description": "A pontuação do jogador dois a mostrar."
+        }
+      }
+    },
+    "noise": {
+      "name": "Sonómetro",
+      "description": "Mostra o sonómetro num dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Iniciar",
+          "description": "Controla o estado de início/paragem."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Modo de sono",
+      "description": "Mostra o modo de sono num dispositivo Divoom, que reproduz sons relaxantes, opcionalmente com temporizador e luz.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Iniciar",
+          "description": "Controla o estado de início/paragem."
+        },
+        "time": {
+          "name": "Temporizador de sono",
+          "description": "O tempo em minutos após o qual o modo de sono termina. Por predefinição, 120 quando não é indicado."
+        },
+        "sleepmode": {
+          "name": "Efeito sonoro",
+          "description": "O efeito sonoro a reproduzir. Vê na aplicação quantas opções estão disponíveis."
+        },
+        "frequency": {
+          "name": "Frequência de rádio",
+          "description": "A frequência de rádio a definir."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "O valor de volume entre 0 e 100."
+        },
+        "color": {
+          "name": "Cor",
+          "description": "A cor do ecrã."
+        },
+        "brightness": {
+          "name": "Brilho",
+          "description": "O valor de brilho entre 0 e 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Data e hora",
+      "description": "Define a data e a hora de um dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Data e hora",
+          "description": "A data e a hora a definir. Deixa vazio para usar simplesmente a data e a hora atuais."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Equalizador",
+      "description": "Inicia o equalizador de música num dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "number": {
+          "name": "Equalizador",
+          "description": "O número do equalizador concreto. Consulta a aplicação do teu telemóvel e conta-os."
+        },
+        "audiomode": {
+          "name": "Modo de áudio original",
+          "description": "Ativa o modo de áudio original."
+        },
+        "backgroundmode": {
+          "name": "Modo de áudio em segundo plano",
+          "description": "Ativa o modo de áudio em segundo plano."
+        },
+        "streammode": {
+          "name": "Modo de áudio em streaming",
+          "description": "Ativa o modo de áudio em streaming."
+        }
+      }
+    },
+    "volume": {
+      "name": "Volume",
+      "description": "Define o volume de um dispositivo Divoom. Apenas suportado por dispositivos Divoom com funções de áudio.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "O valor de volume entre 0 e 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Estado de reprodução",
+      "description": "Define o estado de reprodução da música atualmente reproduzida num dispositivo Divoom. Apenas suportado por dispositivos Divoom com funções de áudio.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Reproduzir",
+          "description": "Controla o estado de reprodução/pausa."
+        }
+      }
+    },
+    "radio": {
+      "name": "Rádio",
+      "description": "Mostra e reproduz o canal de rádio num dispositivo Divoom. Apenas suportado por dispositivos Divoom com função de rádio.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Ligado",
+          "description": "Controla o estado ligado/desligado."
+        },
+        "frequency": {
+          "name": "Frequência de rádio",
+          "description": "A frequência de rádio a definir."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Letras",
+      "description": "Mostra o canal de letras num dispositivo Divoom. Pode não ser suportado por todos os dispositivos Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Teclado",
+      "description": "Controla os LED do teclado, especificamente no Ditoo.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Efeito",
+          "description": "Altera o efeito de iluminação do teclado."
+        }
+      }
+    },
+    "game": {
+      "name": "Jogo",
+      "description": "Mostra um jogo num dispositivo Divoom. É teoricamente possível abrir jogos que não aparecem na aplicação do teu telemóvel, mas podem não funcionar muito bem.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Jogo",
+          "description": "O número do jogo concreto. Consoante o teu dispositivo, a quantidade de jogos pode variar. Consulta a aplicação do teu telemóvel e conta-os."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Controlo do jogo",
+      "description": "Envia comandos de controlo para o jogo atualmente aberto num dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Comando",
+          "description": "O comando a enviar para o jogo."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Segunda-feira",
+        "tue": "Terça-feira",
+        "wed": "Quarta-feira",
+        "thu": "Quinta-feira",
+        "fri": "Sexta-feira",
+        "sat": "Sábado",
+        "sun": "Domingo"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Efeito anterior",
+        "toggle": "Ligar/desligar",
+        "next": "Efeito seguinte"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Ir",
+        "left": "Esquerda",
+        "right": "Direita",
+        "up": "Cima",
+        "down": "Baixo",
+        "ok": "OK"
+      }
     }
   }
 }

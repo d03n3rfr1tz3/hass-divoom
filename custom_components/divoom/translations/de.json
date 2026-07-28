@@ -257,6 +257,336 @@
           "description": "Die Nummer des konkreten Signals. Schau in der Handy-App nach und zähle sie."
         }
       }
+    },
+    "alarm": {
+      "name": "Wecker",
+      "description": "Stellt einen Wecker auf einem Divoom-Gerät. Möglicherweise musst du ausprobieren, welche Optionen dein Divoom-Gerät unterstützt und was sie tatsächlich bewirken. Nicht unterstützte Werte werden ignoriert oder, wenn möglich, direkt auf null gesetzt, um seltsames Verhalten zu vermeiden.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "number": {
+          "name": "Wecker-Speicherplatz",
+          "description": "Der konkrete Speicherplatz für den Wecker. Wie viele Plätze es tatsächlich gibt, siehst du gegebenenfalls in der Handy-App."
+        },
+        "value": {
+          "name": "Uhrzeit",
+          "description": "Die konkrete Uhrzeit, zu der der Wecker klingeln soll."
+        },
+        "weekday": {
+          "name": "Wochentage",
+          "description": "Die übliche Liste der Wochentage, an denen der Wecker klingeln soll."
+        },
+        "alarmmode": {
+          "name": "Wecker-Modus",
+          "description": "Der Wecker-Modus. Schau in der Handy-App nach, was dein Divoom-Gerät unterstützt."
+        },
+        "triggermode": {
+          "name": "Auslöse-Modus",
+          "description": "Der Auslöse-Modus. Schau in der Handy-App nach, was dein Divoom-Gerät unterstützt."
+        },
+        "frequency": {
+          "name": "Radiofrequenz",
+          "description": "Die einzustellende Radiofrequenz."
+        },
+        "volume": {
+          "name": "Lautstärke",
+          "description": "Die Lautstärke des Weckers."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Countdown",
+      "description": "Zeigt das Countdown-Werkzeug auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Steuert den Start/Stopp-Zustand."
+        },
+        "countdown": {
+          "name": "Countdown",
+          "description": "Der konkrete Countdown."
+        }
+      }
+    },
+    "timer": {
+      "name": "Stoppuhr",
+      "description": "Zeigt das Stoppuhr-Werkzeug auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Steuert den Start/Stopp-Zustand."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Gedenktag",
+      "description": "Setzt einen Gedenktag (Erinnerung) auf einem Divoom-Gerät.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "number": {
+          "name": "Gedenktag-Speicherplatz",
+          "description": "Der konkrete Speicherplatz für den Gedenktag. Wie viele Plätze es tatsächlich gibt, siehst du gegebenenfalls in der Handy-App."
+        },
+        "value": {
+          "name": "Datum und Uhrzeit",
+          "description": "Das Datum und die Uhrzeit des Gedenktags. Das Jahr wird ignoriert."
+        },
+        "text": {
+          "name": "Name",
+          "description": "Der Name des Gedenktags, wie er in der Handy-App erscheint. Auf 16 Zeichen begrenzt. Standardmäßig „Home Assistant“."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Anzeigetafel",
+      "description": "Zeigt den Anzeigetafel-Kanal bzw. das Anzeigetafel-Werkzeug auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "player1": {
+          "name": "Spieler eins",
+          "description": "Der anzuzeigende Punktestand von Spieler eins."
+        },
+        "player2": {
+          "name": "Spieler zwei",
+          "description": "Der anzuzeigende Punktestand von Spieler zwei."
+        }
+      }
+    },
+    "noise": {
+      "name": "Lärmpegel",
+      "description": "Zeigt den Lärmpegelmesser auf einem Divoom-Gerät an.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Steuert den Start/Stopp-Zustand."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Schlafmodus",
+      "description": "Zeigt den Schlafmodus auf einem Divoom-Gerät an, der beruhigende Klänge abspielt, optional mit Timer und Licht.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Steuert den Start/Stopp-Zustand."
+        },
+        "time": {
+          "name": "Einschlaf-Timer",
+          "description": "Die Zeit in Minuten, nach der der Schlafmodus beendet wird. Standardmäßig 120, wenn nichts angegeben wird."
+        },
+        "sleepmode": {
+          "name": "Klang",
+          "description": "Der abzuspielende Klang. Wie viele Optionen es gibt, siehst du in der App."
+        },
+        "frequency": {
+          "name": "Radiofrequenz",
+          "description": "Die einzustellende Radiofrequenz."
+        },
+        "volume": {
+          "name": "Lautstärke",
+          "description": "Der Lautstärkewert zwischen 0 und 100."
+        },
+        "color": {
+          "name": "Farbe",
+          "description": "Die Farbe der Anzeige."
+        },
+        "brightness": {
+          "name": "Helligkeit",
+          "description": "Der Helligkeitswert zwischen 0 und 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Datum und Uhrzeit",
+      "description": "Stellt Datum und Uhrzeit eines Divoom-Geräts ein.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Datum und Uhrzeit",
+          "description": "Das einzustellende Datum mit Uhrzeit. Leer lassen, um einfach das aktuelle Datum und die aktuelle Uhrzeit zu verwenden."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Equalizer",
+      "description": "Startet den Musik-Equalizer auf einem Divoom-Gerät.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "number": {
+          "name": "Equalizer",
+          "description": "Die Nummer des konkreten Equalizers. Schau in der Handy-App nach und zähle sie."
+        },
+        "audiomode": {
+          "name": "Original-Audiomodus",
+          "description": "Aktiviert den Original-Audiomodus."
+        },
+        "backgroundmode": {
+          "name": "Hintergrund-Audiomodus",
+          "description": "Aktiviert den Hintergrund-Audiomodus."
+        },
+        "streammode": {
+          "name": "Streaming-Audiomodus",
+          "description": "Aktiviert den Streaming-Audiomodus."
+        }
+      }
+    },
+    "volume": {
+      "name": "Lautstärke",
+      "description": "Stellt die Lautstärke eines Divoom-Geräts ein. Wird nur von Divoom-Geräten mit Audiofunktionen unterstützt.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "volume": {
+          "name": "Lautstärke",
+          "description": "Der Lautstärkewert zwischen 0 und 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Wiedergabestatus",
+      "description": "Setzt den Wiedergabestatus der aktuell gespielten Musik auf einem Divoom-Gerät. Wird nur von Divoom-Geräten mit Audiofunktionen unterstützt.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Wiedergabe",
+          "description": "Steuert den Wiedergabe/Pause-Zustand."
+        }
+      }
+    },
+    "radio": {
+      "name": "Radio",
+      "description": "Zeigt und spielt den Radio-Kanal auf einem Divoom-Gerät. Wird nur von Divoom-Geräten mit Radiofunktion unterstützt.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Ein",
+          "description": "Steuert den Ein/Aus-Zustand."
+        },
+        "frequency": {
+          "name": "Radiofrequenz",
+          "description": "Die einzustellende Radiofrequenz."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Liedtexte",
+      "description": "Zeigt den Liedtext-Kanal auf einem Divoom-Gerät an. Wird möglicherweise nicht von jedem Divoom-Gerät unterstützt.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Tastatur",
+      "description": "Steuert die Tastaturbeleuchtung, speziell auf dem Ditoo.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Effekt",
+          "description": "Ändert den Effekt der Tastaturbeleuchtung."
+        }
+      }
+    },
+    "game": {
+      "name": "Spiel",
+      "description": "Zeigt ein Spiel auf einem Divoom-Gerät an. Theoretisch lassen sich auch Spiele öffnen, die nicht in der Handy-App angezeigt werden, sie funktionieren aber möglicherweise nicht gut.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Spiel",
+          "description": "Die Nummer des konkreten Spiels. Je nach Gerät kann die Anzahl der Spiele unterschiedlich sein. Schau in der Handy-App nach und zähle sie."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Spielsteuerung",
+      "description": "Sendet Steuerbefehle an das aktuell geöffnete Spiel auf einem Divoom-Gerät.",
+      "fields": {
+        "entry_id": {
+          "name": "Gerät",
+          "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "value": {
+          "name": "Befehl",
+          "description": "Der Befehl, der an das Spiel gesendet wird."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Montag",
+        "tue": "Dienstag",
+        "wed": "Mittwoch",
+        "thu": "Donnerstag",
+        "fri": "Freitag",
+        "sat": "Samstag",
+        "sun": "Sonntag"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Vorheriger Effekt",
+        "toggle": "Ein-/ausschalten",
+        "next": "Nächster Effekt"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Los",
+        "left": "Links",
+        "right": "Rechts",
+        "up": "Hoch",
+        "down": "Runter",
+        "ok": "OK"
+      }
     }
   }
 }

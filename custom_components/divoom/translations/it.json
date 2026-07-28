@@ -257,6 +257,336 @@
           "description": "Il numero del segnale specifico. Guarda nell'app del telefono e contali."
         }
       }
+    },
+    "alarm": {
+      "name": "Sveglia",
+      "description": "Imposta una sveglia su un dispositivo Divoom. Potresti dover sperimentare quali opzioni il tuo dispositivo Divoom supporta e cosa cambiano davvero. I valori non supportati vengono ignorati o, se possibile, azzerati direttamente per evitare comportamenti strani.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "number": {
+          "name": "Slot della sveglia",
+          "description": "Lo slot specifico per la sveglia. Per sapere quanti slot ci sono davvero, guarda nell'app del telefono."
+        },
+        "value": {
+          "name": "Orario",
+          "description": "L'orario specifico in cui la sveglia deve suonare."
+        },
+        "weekday": {
+          "name": "Giorni della settimana",
+          "description": "Il consueto elenco dei giorni della settimana in cui la sveglia deve suonare."
+        },
+        "alarmmode": {
+          "name": "Modalità sveglia",
+          "description": "La modalità della sveglia. Guarda nell'app del telefono per sapere cosa supporta il tuo dispositivo Divoom."
+        },
+        "triggermode": {
+          "name": "Modalità di attivazione",
+          "description": "La modalità di attivazione. Guarda nell'app del telefono per sapere cosa supporta il tuo dispositivo Divoom."
+        },
+        "frequency": {
+          "name": "Frequenza radio",
+          "description": "La frequenza radio da impostare."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Il volume della sveglia."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Conto alla rovescia",
+      "description": "Mostra lo strumento conto alla rovescia su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Avvia",
+          "description": "Controlla lo stato di avvio/arresto."
+        },
+        "countdown": {
+          "name": "Conto alla rovescia",
+          "description": "Il conto alla rovescia specifico."
+        }
+      }
+    },
+    "timer": {
+      "name": "Cronometro",
+      "description": "Mostra lo strumento cronometro su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Avvia",
+          "description": "Controlla lo stato di avvio/arresto."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Ricorrenza",
+      "description": "Imposta una ricorrenza (promemoria) su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "number": {
+          "name": "Slot della ricorrenza",
+          "description": "Lo slot specifico per la ricorrenza. Per sapere quanti slot ci sono davvero, guarda nell'app del telefono."
+        },
+        "value": {
+          "name": "Data e ora",
+          "description": "La data e l'ora della ricorrenza. L'anno viene ignorato."
+        },
+        "text": {
+          "name": "Nome",
+          "description": "Il nome della tua ricorrenza, come apparirà nell'app del telefono. Limitato a 16 caratteri. Per impostazione predefinita Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Tabellone",
+      "description": "Mostra il canale o lo strumento tabellone su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "player1": {
+          "name": "Giocatore uno",
+          "description": "Il punteggio del giocatore uno da mostrare."
+        },
+        "player2": {
+          "name": "Giocatore due",
+          "description": "Il punteggio del giocatore due da mostrare."
+        }
+      }
+    },
+    "noise": {
+      "name": "Fonometro",
+      "description": "Mostra il fonometro su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Avvia",
+          "description": "Controlla lo stato di avvio/arresto."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Modalità sonno",
+      "description": "Mostra la modalità sonno su un dispositivo Divoom, che riproduce suoni rilassanti, con timer e luce opzionali.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Avvia",
+          "description": "Controlla lo stato di avvio/arresto."
+        },
+        "time": {
+          "name": "Timer di spegnimento",
+          "description": "Il tempo in minuti dopo il quale la modalità sonno si interrompe. Per impostazione predefinita 120 se non indicato."
+        },
+        "sleepmode": {
+          "name": "Effetto sonoro",
+          "description": "L'effetto sonoro da riprodurre. Controlla nell'app quante opzioni sono disponibili."
+        },
+        "frequency": {
+          "name": "Frequenza radio",
+          "description": "La frequenza radio da impostare."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Il valore del volume tra 0 e 100."
+        },
+        "color": {
+          "name": "Colore",
+          "description": "Il colore del display."
+        },
+        "brightness": {
+          "name": "Luminosità",
+          "description": "Il valore di luminosità tra 0 e 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Data e ora",
+      "description": "Imposta la data e l'ora di un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Data e ora",
+          "description": "La data e l'ora da impostare. Lascia vuoto per usare semplicemente la data e l'ora attuali."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Equalizzatore",
+      "description": "Avvia l'equalizzatore musicale su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "number": {
+          "name": "Equalizzatore",
+          "description": "Il numero dell'equalizzatore specifico. Guarda nell'app del telefono e contali."
+        },
+        "audiomode": {
+          "name": "Modalità audio originale",
+          "description": "Attiva la modalità audio originale."
+        },
+        "backgroundmode": {
+          "name": "Modalità audio in background",
+          "description": "Attiva la modalità audio in background."
+        },
+        "streammode": {
+          "name": "Modalità audio in streaming",
+          "description": "Attiva la modalità audio in streaming."
+        }
+      }
+    },
+    "volume": {
+      "name": "Volume",
+      "description": "Imposta il volume di un dispositivo Divoom. Supportato solo dai dispositivi Divoom con funzioni audio.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Il valore del volume tra 0 e 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Stato di riproduzione",
+      "description": "Imposta lo stato di riproduzione della musica attualmente in riproduzione su un dispositivo Divoom. Supportato solo dai dispositivi Divoom con funzioni audio.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Riproduci",
+          "description": "Controlla lo stato riproduzione/pausa."
+        }
+      }
+    },
+    "radio": {
+      "name": "Radio",
+      "description": "Mostra e riproduce il canale radio su un dispositivo Divoom. Supportato solo dai dispositivi Divoom con funzione radio.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Accesa",
+          "description": "Controlla lo stato acceso/spento."
+        },
+        "frequency": {
+          "name": "Frequenza radio",
+          "description": "La frequenza radio da impostare."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Testi",
+      "description": "Mostra il canale dei testi su un dispositivo Divoom. Potrebbe non essere supportato da tutti i dispositivi Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Tastiera",
+      "description": "Controlla i LED della tastiera, in particolare sul Ditoo.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Effetto",
+          "description": "Cambia l'effetto luminoso della tastiera."
+        }
+      }
+    },
+    "game": {
+      "name": "Gioco",
+      "description": "Mostra un gioco su un dispositivo Divoom. È teoricamente possibile aprire giochi che non compaiono nell'app del telefono, ma potrebbero non funzionare molto bene.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Gioco",
+          "description": "Il numero del gioco specifico. A seconda del dispositivo il numero di giochi può variare. Guarda nell'app del telefono e contali."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Controllo del gioco",
+      "description": "Invia comandi di controllo al gioco attualmente aperto su un dispositivo Divoom.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "value": {
+          "name": "Comando",
+          "description": "Il comando da inviare al gioco."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Lunedì",
+        "tue": "Martedì",
+        "wed": "Mercoledì",
+        "thu": "Giovedì",
+        "fri": "Venerdì",
+        "sat": "Sabato",
+        "sun": "Domenica"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Effetto precedente",
+        "toggle": "Attiva/disattiva",
+        "next": "Effetto successivo"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Vai",
+        "left": "Sinistra",
+        "right": "Destra",
+        "up": "Su",
+        "down": "Giù",
+        "ok": "OK"
+      }
     }
   }
 }

@@ -257,6 +257,336 @@
           "description": "The number of the concrete signal. Look into your phone app and count them."
         }
       }
+    },
+    "alarm": {
+      "name": "Alarm",
+      "description": "Sets an alarm on a Divoom device. You might have to experiment with the options your Divoom device supports and what it actually changes. Unsupported values will be ignored or if possible directly zeroed, to prevent strange behavior.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Alarm slot",
+          "description": "The concrete slot for the alarm. For the actual amount of slots you might have to look into the phone app."
+        },
+        "value": {
+          "name": "Time",
+          "description": "The concrete time for when the alarm should happen."
+        },
+        "weekday": {
+          "name": "Weekdays",
+          "description": "The typical list of weekdays for when the alarm should happen."
+        },
+        "alarmmode": {
+          "name": "Alarm mode",
+          "description": "The alarm mode. Look into your phone app for what is supported by your Divoom device."
+        },
+        "triggermode": {
+          "name": "Trigger mode",
+          "description": "The trigger mode. Look into your phone app for what is supported by your Divoom device."
+        },
+        "frequency": {
+          "name": "Radio frequency",
+          "description": "The radio frequency to set."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "The volume of the alarm."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Countdown",
+      "description": "Shows the countdown tool on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Controls the start/stop state."
+        },
+        "countdown": {
+          "name": "Countdown",
+          "description": "The concrete countdown."
+        }
+      }
+    },
+    "timer": {
+      "name": "Timer",
+      "description": "Shows the timer tool on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Controls the start/stop state."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Memorial",
+      "description": "Sets a memorial (reminder) on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Memorial slot",
+          "description": "The concrete slot for the memorial. For the actual amount of slots you might have to look into the phone app."
+        },
+        "value": {
+          "name": "Date and time",
+          "description": "The date and time of the memorial. The year will be ignored."
+        },
+        "text": {
+          "name": "Name",
+          "description": "The name of your memorial, as it will appear in the phone app. Limited to 16 characters. Defaults to Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Scoreboard",
+      "description": "Shows the scoreboard channel or tool on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "player1": {
+          "name": "Player one",
+          "description": "The score of player one to show."
+        },
+        "player2": {
+          "name": "Player two",
+          "description": "The score of player two to show."
+        }
+      }
+    },
+    "noise": {
+      "name": "Noise meter",
+      "description": "Shows the noise meter on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Controls the start/stop state."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Sleep mode",
+      "description": "Shows the sleep mode on a Divoom device, which plays soothing sounds, optionally with a timer and light.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Controls the start/stop state."
+        },
+        "time": {
+          "name": "Sleep timer",
+          "description": "The time in minutes after which to stop the sleep mode. Defaults to 120 when not provided."
+        },
+        "sleepmode": {
+          "name": "Sound effect",
+          "description": "The sound effect to play. Check in the app how many options are available."
+        },
+        "frequency": {
+          "name": "Radio frequency",
+          "description": "The radio frequency to set."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "The volume value between 0 and 100."
+        },
+        "color": {
+          "name": "Color",
+          "description": "The color of the display."
+        },
+        "brightness": {
+          "name": "Brightness",
+          "description": "The brightness value between 0 and 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Date and time",
+      "description": "Sets the date and time of a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Date and time",
+          "description": "The date and time to set. Leave it empty to just use the current date and time."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Equalizer",
+      "description": "Starts the music equalizer on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Equalizer",
+          "description": "The number of the concrete equalizer. Look into your phone app and count them."
+        },
+        "audiomode": {
+          "name": "Original audio mode",
+          "description": "Activates the original audio mode."
+        },
+        "backgroundmode": {
+          "name": "Background audio mode",
+          "description": "Activates the background audio mode."
+        },
+        "streammode": {
+          "name": "Streaming audio mode",
+          "description": "Activates the streaming audio mode."
+        }
+      }
+    },
+    "volume": {
+      "name": "Volume",
+      "description": "Sets the volume of a Divoom device. Only supported by Divoom devices with audio features.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "The volume value between 0 and 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Play state",
+      "description": "Sets the playstate for the currently played music on a Divoom device. Only supported by Divoom devices with audio features.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Play",
+          "description": "Controls the play/pause state."
+        }
+      }
+    },
+    "radio": {
+      "name": "Radio",
+      "description": "Shows and plays the radio channel on a Divoom device. Only supported by Divoom devices with the radio feature.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "On",
+          "description": "Controls the on/off state."
+        },
+        "frequency": {
+          "name": "Radio frequency",
+          "description": "The radio frequency to set."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Lyrics",
+      "description": "Shows the lyrics channel on a Divoom device. Might not be supported by every Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Keyboard",
+      "description": "Controls the keyboard LEDs, specifically on the Ditoo.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Effect",
+          "description": "Changes the keyboard LED effect."
+        }
+      }
+    },
+    "game": {
+      "name": "Game",
+      "description": "Shows a game on a Divoom device. It is theoretically possible to open games that are not shown in your phone app, but they might not work very well.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Game",
+          "description": "The number of the concrete game. Depending on your device you may have a different amount of games. Look into your phone app and count them."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Game control",
+      "description": "Sends controlling commands to the currently open game on a Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Command",
+          "description": "The command to send to the game."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Previous effect",
+        "toggle": "Toggle on/off",
+        "next": "Next effect"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Go",
+        "left": "Left",
+        "right": "Right",
+        "up": "Up",
+        "down": "Down",
+        "ok": "OK"
+      }
     }
   }
 }
