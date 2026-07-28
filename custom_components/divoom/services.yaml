@@ -584,3 +584,97 @@ gamecontrol:
             - up
             - down
             - ok
+
+weather:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      required: true
+      example: 25
+      selector:
+        number:
+          step: 1
+          mode: box
+    unit:
+      example: "°C"
+      selector:
+        select:
+          translation_key: temperature_unit
+          options:
+            - "°C"
+            - "°F"
+    weather:
+      example: rainy
+      selector:
+        select:
+          custom_value: true
+          translation_key: weather_condition
+          options:
+            - clear-night
+            - cloudy
+            - exceptional
+            - fog
+            - hail
+            - lightning
+            - lightning-rainy
+            - partlycloudy
+            - pouring
+            - rainy
+            - snowy
+            - snowy-rainy
+            - sunny
+            - windy
+            - windy-variant
+
+temperature:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    value:
+      example: "°C"
+      selector:
+        select:
+          translation_key: temperature_unit
+          options:
+            - "°C"
+            - "°F"
+    color:
+      example: [250, 0, 0]
+      selector:
+        color_rgb:
+
+raw:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+    raw:
+      required: true
+      example: [0x74, 0x64]
+      selector:
+        object:
+
+connect:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom
+
+disconnect:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: divoom

@@ -557,6 +557,80 @@
           "description": "Příkaz, který se odešle hře."
         }
       }
+    },
+    "weather": {
+      "name": "Počasí",
+      "description": "Nastaví počasí.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Teplota",
+          "description": "Teplota ve stupních."
+        },
+        "unit": {
+          "name": "Jednotka",
+          "description": "Teplotní jednotka Celsia nebo Fahrenheita. Bez uvedení si zařízení ponechá svou aktuální jednotku."
+        },
+        "weather": {
+          "name": "Typ počasí",
+          "description": "Skutečný typ počasí."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Teplota",
+      "description": "Zobrazí kanál teploty. Pozor: tento režim je určen především pro Aurabox nebo Timebox Mini. Na ostatních zařízeních funguje také, používá však režim hodin, a může tak nechtěně změnit nastavení.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "value": {
+          "name": "Jednotka",
+          "description": "Přepíná mezi jednotkami °C a °F. Výchozí je °C."
+        },
+        "color": {
+          "name": "Barva",
+          "description": "Barva teploty."
+        }
+      }
+    },
+    "raw": {
+      "name": "Surový příkaz",
+      "description": "Odešle surová data do zařízení Divoom. Může se hodit, pokud něco nefunguje nebo to ostatní režimy nepodporují.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "raw": {
+          "name": "Bajty",
+          "description": "Bajty k odeslání."
+        }
+      }
+    },
+    "connect": {
+      "name": "Připojit",
+      "description": "Výslovně se připojí ke konfigurovanému zařízení Divoom. Může se hodit, pokud chceš pouze navázat spojení, aniž bys cokoli měnil. Spojení se obvykle otevře automaticky při použití libovolného režimu.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Odpojit",
+      "description": "Výslovně odpojí konfigurované zařízení Divoom. Může se hodit, pokud se nemůžeš připojit telefonem nebo jinými zařízeními. Tato komponenta obvykle nechává spojení se zařízením Divoom otevřené.",
+      "fields": {
+        "entry_id": {
+          "name": "Zařízení",
+          "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        }
+      }
     }
   },
   "selector": {
@@ -586,6 +660,31 @@
         "up": "Nahoru",
         "down": "Dolů",
         "ok": "OK"
+      }
+    },
+    "temperature_unit": {
+      "options": {
+        "°C": "Celsia (°C)",
+        "°F": "Fahrenheita (°F)"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Jasno, noc",
+        "cloudy": "Zataženo",
+        "exceptional": "Výjimečné",
+        "fog": "Mlha",
+        "hail": "Krupobití",
+        "lightning": "Bouřka",
+        "lightning-rainy": "Bouřka s deštěm",
+        "partlycloudy": "Polojasno",
+        "pouring": "Liják",
+        "rainy": "Deštivo",
+        "snowy": "Sněžení",
+        "snowy-rainy": "Déšť se sněhem",
+        "sunny": "Slunečno",
+        "windy": "Větrno",
+        "windy-variant": "Větrno a zataženo"
       }
     }
   }

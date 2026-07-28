@@ -175,15 +175,14 @@ class Aurabox(Divoom):
 
     def show_temperature(self, value=None, color=None):
         """Show temperature on the Divoom device in the color"""
+        number, unit = self._parse_temperature(value)
+        if unit == None and number != None: unit = 1 if number == 1 else 0
 
         args = [0x01]
         result = self.send_command("set view", args)
 
-        if value is not None:
-            if value == False or value == 0:
-                self.send_command("set temp unit", [0x00])
-            if value == True or value == 1:
-                self.send_command("set temp unit", [0x01])
+        if unit is not None:
+            self.send_command("set temp unit", [0x01 if unit == 1 else 0x00])
 
         return result
 

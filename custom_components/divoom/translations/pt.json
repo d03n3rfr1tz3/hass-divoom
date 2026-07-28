@@ -557,6 +557,80 @@
           "description": "O comando a enviar para o jogo."
         }
       }
+    },
+    "weather": {
+      "name": "Meteorologia",
+      "description": "Define a meteorologia.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Temperatura",
+          "description": "A temperatura em graus."
+        },
+        "unit": {
+          "name": "Unidade",
+          "description": "A unidade de temperatura Celsius ou Fahrenheit. Sem indicação, o dispositivo mantém a unidade atual."
+        },
+        "weather": {
+          "name": "Tipo de tempo",
+          "description": "O tipo de tempo real."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Temperatura",
+      "description": "Mostra o canal de temperatura. Atenção: este modo destina-se especificamente à Aurabox ou à Timebox Mini. Também funciona noutros dispositivos, mas utiliza o modo relógio e pode assim alterar definições involuntariamente.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "value": {
+          "name": "Unidade",
+          "description": "Alterna entre as unidades °C e °F. Por predefinição °C."
+        },
+        "color": {
+          "name": "Cor",
+          "description": "A cor da temperatura."
+        }
+      }
+    },
+    "raw": {
+      "name": "Comando em bruto",
+      "description": "Envia dados em bruto para o dispositivo Divoom. Pode ser útil se algo estiver errado ou não for suportado pelos outros modos.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "raw": {
+          "name": "Bytes",
+          "description": "Os bytes a enviar."
+        }
+      }
+    },
+    "connect": {
+      "name": "Ligar",
+      "description": "Liga-se explicitamente ao dispositivo Divoom configurado. Pode ser útil se quiser apenas estabelecer a ligação sem alterar nada. Normalmente a ligação é aberta automaticamente ao usar qualquer modo.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Desligar",
+      "description": "Desliga-se explicitamente do dispositivo Divoom configurado. Pode ser útil se não conseguir ligar-se com o telemóvel ou outros dispositivos. Normalmente este componente mantém a ligação ao dispositivo Divoom aberta.",
+      "fields": {
+        "entry_id": {
+          "name": "Dispositivo",
+          "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        }
+      }
     }
   },
   "selector": {
@@ -586,6 +660,31 @@
         "up": "Cima",
         "down": "Baixo",
         "ok": "OK"
+      }
+    },
+    "temperature_unit": {
+      "options": {
+        "°C": "Celsius (°C)",
+        "°F": "Fahrenheit (°F)"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Céu limpo, noite",
+        "cloudy": "Nublado",
+        "exceptional": "Excecional",
+        "fog": "Nevoeiro",
+        "hail": "Granizo",
+        "lightning": "Trovoada",
+        "lightning-rainy": "Trovoada com chuva",
+        "partlycloudy": "Parcialmente nublado",
+        "pouring": "Chuva forte",
+        "rainy": "Chuvoso",
+        "snowy": "Neve",
+        "snowy-rainy": "Chuva com neve",
+        "sunny": "Sol",
+        "windy": "Vento",
+        "windy-variant": "Vento e nuvens"
       }
     }
   }

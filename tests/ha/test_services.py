@@ -24,8 +24,10 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.divoom import notify as notify_module
 from custom_components.divoom.const import CONF_ENTRY_ID, DOMAIN
+from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.ditoo import Ditoo
 from custom_components.divoom.devices.pixoo import Pixoo
+from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from custom_components.divoom.notify import VALID_MODES
 from custom_components.divoom.services import SERVICE_SCHEMAS, _resolve_target
 
@@ -329,6 +331,24 @@ DISPATCH_CASES = [
         {"value": "go"}, {"value": "go"},
         "send_gamecontrol", (), {"value": "go"},
     ),
+    (
+        "weather",
+        {"value": 25, "unit": "°C", "weather": "rainy"},
+        {"value": 25, "unit": "°C", "weather": "rainy"},
+        "send_weather", (), {"value": 25.0, "weather": 6, "unit": "°C"},
+    ),
+    (
+        "temperature",
+        {"value": "°F", "color": [250, 0, 0]}, {"value": "°F", "color": [250, 0, 0]},
+        "show_temperature", (), {"value": "°F", "color": [250, 0, 0]},
+    ),
+    (
+        "raw",
+        {"raw": [0x74, 0x64]}, {"raw": [0x74, 0x64]},
+        "send_command", (), {"command": 0x74, "args": [0x64]},
+    ),
+    ("connect", {}, {}, "connect", (), {}),
+    ("disconnect", {}, {}, "disconnect", (), {}),
 ]
 
 DISPATCH_IDS = [
@@ -387,6 +407,8 @@ async def test_notify_and_service_paths_match(hass, mode, params, notify_data, m
         ("radio", {}),
         ("keyboard", {}),
         ("gamecontrol", {}),
+        ("weather", {}),
+        ("raw", {}),
     ],
 )
 async def test_service_requires_mandatory_field(hass, mode, params):
@@ -527,6 +549,84 @@ def test_keyboard_aliases_match_numbers(alias, number):
     assert by_alias.send_command.call_args == by_number.send_command.call_args
 
 
+@pytest.mark.parametrize("mode", ["connect", "disconnect"])
+async def test_connect_and_disconnect_services_skip_the_reconnect(hass, mode):
+    """call_mode reconnects before every mode but these two - reconnecting
+    first would make disconnect open the socket it is about to close."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, service = register_device(hass)
+
+    await hass.services.async_call(
+        DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id}, blocking=True
+    )
+
+    service._device.reconnect.assert_not_called()
+
+
+def _weather_calls(**kwargs):
+    device = Pixoo(mac="11:22:33:44:55:66")
+    device.send_command = Mock()
+
+    device.send_weather(**kwargs)
+
+    return device.send_command.call_args_list
+
+
+def _temperature_byte(calls):
+    return calls[0].args[1][0]
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"value": "25°C"},
+        {"value": "25 °c"},
+        {"value": 25, "unit": "°C"},
+        {"value": "77°F"},
+        {"value": 77, "unit": "°F"},
+        {"value": "77°F", "unit": "°C", "extra": 77},
+    ],
+)
+def test_weather_value_accepts_number_and_unit(kwargs):
+    """The UI splits temperature into a number and an optional unit, older
+    automations pack both into one string - every spelling has to end up as
+    the same celsius byte. An explicit unit wins over the one in the string,
+    which is why the last case sends 77 rather than converting it."""
+    expected = kwargs.pop("extra", 25)
+
+    assert _temperature_byte(_weather_calls(**kwargs)) == expected
+
+
+def test_weather_without_unit_leaves_the_device_setting_alone():
+    """A bare number says nothing about celsius or fahrenheit, so "set temp
+    type" must not be guessed - the device keeps whatever it is set to."""
+    calls = _weather_calls(value=25)
+
+    assert [call.args[0] for call in calls] == ["set temp"]
+
+
+@pytest.mark.parametrize("device_cls", [Pixoo, Aurabox, TimeboxMini])
+@pytest.mark.parametrize("unit,number", [("°C", 0), ("°F", 1)])
+def test_temperature_unit_aliases_match_numbers(device_cls, unit, number):
+    """The select: field sends °C/°F, the notify path and older automations
+    send 0/1 - all three show_temperature implementations have to agree."""
+    by_alias = device_cls(mac="11:22:33:44:55:66")
+    by_alias.send_command = Mock()
+    by_number = device_cls(mac="11:22:33:44:55:66")
+    by_number.send_command = Mock()
+
+    by_alias.show_temperature(value=unit)
+    by_number.show_temperature(value=number)
+
+    assert by_alias.send_command.call_args_list == by_number.send_command.call_args_list
+
+
+def test_every_valid_mode_has_a_service():
+    """A mode reachable through notify but not registered as a service would
+    stay invisible in the UI without anything failing."""
+    assert set(SERVICE_SCHEMAS) == set(VALID_MODES)
+
+
 def _number_selector(field_definition):
     return field_definition.get("selector", {}).get("number")
 
@@ -563,7 +663,13 @@ def test_services_yaml_number_bounds_match_the_schema(mode, field):
     selector = _number_selector(SERVICES_YAML[mode]["fields"][field])
     bounds = _range_of(SERVICE_SCHEMAS[mode].schema[field])
 
-    assert bounds is not None, (mode, field)
+    # weather.value is bounded on the celsius-converted value, so neither side
+    # can name a limit - either both carry one and agree, or neither does
+    if bounds is None:
+        assert selector.get("min") is None, (mode, field)
+        assert selector.get("max") is None, (mode, field)
+        return
+
     assert selector.get("min") == bounds.min, (mode, field)
     assert selector.get("max") == bounds.max, (mode, field)
 

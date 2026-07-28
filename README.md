@@ -600,7 +600,7 @@ Shows the temperature channel. Be aware, that this mode is specifically for Aura
 
 | Parameter | Description |
 | ---       | ---         |
-| `value` | Changes between °C or °F unit. <br/> `0` = °C, `1` = °F. Defaults to °C. |
+| `value` | Changes between °C or °F unit. <br/> `0` or `°C` = °C, <br/> `1` or `°F` = °F. Defaults to °C. |
 | `color`   | The color of the temperature. Accepts an array of RGB color values. |
 
 ```
@@ -679,8 +679,9 @@ Sets the weather.
 
 | Parameter | Description |
 | ---       | ---         |
-| `value`   | The temperature in degree including the temperature type for celsius or fahrenheit. |
-| `weather` | The actual type of the weather. <br/> `1` = clear, `3` = cloudy sky, `5` = thunderstorm, `6` = rain, `8` = snow, `9` = fog |
+| `value`   | The temperature in degree, optionally including the temperature type for celsius or fahrenheit as `°C` or `°F`. |
+| `unit`    | The temperature type for celsius or fahrenheit as `°C` or `°F`. Takes precedence over the type given in `value`. Without any type the device keeps its current one. |
+| `weather` | The actual type of the weather. <br/> `1` = clear, `3` = cloudy sky, `5` = thunderstorm, `6` = rain, `8` = snow, `9` = fog. <br/> The Home Assistant weather states (`sunny`, `rainy`, `partlycloudy`, ...) are accepted as well. |
 
 ```
 message: 'weather'

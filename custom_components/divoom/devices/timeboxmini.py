@@ -142,10 +142,11 @@ class TimeboxMini(Divoom):
 
     def show_temperature(self, value=None, color=None):
         """Show temperature on the Divoom device in the color"""
-        if value == None: value = False
+        number, unit = self._parse_temperature(value)
+        if unit == None and number != None: unit = 1 if number == 1 else 0
 
         args = [0x01]
-        args += [0x01 if value == True or value == 1 else 0x00]
+        args += [0x01 if unit == 1 else 0x00]
         if not color is None:
             args += self.convert_color(color)
         args += [0x00]

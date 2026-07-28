@@ -557,6 +557,80 @@
           "description": "De opdracht die naar het spel wordt gestuurd."
         }
       }
+    },
+    "weather": {
+      "name": "Weer",
+      "description": "Stelt het weer in.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Temperatuur",
+          "description": "De temperatuur in graden."
+        },
+        "unit": {
+          "name": "Eenheid",
+          "description": "De temperatuureenheid Celsius of Fahrenheit. Zonder opgave behoudt het apparaat zijn huidige eenheid."
+        },
+        "weather": {
+          "name": "Weertype",
+          "description": "Het daadwerkelijke weertype."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Temperatuur",
+      "description": "Toont het temperatuurkanaal. Let op: deze modus is specifiek bedoeld voor de Aurabox of de Timebox Mini. Op andere apparaten werkt hij ook, maar gebruikt dan de klokmodus en kan daardoor onbedoeld instellingen wijzigen.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Eenheid",
+          "description": "Wisselt tussen de eenheden °C en °F. Standaard °C."
+        },
+        "color": {
+          "name": "Kleur",
+          "description": "De kleur van de temperatuur."
+        }
+      }
+    },
+    "raw": {
+      "name": "Ruw commando",
+      "description": "Stuurt ruwe data naar het Divoom-apparaat. Dat kan nuttig zijn als er iets misgaat of iets niet door de andere modi wordt ondersteund.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "raw": {
+          "name": "Bytes",
+          "description": "De te verzenden bytes."
+        }
+      }
+    },
+    "connect": {
+      "name": "Verbinden",
+      "description": "Maakt expliciet verbinding met het geconfigureerde Divoom-apparaat. Dat kan nuttig zijn als je alleen wilt verbinden zonder iets te wijzigen. Normaal wordt de verbinding bij elke modus automatisch geopend.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Verbinding verbreken",
+      "description": "Verbreekt expliciet de verbinding met het geconfigureerde Divoom-apparaat. Dat kan nuttig zijn als je met je telefoon of andere apparaten geen verbinding kunt maken. Normaal houdt deze component de verbinding met je Divoom-apparaat open.",
+      "fields": {
+        "entry_id": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
     }
   },
   "selector": {
@@ -586,6 +660,31 @@
         "up": "Omhoog",
         "down": "Omlaag",
         "ok": "OK"
+      }
+    },
+    "temperature_unit": {
+      "options": {
+        "°C": "Celsius (°C)",
+        "°F": "Fahrenheit (°F)"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Helder, nacht",
+        "cloudy": "Bewolkt",
+        "exceptional": "Uitzonderlijk",
+        "fog": "Mist",
+        "hail": "Hagel",
+        "lightning": "Onweer",
+        "lightning-rainy": "Onweer met regen",
+        "partlycloudy": "Gedeeltelijk bewolkt",
+        "pouring": "Stortregen",
+        "rainy": "Regenachtig",
+        "snowy": "Sneeuw",
+        "snowy-rainy": "Sneeuw met regen",
+        "sunny": "Zonnig",
+        "windy": "Winderig",
+        "windy-variant": "Winderig en bewolkt"
       }
     }
   }

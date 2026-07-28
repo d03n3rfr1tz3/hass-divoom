@@ -1,5 +1,5 @@
 """Domain services for divoom, one per device mode."""
-import logging
+import logging, re
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant, ServiceCall, callback
@@ -26,6 +26,7 @@ from .notify import (
     PARAM_NUMBER,
     PARAM_PLAYER1,
     PARAM_PLAYER2,
+    PARAM_RAW,
     PARAM_SIZE,
     PARAM_SLEEPMODE,
     PARAM_STREAMMODE,
@@ -34,10 +35,12 @@ from .notify import (
     PARAM_TIME,
     PARAM_TRIGGERMODE,
     PARAM_TWENTYFOUR,
+    PARAM_UNIT,
     PARAM_VALUE,
     PARAM_VOLUME,
     PARAM_WEATHER,
     PARAM_WEEKDAY,
+    WEATHER_MODES,
 )
 
 _LOGGER = logging.getLogger(__package__)
@@ -65,6 +68,13 @@ FREQUENCY = vol.All(vol.Coerce(float), vol.Range(min=64, max=108))
 
 KEYBOARD_VALUES = ["previous", "toggle", "next"]
 GAMECONTROL_VALUES = ["go", "left", "right", "up", "down", "ok"]
+TEMPERATURE_UNITS = ["°C", "°F"]
+
+# a plain number from the UI, or the combined "25°C" the README documents
+TEMPERATURE = vol.Any(
+    vol.Coerce(float),
+    vol.All(cv.string, vol.Match(r"^\s*-?\d+([.,]\d+)?\s*°?\s*[CF]\s*$", re.IGNORECASE)),
+)
 
 SERVICE_SCHEMAS = {
     "clock": vol.Schema({
@@ -207,6 +217,27 @@ SERVICE_SCHEMAS = {
     "gamecontrol": vol.Schema({
         **TARGET_SCHEMA,
         vol.Required(PARAM_VALUE): vol.In(GAMECONTROL_VALUES),
+    }),
+    "weather": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_VALUE): TEMPERATURE,
+        vol.Optional(PARAM_UNIT): vol.In(TEMPERATURE_UNITS),
+        vol.Optional(PARAM_WEATHER): vol.Any(vol.In(WEATHER_MODES), BYTE),
+    }),
+    "temperature": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Optional(PARAM_VALUE): vol.In(TEMPERATURE_UNITS),
+        vol.Optional(PARAM_COLOR): RGB,
+    }),
+    "raw": vol.Schema({
+        **TARGET_SCHEMA,
+        vol.Required(PARAM_RAW): vol.All(cv.ensure_list, vol.Length(min=1)),
+    }),
+    "connect": vol.Schema({
+        **TARGET_SCHEMA,
+    }),
+    "disconnect": vol.Schema({
+        **TARGET_SCHEMA,
     }),
 }
 

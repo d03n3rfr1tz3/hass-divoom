@@ -26,6 +26,7 @@ PARAM_CLOCK = 'clock'
 PARAM_TWENTYFOUR = 'twentyfour'
 PARAM_WEATHER = 'weather'
 PARAM_TEMP = 'temp'
+PARAM_UNIT = 'unit'
 PARAM_CALENDAR = 'calendar'
 PARAM_HOT = 'hot'
 
@@ -451,6 +452,7 @@ class DivoomNotificationService(BaseNotificationService):
 
             elif mode == "weather":
                 value = data.get(PARAM_VALUE)
+                unit = data.get(PARAM_UNIT)
                 weather = data.get(PARAM_WEATHER)
 
                 weathernum = None
@@ -461,7 +463,7 @@ class DivoomNotificationService(BaseNotificationService):
                 elif isinstance(weather, str):
                     weathernum = WEATHER_MODES.get(weather) or None
 
-                self._device.send_weather(value=value, weather=weathernum)
+                self._device.send_weather(value=value, weather=weathernum, unit=unit)
 
             else:
                 validModes = ""

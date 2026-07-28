@@ -557,6 +557,80 @@
           "description": "The command to send to the game."
         }
       }
+    },
+    "weather": {
+      "name": "Weather",
+      "description": "Sets the weather.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Temperature",
+          "description": "The temperature in degree."
+        },
+        "unit": {
+          "name": "Unit",
+          "description": "The temperature type for celsius or fahrenheit. Without any type the device keeps its current one."
+        },
+        "weather": {
+          "name": "Weather",
+          "description": "The actual type of the weather."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Temperature",
+      "description": "Shows the temperature channel. Be aware, that this mode is specifically for Aurabox or Timebox Mini. It still works on other device, but utilizes the clock mode and therefore might change settings unintentional.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Unit",
+          "description": "Changes between °C or °F unit. Defaults to °C."
+        },
+        "color": {
+          "name": "Color",
+          "description": "The color of the temperature."
+        }
+      }
+    },
+    "raw": {
+      "name": "Raw command",
+      "description": "Sends raw data to the Divoom device. Might be useful, if there is something wrong or not supported by the other modes.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "raw": {
+          "name": "Bytes",
+          "description": "The bytes to send."
+        }
+      }
+    },
+    "connect": {
+      "name": "Connect",
+      "description": "Explicitly connects to your configured Divoom device. Might be useful, if you just want to connect without changing anything. Typically the connection is opened automatically when using any mode.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Disconnect",
+      "description": "Explicitly disconnects from your configured Divoom device. Might be useful, if you cannot connect with your Phone or other devices. Typically this component leaves the connection open to your Divoom device.",
+      "fields": {
+        "entry_id": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
     }
   },
   "selector": {
@@ -586,6 +660,31 @@
         "up": "Up",
         "down": "Down",
         "ok": "OK"
+      }
+    },
+    "temperature_unit": {
+      "options": {
+        "°C": "Celsius (°C)",
+        "°F": "Fahrenheit (°F)"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Clear, night",
+        "cloudy": "Cloudy",
+        "exceptional": "Exceptional",
+        "fog": "Fog",
+        "hail": "Hail",
+        "lightning": "Lightning",
+        "lightning-rainy": "Lightning, rainy",
+        "partlycloudy": "Partly cloudy",
+        "pouring": "Pouring",
+        "rainy": "Rainy",
+        "snowy": "Snowy",
+        "snowy-rainy": "Snowy, rainy",
+        "sunny": "Sunny",
+        "windy": "Windy",
+        "windy-variant": "Windy, cloudy"
       }
     }
   }

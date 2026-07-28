@@ -557,6 +557,80 @@
           "description": "Polecenie wysyłane do gry."
         }
       }
+    },
+    "weather": {
+      "name": "Pogoda",
+      "description": "Ustawia pogodę.",
+      "fields": {
+        "entry_id": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Temperatura",
+          "description": "Temperatura w stopniach."
+        },
+        "unit": {
+          "name": "Jednostka",
+          "description": "Jednostka temperatury Celsjusza lub Fahrenheita. Bez podania urządzenie zachowuje swoją bieżącą jednostkę."
+        },
+        "weather": {
+          "name": "Rodzaj pogody",
+          "description": "Rzeczywisty rodzaj pogody."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Temperatura",
+      "description": "Wyświetla kanał temperatury. Uwaga: ten tryb jest przeznaczony przede wszystkim dla Auraboxa lub Timeboxa Mini. Na innych urządzeniach również działa, ale korzysta wtedy z trybu zegara i może przez to nieumyślnie zmienić ustawienia.",
+      "fields": {
+        "entry_id": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Jednostka",
+          "description": "Przełącza między jednostkami °C i °F. Domyślnie °C."
+        },
+        "color": {
+          "name": "Kolor",
+          "description": "Kolor temperatury."
+        }
+      }
+    },
+    "raw": {
+      "name": "Surowe polecenie",
+      "description": "Wysyła surowe dane do urządzenia Divoom. Może się przydać, gdy coś jest nie tak lub nie jest obsługiwane przez pozostałe tryby.",
+      "fields": {
+        "entry_id": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "raw": {
+          "name": "Bajty",
+          "description": "Bajty do wysłania."
+        }
+      }
+    },
+    "connect": {
+      "name": "Połącz",
+      "description": "Jawnie łączy się ze skonfigurowanym urządzeniem Divoom. Może się przydać, gdy chcesz tylko nawiązać połączenie bez zmieniania czegokolwiek. Zwykle połączenie jest otwierane automatycznie przy każdym trybie.",
+      "fields": {
+        "entry_id": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Rozłącz",
+      "description": "Jawnie rozłącza się ze skonfigurowanym urządzeniem Divoom. Może się przydać, gdy nie możesz połączyć się telefonem lub innymi urządzeniami. Zwykle ten komponent pozostawia połączenie z urządzeniem Divoom otwarte.",
+      "fields": {
+        "entry_id": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        }
+      }
     }
   },
   "selector": {
@@ -586,6 +660,31 @@
         "up": "Góra",
         "down": "Dół",
         "ok": "OK"
+      }
+    },
+    "temperature_unit": {
+      "options": {
+        "°C": "Celsjusz (°C)",
+        "°F": "Fahrenheit (°F)"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Bezchmurnie, noc",
+        "cloudy": "Pochmurno",
+        "exceptional": "Wyjątkowo",
+        "fog": "Mgła",
+        "hail": "Grad",
+        "lightning": "Burza",
+        "lightning-rainy": "Burza z deszczem",
+        "partlycloudy": "Częściowe zachmurzenie",
+        "pouring": "Ulewa",
+        "rainy": "Deszczowo",
+        "snowy": "Śnieg",
+        "snowy-rainy": "Deszcz ze śniegiem",
+        "sunny": "Słonecznie",
+        "windy": "Wietrznie",
+        "windy-variant": "Wietrznie i pochmurno"
       }
     }
   }
