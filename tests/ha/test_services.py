@@ -280,8 +280,8 @@ DISPATCH_CASES = [
     ),
     (
         "countdown",
-        {"value": True, "countdown": "01:30:00"}, {"value": True, "countdown": "01:30:00"},
-        "show_countdown", (), {"value": True, "countdown": "01:30:00"},
+        {"value": True, "countdown": "00:01:30"}, {"value": True, "countdown": "00:01:30"},
+        "show_countdown", (), {"value": True, "countdown": "00:01:30"},
     ),
     ("timer", {"value": True}, {"value": True}, "show_timer", (), {"value": True}),
     (
@@ -522,15 +522,24 @@ def test_alarm_accepts_both_time_formats(time_value):
     assert args[2:4] == [7, 30]
 
 
-@pytest.mark.parametrize("countdown_value", ["01:30", "01:30:00"])
-def test_countdown_accepts_both_time_formats(countdown_value):
+@pytest.mark.parametrize(
+    "countdown_value,expected",
+    [
+        ("01:30", [1, 30]),  # mm:ss, as documented in the README
+        ("00:01:30", [1, 30]),  # hh:mm:ss, as the time: selector emits it
+        ("01:30:00", [30, 0]),  # the hours are dropped
+    ],
+)
+def test_countdown_reads_minutes_and_seconds_from_the_end(countdown_value, expected):
+    """The countdown takes mm:ss, so a three-part value has to be read from
+    the back - reading it from the front turned the hours into minutes."""
     device = Pixoo(mac="11:22:33:44:55:66")
     device.send_command = Mock()
 
     device.show_countdown(value=1, countdown=countdown_value)
 
     args = device.send_command.call_args.args[1]
-    assert args[2:4] == [1, 30]
+    assert args[2:4] == expected
 
 
 @pytest.mark.parametrize(

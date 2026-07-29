@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Odliczanie",
-          "description": "Konkretny czas odliczania."
+          "description": "Konkretny czas odliczania w formacie mm:ss. Podany jako hh:mm:ss, godziny są ignorowane."
         }
       }
     },

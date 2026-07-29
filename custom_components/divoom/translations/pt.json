@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Contagem decrescente",
-          "description": "A contagem decrescente concreta."
+          "description": "A contagem decrescente concreta no formato mm:ss. Se indicada como hh:mm:ss, as horas são ignoradas."
         }
       }
     },

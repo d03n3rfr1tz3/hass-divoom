@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Cuenta atrás",
-          "description": "La cuenta atrás concreta."
+          "description": "La cuenta atrás concreta en el formato mm:ss. Si se indica como hh:mm:ss, las horas se ignoran."
         }
       }
     },

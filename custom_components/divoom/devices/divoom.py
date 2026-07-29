@@ -615,6 +615,7 @@ class Divoom:
         args = [0x03]
         args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
         if countdown != None:
+            countdown = countdown[-5:] # the optional leading "hh:" is not used
             args += int(countdown[0:2]).to_bytes(1, byteorder='big')
             args += int(countdown[3:5]).to_bytes(1, byteorder='big')
         else:

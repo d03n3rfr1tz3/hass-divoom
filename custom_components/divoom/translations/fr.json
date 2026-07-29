@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Compte à rebours",
-          "description": "Le compte à rebours concret."
+          "description": "Le compte à rebours concret au format mm:ss. Indiqué en hh:mm:ss, les heures sont ignorées."
         }
       }
     },

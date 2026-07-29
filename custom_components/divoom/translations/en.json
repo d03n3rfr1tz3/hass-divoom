@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Countdown",
-          "description": "The concrete countdown."
+          "description": "The concrete countdown in the format mm:ss. Given as hh:mm:ss, the hours are ignored."
         }
       }
     },

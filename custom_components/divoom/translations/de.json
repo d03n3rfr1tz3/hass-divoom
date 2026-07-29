@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Countdown",
-          "description": "Der konkrete Countdown."
+          "description": "Der konkrete Countdown im Format mm:ss. Bei Angabe als hh:mm:ss werden die Stunden ignoriert."
         }
       }
     },

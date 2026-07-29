@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Aftelklok",
-          "description": "De concrete aftelklok."
+          "description": "De concrete aftelklok in de notatie mm:ss. Opgegeven als hh:mm:ss worden de uren genegeerd."
         }
       }
     },

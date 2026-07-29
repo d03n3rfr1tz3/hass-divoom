@@ -307,7 +307,7 @@ Shows the countdown tool.
 | Parameter | Description |
 | ---       | ---         |
 | `value`   | Controls the start/stop state. <br/> `0` = stop, `1` = start |
-| `countdown` | The concrete countdown in the format `mm:ss`. |
+| `countdown` | The concrete countdown in the format `mm:ss`. <br/> Given as `hh:mm:ss`, the hours are ignored. |
 
 ```
 message: 'countdown'
@@ -559,7 +559,8 @@ data:
 ```
 
 #### MODE signal
-Shows the signal channel.
+Shows the signal channel. This is a special feature of the Divoom Backpack to use it for traffic signals (like a turn signal).
+On other Divoom devices its basically the `visualization` mode.
 
 | Parameter | Description |
 | ---       | ---         |

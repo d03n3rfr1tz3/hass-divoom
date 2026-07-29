@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Conto alla rovescia",
-          "description": "Il conto alla rovescia specifico."
+          "description": "Il conto alla rovescia specifico nel formato mm:ss. Se indicato come hh:mm:ss, le ore vengono ignorate."
         }
       }
     },

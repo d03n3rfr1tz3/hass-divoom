@@ -310,7 +310,7 @@
         },
         "countdown": {
           "name": "Odpočet",
-          "description": "Konkrétní odpočet."
+          "description": "Konkrétní odpočet ve formátu mm:ss. Pokud je zadán jako hh:mm:ss, hodiny se ignorují."
         }
       }
     },

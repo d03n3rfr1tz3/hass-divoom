@@ -299,7 +299,7 @@ countdown:
       selector:
         boolean:
     countdown:
-      example: "01:30:00"
+      example: "00:01:30"
       selector:
         time:
 
