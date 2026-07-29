@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import threading
 from pathlib import Path
 from unittest.mock import Mock
@@ -711,11 +712,36 @@ def test_selector_options_are_translated():
                 continue
 
             key = selector.get("translation_key")
+            if key is None:
+                assert all(isinstance(option, str) for option in selector["options"])
+                continue
+
             assert key in strings["selector"], (mode, field)
             assert set(strings["selector"][key]["options"]) == set(selector["options"])
             found += 1
 
     assert found
+
+
+# hassfest's rule for every key in strings.json and translations/*.json
+TRANSLATION_KEY = re.compile(r"^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$")
+
+
+def _keys(node):
+    for key, value in node.items():
+        yield key
+        if isinstance(value, dict):
+            yield from _keys(value)
+
+
+def test_translation_keys_are_valid():
+    """Select options become JSON keys under "selector", and hassfest only
+    accepts [a-z0-9-_] there. "°C" passes every test in this file and still
+    fails the whole validation in CI, so the rule is checked here too."""
+    for path in [COMPONENT_PATH / "strings.json", *(COMPONENT_PATH / "translations").glob("*.json")]:
+        document = json.loads(path.read_text(encoding="utf-8"))
+        invalid = [key for key in _keys(document) if not TRANSLATION_KEY.match(key)]
+        assert invalid == [], (path.name, invalid)
 
 
 def test_every_service_field_is_a_known_notify_param():

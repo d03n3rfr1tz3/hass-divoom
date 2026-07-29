@@ -603,7 +603,6 @@ weather:
       example: "°C"
       selector:
         select:
-          translation_key: temperature_unit
           options:
             - "°C"
             - "°F"
@@ -641,7 +640,6 @@ temperature:
       example: "°C"
       selector:
         select:
-          translation_key: temperature_unit
           options:
             - "°C"
             - "°F"

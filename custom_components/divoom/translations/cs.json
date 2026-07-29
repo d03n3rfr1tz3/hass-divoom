@@ -662,12 +662,6 @@
         "ok": "OK"
       }
     },
-    "temperature_unit": {
-      "options": {
-        "°C": "Celsia (°C)",
-        "°F": "Fahrenheita (°F)"
-      }
-    },
     "weather_condition": {
       "options": {
         "clear-night": "Jasno, noc",

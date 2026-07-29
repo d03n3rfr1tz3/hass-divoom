@@ -662,12 +662,6 @@
         "ok": "OK"
       }
     },
-    "temperature_unit": {
-      "options": {
-        "°C": "Celsius (°C)",
-        "°F": "Fahrenheit (°F)"
-      }
-    },
     "weather_condition": {
       "options": {
         "clear-night": "Clear, night",
