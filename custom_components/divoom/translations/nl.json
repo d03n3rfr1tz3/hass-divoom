@@ -49,6 +49,9 @@
     },
     "mode_failed": {
       "message": "De actie {mode} is mislukt. Bekijk het Home Assistant-logboek voor details."
+    },
+    "mode_unsupported": {
+      "message": "Het apparaat {device} ondersteunt de actie {mode} niet."
     }
   },
   "services": {

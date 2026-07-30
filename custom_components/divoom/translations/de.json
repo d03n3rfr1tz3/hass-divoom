@@ -49,6 +49,9 @@
     },
     "mode_failed": {
       "message": "Die Aktion {mode} ist fehlgeschlagen. Details stehen im Home-Assistant-Protokoll."
+    },
+    "mode_unsupported": {
+      "message": "Das Gerät {device} unterstützt die Aktion {mode} nicht."
     }
   },
   "services": {

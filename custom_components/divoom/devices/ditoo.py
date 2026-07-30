@@ -13,7 +13,7 @@ class Ditoo(Divoom):
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+        self.unsupported("the music equalizer mode")
 
     def send_keyboard(self, value=None):
         """Send keyboard command on the Divoom device"""

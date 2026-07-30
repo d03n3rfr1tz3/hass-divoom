@@ -64,10 +64,10 @@ class TimeboxMini(Divoom):
         return self.send_command("set view", args)
 
     def show_countdown(self, value=None, countdown=None):
-        self.logger.warning("{0}: this device does not support the countdown mode.".format(self.type))
+        self.unsupported("the countdown mode")
 
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+        self.unsupported("the music equalizer mode")
 
     def show_image(self, file, time=None):
         """Show image or animation on the Divoom device"""
@@ -90,7 +90,7 @@ class TimeboxMini(Divoom):
         return result
 
     def send_keyboard(self, value=None):
-        self.logger.warning("{0}: this device does not support changing the keyboard light.".format(self.type))
+        self.unsupported("changing the keyboard light")
 
     def show_light(self, color, brightness=None, power=None):
         """Show light on the Divoom device in the color"""
@@ -109,10 +109,10 @@ class TimeboxMini(Divoom):
         return self.send_command("set view", args)
 
     def show_lyrics(self):
-        self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
+        self.unsupported("lyrics view")
 
     def show_noise(self, value=None):
-        self.logger.warning("{0}: this device does not support the noise mode.".format(self.type))
+        self.unsupported("the noise mode")
 
     def show_scoreboard(self, blue=None, red=None):
         """Show scoreboard on the Divoom device with specific score"""

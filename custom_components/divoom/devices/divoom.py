@@ -5,6 +5,14 @@ from PIL import Image, ImageDraw, ImageFont
 
 TEMPERATURE_PATTERN = re.compile(r"^\s*(-?\d+(?:[.,]\d+)?)?\s*°?\s*([CF])?\s*$", re.IGNORECASE)
 
+class DivoomUnsupportedError(Exception):
+    """Raised when a device cannot do what a mode asks of it."""
+
+    def __init__(self, device, feature):
+        self.device = device
+        self.feature = feature
+        Exception.__init__(self, "{0}: {1}".format(device, feature))
+
 class Divoom:
     """Class Divoom encapsulates the Divoom Bluetooth communication."""
 
@@ -56,6 +64,16 @@ class Divoom:
         if logger is None:
             logger = logging.getLogger(self.type)
         self.logger = logger
+
+    def unsupported(self, feature):
+        """Refuse a feature this device does not have"""
+        self.logger.warning("{0}: this device does not support {1}.".format(self.type, feature))
+        raise DivoomUnsupportedError(self.type, feature)
+
+    def unimplemented(self):
+        """Refuse a feature that is not implemented for this device yet"""
+        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+        raise DivoomUnsupportedError(self.type, "the implementation is missing")
 
     def __del__(self):
         self.disconnect()
@@ -662,7 +680,7 @@ class Divoom:
         return self.send_command("set view", args)
 
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+        self.unimplemented()
 
     def show_game(self, value=None):
         """Show game on the Divoom device"""
@@ -723,7 +741,7 @@ class Divoom:
         return result
 
     def send_keyboard(self, value=None):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+        self.unimplemented()
 
     def show_light(self, color, brightness=None, power=None):
         """Show light on the Divoom device in the color"""
@@ -744,7 +762,7 @@ class Divoom:
         return self.send_command("set view", args)
 
     def show_lyrics(self):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+        self.unimplemented()
 
     def show_memorial(self, number=None, value=None, text=None, animate=True):
         """Show memorial tool on the Divoom device"""
@@ -802,7 +820,7 @@ class Divoom:
         return result
 
     def show_scoreboard(self, blue=None, red=None):
-        self.logger.warning("{0}: the implementation is missing. it needs a decision, in which way the scoreboard can be accessed (set view or set tool).".format(self.type))
+        self.unimplemented() # needs a decision, in which way the scoreboard can be accessed (set view or set tool)
 
     def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
         """Show sleep mode on the Divoom device and optionally sets mode, volume, time, color, frequency and brightness"""
@@ -876,6 +894,9 @@ class Divoom:
         args = [0x00]
         args += value.to_bytes(1, byteorder='big')
         return self.send_command("set tool", args)
+
+    def show_signal(self, number, color1=None, color2=None):
+        self.unsupported("the signal mode")
 
     def show_visualization(self, number, color1, color2):
         """Show visualization on the Divoom device"""

@@ -49,6 +49,9 @@
     },
     "mode_failed": {
       "message": "Akce {mode} se nezdařila. Podrobnosti najdete v protokolu Home Assistanta."
+    },
+    "mode_unsupported": {
+      "message": "Zařízení {device} nepodporuje akci {mode}."
     }
   },
   "services": {

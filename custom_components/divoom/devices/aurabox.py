@@ -95,7 +95,7 @@ class Aurabox(Divoom):
         return self.send_command("set view", args)
 
     def show_countdown(self, value=None, countdown=None):
-        self.logger.warning("{0}: this device does not support the countdown mode.".format(self.type))
+        self.unsupported("the countdown mode")
 
     def show_effects(self, number):
         """Show effects on the Divoom device"""
@@ -107,7 +107,7 @@ class Aurabox(Divoom):
         return self.send_command("set view", args)
 
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+        self.unsupported("the music equalizer mode")
 
     def show_image(self, file, time=None):
         """Show image or animation on the Divoom device"""
@@ -130,7 +130,7 @@ class Aurabox(Divoom):
         return result
 
     def send_keyboard(self, value=None):
-        self.logger.warning("{0}: this device does not support changing the keyboard light.".format(self.type))
+        self.unsupported("changing the keyboard light")
 
     def show_light(self, color, brightness=None, power=None):
         """Show light on the Divoom device in the color"""
@@ -151,13 +151,13 @@ class Aurabox(Divoom):
         return result
 
     def show_lyrics(self):
-        self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
+        self.unsupported("lyrics view")
 
     def show_noise(self, value=None):
-        self.logger.warning("{0}: this device does not support the noise mode.".format(self.type))
+        self.unsupported("the noise mode")
 
     def show_scoreboard(self, blue=None, red=None):
-        self.logger.warning("{0}: this device does not support scoreboard view.".format(self.type))
+        self.unsupported("scoreboard view")
 
     def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
         """Show sleep mode on the Divoom device and optionally sets mode, time"""
@@ -187,7 +187,7 @@ class Aurabox(Divoom):
         return result
 
     def show_timer(self, value=None):
-        self.logger.warning("{0}: this device does not support timer view.".format(self.type))
+        self.unsupported("timer view")
 
     def show_visualization(self, number, color1=None, color2=None):
         """Show visualization on the Divoom device"""
@@ -197,4 +197,4 @@ class Aurabox(Divoom):
         return self.send_command("set view", args)
 
     def send_weather(self, value=None, weather=None):
-        self.logger.warning("{0}: this device does not support weather info.".format(self.type))
+        self.unsupported("weather info")

@@ -49,6 +49,9 @@
     },
     "mode_failed": {
       "message": "The {mode} action failed. See the Home Assistant log for details."
+    },
+    "mode_unsupported": {
+      "message": "The {device} does not support the {mode} action."
     }
   },
   "services": {

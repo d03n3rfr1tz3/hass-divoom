@@ -8,6 +8,7 @@ from homeassistant.helpers import config_validation as cv
 
 from homeassistant.const import CONF_MAC
 from .const import CONF_ENTRY_ID, DOMAIN
+from .devices.divoom import DivoomUnsupportedError
 from .notify import (
     PARAM_ALARMMODE,
     PARAM_AUDIOMODE,
@@ -267,7 +268,15 @@ def _make_handler(mode: str):
         service = _resolve_target(call.hass, call.data)
         params = {key: value for key, value in call.data.items() if key != CONF_ENTRY_ID}
 
-        result = await call.hass.async_add_executor_job(service.call_mode, mode, params)
+        try:
+            result = await call.hass.async_add_executor_job(service.call_mode, mode, params)
+        except DivoomUnsupportedError as err:
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="mode_unsupported",
+                translation_placeholders={"device": err.device, "mode": mode},
+            ) from err
+
         if not result:
             raise HomeAssistantError(
                 translation_domain=DOMAIN,

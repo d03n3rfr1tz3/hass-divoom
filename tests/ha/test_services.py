@@ -26,7 +26,9 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from custom_components.divoom import notify as notify_module
 from custom_components.divoom.const import CONF_ENTRY_ID, DOMAIN
 from custom_components.divoom.devices.aurabox import Aurabox
+from custom_components.divoom.devices.backpack import Backpack
 from custom_components.divoom.devices.ditoo import Ditoo
+from custom_components.divoom.devices.divoom import DivoomUnsupportedError
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from custom_components.divoom.notify import VALID_MODES
@@ -266,7 +268,7 @@ DISPATCH_CASES = [
     (
         "signal",
         {"number": 2}, {"number": 2},
-        "show_visualization", (), {"number": 2, "color1": None, "color2": None},
+        "show_signal", (), {"number": 2, "color1": None, "color2": None},
     ),
     (
         "alarm",
@@ -631,6 +633,73 @@ def test_temperature_unit_aliases_match_numbers(device_cls, unit, number):
     assert by_alias.send_command.call_args_list == by_number.send_command.call_args_list
 
 
+async def test_unsupported_mode_raises_a_translated_error(hass):
+    """A mode the device cannot do must reach the UI as an error - over the
+    service path a silent warning would look like success."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, service = register_device(hass)
+    service._device.show_radio.side_effect = DivoomUnsupportedError("Pixoo", "showing the radio")
+
+    with pytest.raises(HomeAssistantError) as error:
+        await hass.services.async_call(
+            DOMAIN, "radio", {CONF_ENTRY_ID: entry.entry_id, "value": True}, blocking=True
+        )
+
+    assert error.value.translation_key == "mode_unsupported"
+    assert error.value.translation_placeholders == {"device": "Pixoo", "mode": "radio"}
+
+
+def test_notify_path_continues_on_unsupported_modes():
+    """Backwards compatibility: notify.<device> behaved like this before the
+    services existed and must keep doing so."""
+    service = make_mocked_service()
+    service._device.show_radio.side_effect = DivoomUnsupportedError("Pixoo", "showing the radio")
+
+    assert service.send_message("radio", data={"value": True}) is True
+
+
+def test_call_mode_raises_without_continue_on_error():
+    """The default has to be the strict one, whoever calls it - only the
+    legacy notify path opts out."""
+    service = make_mocked_service()
+    service._device.show_radio.side_effect = DivoomUnsupportedError("Pixoo", "showing the radio")
+
+    with pytest.raises(DivoomUnsupportedError):
+        service.call_mode("radio", {"value": True})
+
+    assert service.call_mode("radio", {"value": True}, continue_on_error=True) is True
+
+
+def test_unsupported_warns_before_it_raises(caplog):
+    """The log line is unchanged from before the exception existed, so log
+    based troubleshooting keeps working."""
+    device = Pixoo(mac="11:22:33:44:55:66")
+
+    with pytest.raises(DivoomUnsupportedError):
+        device.show_radio(True)
+
+    assert "Pixoo: this device does not support showing the radio." in caplog.text
+
+
+def test_signal_is_backpack_only():
+    """Both modes send the same view number, but only the backpack has the
+    traffic signal and only the others have a microphone."""
+    backpack = Backpack(mac="11:22:33:44:55:66")
+    backpack.send_command = Mock()
+    pixoo = Pixoo(mac="11:22:33:44:55:66")
+    pixoo.send_command = Mock()
+
+    backpack.show_signal(1, color1=[1, 2, 3], color2=[4, 5, 6])
+    pixoo.show_visualization(1, color1=[1, 2, 3], color2=[4, 5, 6])
+
+    assert backpack.send_command.call_args == pixoo.send_command.call_args
+
+    with pytest.raises(DivoomUnsupportedError):
+        backpack.show_visualization(1)
+    with pytest.raises(DivoomUnsupportedError):
+        pixoo.show_signal(1)
+
+
 def test_every_valid_mode_has_a_service():
     """A mode reachable through notify but not registered as a service would
     stay invisible in the UI without anything failing."""
@@ -798,6 +867,7 @@ def test_services_yaml_strings_and_translations_stay_in_sync():
         "entry_not_found",
         "entry_not_loaded",
         "mode_failed",
+        "mode_unsupported",
     }
 
     reference = _flatten(strings)

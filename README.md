@@ -559,8 +559,8 @@ data:
 ```
 
 #### MODE signal
-Shows the signal channel. This is a special feature of the Divoom Backpack to use it for traffic signals (like a turn signal).
-On other Divoom devices its basically the `visualization` mode.
+Shows the signal channel specifically on the Backpack.
+It shows traffic signals, like a turn signal.
 
 | Parameter | Description |
 | ---       | ---         |
@@ -646,7 +646,7 @@ data:
 ```
 
 #### MODE visualization
-Shows the visualization channel.
+Shows the visualization channel. The Divoom Backpack does not support this mode, because it has no microphone. Use the `signal` mode there instead.
 
 | Parameter | Description |
 | ---       | ---         |

@@ -49,6 +49,9 @@
     },
     "mode_failed": {
       "message": "Akcja {mode} nie powiodła się. Szczegóły znajdziesz w dzienniku Home Assistanta."
+    },
+    "mode_unsupported": {
+      "message": "Urządzenie {device} nie obsługuje akcji {mode}."
     }
   },
   "services": {

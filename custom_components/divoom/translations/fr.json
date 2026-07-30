@@ -49,6 +49,9 @@
     },
     "mode_failed": {
       "message": "L'action {mode} a échoué. Consultez le journal de Home Assistant pour plus de détails."
+    },
+    "mode_unsupported": {
+      "message": "L'appareil {device} ne prend pas en charge l'action {mode}."
     }
   },
   "services": {

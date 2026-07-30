@@ -15,6 +15,7 @@ from homeassistant.components.notify import (
 
 from homeassistant.const import CONF_HOST, CONF_MAC, CONF_PORT
 from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
+from .devices.divoom import DivoomUnsupportedError
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -274,10 +275,17 @@ class DivoomNotificationService(BaseNotificationService):
             return False
 
         data = kwargs.get(ATTR_DATA) or {}
-        return self.call_mode(data.get(PARAM_MODE) or message, data)
+        return self.call_mode(data.get(PARAM_MODE) or message, data, continue_on_error=True)
 
-    def call_mode(self, mode, data):
+    def call_mode(self, mode, data, continue_on_error=False):
         """Execute a single mode. Shared by send_message() and the divoom.* services."""
+        try:
+            return self._call_mode(mode, data)
+        except DivoomUnsupportedError:
+            if not continue_on_error: raise
+            return True # the device already logged the warning, the legacy path stays quiet
+
+    def _call_mode(self, mode, data):
         with self._lock:
             if mode != "connect" and mode != "disconnect":
                 skipPing = True if mode == "gamecontrol" or mode == "raw" else False
@@ -408,6 +416,11 @@ class DivoomNotificationService(BaseNotificationService):
                 player2 = data.get(PARAM_PLAYER2)
                 self._device.show_scoreboard(blue=player1, red=player2)
 
+            elif mode == "signal":
+                number = data.get(PARAM_NUMBER)
+                color1, color2 = self._resolve_colors(data)
+                self._device.show_signal(number=number, color1=color1, color2=color2)
+
             elif mode == "sleep":
                 sleepvalue = data.get(PARAM_VALUE)
                 sleeptime = data.get(PARAM_TIME)
@@ -441,7 +454,7 @@ class DivoomNotificationService(BaseNotificationService):
                 value = data.get(PARAM_VALUE)
                 self._device.show_timer(value=value)
 
-            elif mode == "visualization" or mode == "signal":
+            elif mode == "visualization":
                 number = data.get(PARAM_NUMBER)
                 color1, color2 = self._resolve_colors(data)
                 self._device.show_visualization(number=number, color1=color1, color2=color2)

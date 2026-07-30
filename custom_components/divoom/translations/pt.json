@@ -49,6 +49,9 @@
     },
     "mode_failed": {
       "message": "A ação {mode} falhou. Consulte o registo do Home Assistant para mais detalhes."
+    },
+    "mode_unsupported": {
+      "message": "O dispositivo {device} não suporta a ação {mode}."
     }
   },
   "services": {
