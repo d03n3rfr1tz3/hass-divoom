@@ -622,11 +622,11 @@ def test_weather_without_unit_leaves_the_device_setting_alone():
     assert [call.args[0] for call in calls] == ["set temp"]
 
 
-@pytest.mark.parametrize("device_cls", [Pixoo, Aurabox, TimeboxMini])
+@pytest.mark.parametrize("device_cls", [Aurabox, TimeboxMini])
 @pytest.mark.parametrize("unit,number", [("°C", 0), ("°F", 1)])
 def test_temperature_unit_aliases_match_numbers(device_cls, unit, number):
     """The select: field sends °C/°F, the notify path and older automations
-    send 0/1 - all three show_temperature implementations have to agree."""
+    send 0/1 - both show_temperature implementations have to agree."""
     by_alias = device_cls(mac="11:22:33:44:55:66")
     by_alias.send_command = Mock()
     by_number = device_cls(mac="11:22:33:44:55:66")
@@ -703,6 +703,22 @@ def test_signal_is_backpack_only():
         backpack.show_visualization(1)
     with pytest.raises(DivoomUnsupportedError):
         pixoo.show_signal(1)
+
+
+@pytest.mark.parametrize("device_cls", [Aurabox, TimeboxMini])
+def test_temperature_is_aurabox_and_timeboxmini_only(device_cls):
+    """Only these two have a temperature channel - everywhere else the mode
+    used to switch the clock instead, which is a setting change nobody asked
+    for, so it has to be refused rather than guessed."""
+    device = device_cls(mac="11:22:33:44:55:66")
+    device.send_command = Mock()
+
+    device.show_temperature(value="°C")
+
+    assert device.send_command.call_args_list[0].args[0] == "set view"
+
+    with pytest.raises(DivoomUnsupportedError):
+        Pixoo(mac="11:22:33:44:55:66").show_temperature(value="°C")
 
 
 def test_every_valid_mode_has_a_service():

@@ -585,7 +585,7 @@
     },
     "temperature": {
       "name": "Temperatuur",
-      "description": "Toont het temperatuurkanaal. Let op: deze modus is specifiek bedoeld voor de Aurabox of de Timebox Mini. Op andere apparaten werkt hij ook, maar gebruikt dan de klokmodus en kan daardoor onbedoeld instellingen wijzigen.",
+      "description": "Toont het temperatuurkanaal op een Divoom-apparaat.",
       "fields": {
         "entry_id": {
           "name": "Apparaat",

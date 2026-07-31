@@ -585,7 +585,7 @@
     },
     "temperature": {
       "name": "Temperatur",
-      "description": "Zeigt den Temperatur-Kanal an. Achtung: Dieser Modus ist speziell für die Aurabox oder die Timebox Mini. Auf anderen Geräten funktioniert er ebenfalls, nutzt dort aber den Uhr-Modus und ändert dadurch möglicherweise ungewollt Einstellungen.",
+      "description": "Zeigt den Temperatur-Kanal auf einem Divoom-Gerät an.",
       "fields": {
         "entry_id": {
           "name": "Gerät",

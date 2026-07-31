@@ -626,7 +626,7 @@ data:
 ```
 
 #### MODE temperature
-Shows the temperature channel. Be aware, that this mode is specifically for Aurabox or Timebox Mini. It still works on other device, but utilizes the `clock` mode and therefore might change settings unintentional.
+Shows the temperature channel. Be aware, that this mode is only supported by the Aurabox and the Timebox Mini.
 
 | Parameter | Required | Description |
 | ---       | :---:    | --- |

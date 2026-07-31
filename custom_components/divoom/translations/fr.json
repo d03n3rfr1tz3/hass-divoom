@@ -585,7 +585,7 @@
     },
     "temperature": {
       "name": "Température",
-      "description": "Affiche le canal température. Attention : ce mode est spécifique à l'Aurabox ou à la Timebox Mini. Il fonctionne aussi sur les autres appareils, mais utilise alors le mode horloge et peut donc modifier des réglages involontairement.",
+      "description": "Affiche le canal température sur un appareil Divoom.",
       "fields": {
         "entry_id": {
           "name": "Appareil",

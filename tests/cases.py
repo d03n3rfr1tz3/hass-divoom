@@ -55,6 +55,7 @@ FIXED_CASES = {
     "show_effects": lambda d: d.show_effects(2),
     "show_visualization": lambda d: d.show_visualization(1, color1=[1, 2, 3], color2=[4, 5, 6]),
     "show_signal": lambda d: d.show_signal(1, color1=[1, 2, 3], color2=[4, 5, 6]),
+    "show_temperature": lambda d: d.show_temperature(value="°F", color=[1, 2, 3]),
     "show_scoreboard": lambda d: d.show_scoreboard(blue=12, red=34),
     "show_alarm": lambda d: d.show_alarm(
         number=1, time="07:30", weekdays=["mon", "wed", "fri"],

@@ -585,7 +585,7 @@
     },
     "temperature": {
       "name": "Teplota",
-      "description": "Zobrazí kanál teploty. Pozor: tento režim je určen především pro Aurabox nebo Timebox Mini. Na ostatních zařízeních funguje také, používá však režim hodin, a může tak nechtěně změnit nastavení.",
+      "description": "Zobrazí kanál teploty na zařízení Divoom.",
       "fields": {
         "entry_id": {
           "name": "Zařízení",

@@ -850,14 +850,7 @@ class Divoom:
         return self.send_command("set sleeptime", args)
 
     def show_temperature(self, value=None, color=None):
-        """Show temperature on the Divoom device in the color"""
-        number, unit = self._parse_temperature(value)
-        # without a unit the old 0/1 flag is what the number means
-        if unit == None and number != None: unit = 1 if number == 1 else 0
-
-        result = self.show_clock(clock=None, twentyfour=None, weather=None, temp=True, calendar=None, color=color, hot=None)
-        self.send_command("set temp type", [0x01 if unit == 1 else 0x00])
-        return result
+        self.unsupported("the temperature mode")
 
     def show_text(self, text, font, size=None, time=None, color1=None, color2=None):
         """Show image or animation on the Divoom device"""

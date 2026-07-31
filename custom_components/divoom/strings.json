@@ -585,7 +585,7 @@
     },
     "temperature": {
       "name": "Temperature",
-      "description": "Shows the temperature channel. Be aware, that this mode is specifically for Aurabox or Timebox Mini. It still works on other device, but utilizes the clock mode and therefore might change settings unintentional.",
+      "description": "Shows the temperature channel on a Divoom device.",
       "fields": {
         "entry_id": {
           "name": "Device",
