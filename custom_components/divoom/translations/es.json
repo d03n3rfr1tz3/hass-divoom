@@ -107,7 +107,7 @@
         },
         "color": {
           "name": "Color",
-          "description": "El color de la luz."
+          "description": "El color de la luz. Déjalo vacío para que los colores se fundan entre sí."
         }
       }
     },
@@ -275,7 +275,7 @@
         },
         "value": {
           "name": "Hora",
-          "description": "La hora concreta a la que debe sonar la alarma."
+          "description": "La hora concreta a la que debe sonar la alarma. Déjalo vacío para vaciar la ranura."
         },
         "weekday": {
           "name": "Días de la semana",
@@ -345,7 +345,7 @@
         },
         "value": {
           "name": "Fecha y hora",
-          "description": "La fecha y la hora de la efeméride. El año se ignora."
+          "description": "La fecha y la hora de la efeméride. El año se ignora. Déjalo vacío para vaciar la ranura."
         },
         "text": {
           "name": "Nombre",
@@ -593,7 +593,7 @@
         },
         "value": {
           "name": "Unidad",
-          "description": "Cambia entre las unidades °C y °F. Por defecto °C."
+          "description": "Cambia entre las unidades °C y °F."
         },
         "color": {
           "name": "Color",

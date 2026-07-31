@@ -107,7 +107,7 @@
         },
         "color": {
           "name": "Kolor",
-          "description": "Kolor światła."
+          "description": "Kolor światła. Pozostaw puste, aby kolory płynnie się zmieniały."
         }
       }
     },
@@ -275,7 +275,7 @@
         },
         "value": {
           "name": "Godzina",
-          "description": "Konkretna godzina, o której budzik ma zadzwonić."
+          "description": "Konkretna godzina, o której budzik ma zadzwonić. Pozostaw puste, aby wyczyścić slot."
         },
         "weekday": {
           "name": "Dni tygodnia",
@@ -345,7 +345,7 @@
         },
         "value": {
           "name": "Data i godzina",
-          "description": "Data i godzina rocznicy. Rok jest ignorowany."
+          "description": "Data i godzina rocznicy. Rok jest ignorowany. Pozostaw puste, aby wyczyścić slot."
         },
         "text": {
           "name": "Nazwa",
@@ -593,7 +593,7 @@
         },
         "value": {
           "name": "Jednostka",
-          "description": "Przełącza między jednostkami °C i °F. Domyślnie °C."
+          "description": "Przełącza między jednostkami °C i °F."
         },
         "color": {
           "name": "Kolor",

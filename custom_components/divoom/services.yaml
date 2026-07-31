@@ -6,6 +6,7 @@ clock:
         config_entry:
           integration: divoom
     clock:
+      required: true
       example: 1
       selector:
         number:
@@ -45,6 +46,7 @@ light:
         config_entry:
           integration: divoom
     brightness:
+      required: true
       example: 75
       selector:
         number:
@@ -159,6 +161,7 @@ design:
         config_entry:
           integration: divoom
     number:
+      required: true
       example: 2
       selector:
         number:
@@ -637,6 +640,7 @@ temperature:
         config_entry:
           integration: divoom
     value:
+      required: true
       example: "°C"
       selector:
         select:

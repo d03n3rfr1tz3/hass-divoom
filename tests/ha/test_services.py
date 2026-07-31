@@ -20,7 +20,7 @@ import voluptuous as vol
 from homeassistant.const import CONF_MAC
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.setup import async_setup_component
-from homeassistant.util.yaml import load_yaml
+from homeassistant.util.yaml import load_yaml, parse_yaml
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.divoom import notify as notify_module
@@ -158,11 +158,11 @@ async def test_clock_service_omits_unset_fields(hass):
     entry, service = register_device(hass)
 
     await hass.services.async_call(
-        DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id}, blocking=True
+        DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": 1}, blocking=True
     )
 
     service._device.show_clock.assert_called_once_with(
-        clock=None, twentyfour=None, weather=None, temp=None, calendar=None,
+        clock=1, twentyfour=None, weather=None, temp=None, calendar=None,
         color=None, hot=None,
     )
 
@@ -172,7 +172,7 @@ async def test_clock_service_reconnects_first(hass):
     entry, service = register_device(hass)
 
     await hass.services.async_call(
-        DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id}, blocking=True
+        DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": 1}, blocking=True
     )
 
     service._device.reconnect.assert_called_once_with(skipPing=False)
@@ -187,7 +187,7 @@ async def test_clock_service_raises_when_call_mode_fails(hass):
 
     with pytest.raises(HomeAssistantError) as error:
         await hass.services.async_call(
-            DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id}, blocking=True
+            DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": 1}, blocking=True
         )
 
     assert error.value.translation_key == "mode_failed"
@@ -394,9 +394,12 @@ async def test_notify_and_service_paths_match(hass, mode, params, notify_data, m
 @pytest.mark.parametrize(
     "mode,params",
     [
+        ("clock", {}),
+        ("light", {}),
         ("brightness", {}),
         ("image", {}),
         ("text", {}),
+        ("design", {}),
         ("effects", {}),
         ("visualization", {}),
         ("signal", {}),
@@ -411,12 +414,14 @@ async def test_notify_and_service_paths_match(hass, mode, params, notify_data, m
         ("keyboard", {}),
         ("gamecontrol", {}),
         ("weather", {}),
+        ("temperature", {}),
         ("raw", {}),
     ],
 )
 async def test_service_requires_mandatory_field(hass, mode, params):
-    """Without these the device call would be a silent no-op, so the schema
-    has to reject the call instead of letting it look successful."""
+    """Without these the device call would be a silent no-op or the device
+    default would pick for the caller, so the schema has to reject the call
+    instead of letting it look successful."""
     assert await async_setup_component(hass, DOMAIN, {})
     entry, service = register_device(hass)
 
@@ -704,6 +709,25 @@ def test_every_valid_mode_has_a_service():
     """A mode reachable through notify but not registered as a service would
     stay invisible in the UI without anything failing."""
     assert set(SERVICE_SCHEMAS) == set(VALID_MODES)
+
+
+def test_device_examples_match_the_service_schemas():
+    """The example files are the first thing users copy from, so every block
+    in them has to be a call the action schema actually accepts."""
+    checked = 0
+    for path in sorted((COMPONENT_PATH / "devices").glob("*.txt")):
+        for block in path.read_text(encoding="utf-8").split("\n\n"):
+            if "action:" not in block:
+                continue
+
+            example = parse_yaml(block)
+            mode = example["action"].removeprefix("{}.".format(DOMAIN))
+            assert mode in SERVICE_SCHEMAS, (path.name, example["action"])
+
+            SERVICE_SCHEMAS[mode](example["data"])
+            checked += 1
+
+    assert checked == 241 # every block, not just the ones that happened to parse
 
 
 def _number_selector(field_definition):

@@ -1,117 +1,139 @@
 # turn off the display
-message: 'off'
+action: divoom.off
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
 
 # change brightness of the display
-message: 'brightness'
+action: divoom.brightness
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   brightness: 75
 
 # activate channel 'clock' in rainbow style with specific components
-message: 'clock'
+action: divoom.clock
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   clock: 1
-  weather: 0
-  temp: 0
-  calendar: 1
+  weather: false
+  temp: false
+  calendar: true
   color: [250, 0, 0]
 
 # activate channel 'clock' in analog style with specific components
-message: 'clock'
+action: divoom.clock
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   clock: 5
-  weather: 1
-  temp: 1
-  calendar: 1
+  weather: true
+  temp: true
+  calendar: true
   color: [0, 250, 0]
 
 # activate light mode with specific color
-message: 'light'
+action: divoom.light
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   brightness: 75
   color: [250, 0, 0]
 
 # activate light mode with fading colors
-message: 'light'
+action: divoom.light
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   brightness: 75
 
 # activate channel 'effects' with specific effect
-message: 'effects'
+action: divoom.effects
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   number: 2
 
 # activate channel 'visualization' with specific visualization
-message: 'visualization'
+action: divoom.visualization
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   number: 2
 
 # activate scoreboard with some scores
-message: 'scoreboard'
+action: divoom.scoreboard
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   player1: 2
   player2: 1
 
 # activate channel 'lyrics'
-message: 'lyrics'
+action: divoom.lyrics
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
 
 # activate an image or animation, depending of the number of frames found in the file
-message: 'image'
+action: divoom.image
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   file: 'ha16.gif'
 
 # activate a scrolling text animation with the Divoom font
-message: 'text'
+action: divoom.text
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   text: 'Hi Divoom'
   font: 'divoom.ttf'
 
 # update date and time
-message: 'datetime'
+action: divoom.datetime
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   value: '2024-12-31 18:30:00'
 
 # update weather by setting 25°C and rainy weather
-message: 'weather'
+action: divoom.weather
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   value: '25°C'
   weather: 6
 
 # change the play/pause state
-message: 'playstate'
+action: divoom.playstate
 data:
-  value: 1
+  entry_id: YOUR_DIVOOM_DEVICE
+  value: true
 
 # change the volume
-message: 'volume'
+action: divoom.volume
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   volume: 75
 
 # activates the radio and sets the frequency to 100.3
-message: 'radio'
+action: divoom.radio
 data:
-  value: 1
+  entry_id: YOUR_DIVOOM_DEVICE
+  value: true
   frequency: 100.3
 
 # activates the countdown with 1 minute and 30 seconds
-message: 'countdown'
+action: divoom.countdown
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
+  value: true
   countdown: '01:30'
 
 # activates the noise meter
-message: 'noise'
+action: divoom.noise
 data:
-  value: 1
+  entry_id: YOUR_DIVOOM_DEVICE
+  value: true
 
 # activates the timer
-message: 'timer'
+action: divoom.timer
 data:
-  value: 1
+  entry_id: YOUR_DIVOOM_DEVICE
+  value: true
 
 # activates the alarm in the first slot for 7:30 in the morning on monday-friday
-message: 'alarm'
+action: divoom.alarm
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   number: 0
   value: '07:30'
   weekday:
@@ -122,37 +144,43 @@ data:
     - fri
 
 # activate the sleep mode for 30 minutes
-message: 'sleep'
+action: divoom.sleep
 data:
-  value: 1
+  entry_id: YOUR_DIVOOM_DEVICE
+  value: true
   time: 30
   sleepmode: 4
   volume: 10
   brightness: 50
 
 # activates the memorial in the first slot for 0:00 new year
-message: 'memorial'
+action: divoom.memorial
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   number: 0
   value: '2000-12-31 00:00:00'
   text: 'Happy New Year!'
 
 # activates the third game, which should be the magic 8 ball
-message: 'game'
+action: divoom.game
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   value: 2
 
 # sends the GO control to the current game
-message: 'gamecontrol'
+action: divoom.gamecontrol
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   value: 'go'
 
 # changes keyboard light to next effect
-message: 'keyboard'
+action: divoom.keyboard
 data:
-  value: 1
+  entry_id: YOUR_DIVOOM_DEVICE
+  value: 'next'
 
 # sends a raw command which sets brightness to 100%
-message: 'raw'
+action: divoom.raw
 data:
+  entry_id: YOUR_DIVOOM_DEVICE
   raw: [0x74, 0x64]

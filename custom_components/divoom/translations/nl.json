@@ -107,7 +107,7 @@
         },
         "color": {
           "name": "Kleur",
-          "description": "De kleur van het licht."
+          "description": "De kleur van het licht. Laat leeg om de kleuren te laten doorlopen."
         }
       }
     },
@@ -275,7 +275,7 @@
         },
         "value": {
           "name": "Tijd",
-          "description": "Het concrete tijdstip waarop de wekker moet afgaan."
+          "description": "Het concrete tijdstip waarop de wekker moet afgaan. Laat leeg om de plek te legen."
         },
         "weekday": {
           "name": "Weekdagen",
@@ -345,7 +345,7 @@
         },
         "value": {
           "name": "Datum en tijd",
-          "description": "De datum en tijd van de gedenkdag. Het jaar wordt genegeerd."
+          "description": "De datum en tijd van de gedenkdag. Het jaar wordt genegeerd. Laat leeg om de plek te legen."
         },
         "text": {
           "name": "Naam",
@@ -593,7 +593,7 @@
         },
         "value": {
           "name": "Eenheid",
-          "description": "Wisselt tussen de eenheden °C en °F. Standaard °C."
+          "description": "Wisselt tussen de eenheden °C en °F."
         },
         "color": {
           "name": "Kleur",

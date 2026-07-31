@@ -107,7 +107,7 @@
         },
         "color": {
           "name": "Colore",
-          "description": "Il colore della luce."
+          "description": "Il colore della luce. Lascia vuoto per far scorrere i colori in dissolvenza."
         }
       }
     },
@@ -275,7 +275,7 @@
         },
         "value": {
           "name": "Orario",
-          "description": "L'orario specifico in cui la sveglia deve suonare."
+          "description": "L'orario specifico in cui la sveglia deve suonare. Lascia vuoto per svuotare lo slot."
         },
         "weekday": {
           "name": "Giorni della settimana",
@@ -345,7 +345,7 @@
         },
         "value": {
           "name": "Data e ora",
-          "description": "La data e l'ora della ricorrenza. L'anno viene ignorato."
+          "description": "La data e l'ora della ricorrenza. L'anno viene ignorato. Lascia vuoto per svuotare lo slot."
         },
         "text": {
           "name": "Nome",
@@ -593,7 +593,7 @@
         },
         "value": {
           "name": "Unità",
-          "description": "Alterna tra le unità °C e °F. Predefinito °C."
+          "description": "Alterna tra le unità °C e °F."
         },
         "color": {
           "name": "Colore",

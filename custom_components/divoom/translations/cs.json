@@ -107,7 +107,7 @@
         },
         "color": {
           "name": "Barva",
-          "description": "Barva světla."
+          "description": "Barva světla. Ponechte prázdné, aby barvy plynule přecházely."
         }
       }
     },
@@ -275,7 +275,7 @@
         },
         "value": {
           "name": "Čas",
-          "description": "Konkrétní čas, kdy má budík zazvonit."
+          "description": "Konkrétní čas, kdy má budík zazvonit. Ponechte prázdné, chcete-li pozici vymazat."
         },
         "weekday": {
           "name": "Dny v týdnu",
@@ -345,7 +345,7 @@
         },
         "value": {
           "name": "Datum a čas",
-          "description": "Datum a čas výročí. Rok se ignoruje."
+          "description": "Datum a čas výročí. Rok se ignoruje. Ponechte prázdné, chcete-li pozici vymazat."
         },
         "text": {
           "name": "Název",
@@ -593,7 +593,7 @@
         },
         "value": {
           "name": "Jednotka",
-          "description": "Přepíná mezi jednotkami °C a °F. Výchozí je °C."
+          "description": "Přepíná mezi jednotkami °C a °F."
         },
         "color": {
           "name": "Barva",

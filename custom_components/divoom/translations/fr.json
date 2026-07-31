@@ -107,7 +107,7 @@
         },
         "color": {
           "name": "Couleur",
-          "description": "La couleur de la lumière."
+          "description": "La couleur de la lumière. Laissez vide pour faire défiler les couleurs en fondu."
         }
       }
     },
@@ -275,7 +275,7 @@
         },
         "value": {
           "name": "Heure",
-          "description": "L'heure concrète à laquelle l'alarme doit se déclencher."
+          "description": "L'heure concrète à laquelle l'alarme doit se déclencher. Laissez vide pour vider l'emplacement."
         },
         "weekday": {
           "name": "Jours de la semaine",
@@ -345,7 +345,7 @@
         },
         "value": {
           "name": "Date et heure",
-          "description": "La date et l'heure de la date anniversaire. L'année est ignorée."
+          "description": "La date et l'heure de la date anniversaire. L'année est ignorée. Laissez vide pour vider l'emplacement."
         },
         "text": {
           "name": "Nom",
@@ -593,7 +593,7 @@
         },
         "value": {
           "name": "Unité",
-          "description": "Bascule entre les unités °C et °F. Par défaut °C."
+          "description": "Bascule entre les unités °C et °F."
         },
         "color": {
           "name": "Couleur",

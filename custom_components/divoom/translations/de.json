@@ -107,7 +107,7 @@
         },
         "color": {
           "name": "Farbe",
-          "description": "Die Farbe des Lichts."
+          "description": "Die Farbe des Lichts. Leer lassen, um die Farben durchlaufen zu lassen."
         }
       }
     },
@@ -275,7 +275,7 @@
         },
         "value": {
           "name": "Uhrzeit",
-          "description": "Die konkrete Uhrzeit, zu der der Wecker klingeln soll."
+          "description": "Die konkrete Uhrzeit, zu der der Wecker klingeln soll. Leer lassen, um den Speicherplatz zu leeren."
         },
         "weekday": {
           "name": "Wochentage",
@@ -345,7 +345,7 @@
         },
         "value": {
           "name": "Datum und Uhrzeit",
-          "description": "Das Datum und die Uhrzeit des Gedenktags. Das Jahr wird ignoriert."
+          "description": "Das Datum und die Uhrzeit des Gedenktags. Das Jahr wird ignoriert. Leer lassen, um den Speicherplatz zu leeren."
         },
         "text": {
           "name": "Name",
@@ -593,7 +593,7 @@
         },
         "value": {
           "name": "Einheit",
-          "description": "Wechselt zwischen der Einheit °C und °F. Standardmäßig °C."
+          "description": "Wechselt zwischen der Einheit °C und °F."
         },
         "color": {
           "name": "Farbe",

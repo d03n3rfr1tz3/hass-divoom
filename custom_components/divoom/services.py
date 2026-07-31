@@ -80,7 +80,7 @@ TEMPERATURE = vol.Any(
 SERVICE_SCHEMAS = {
     "clock": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Optional(PARAM_CLOCK): CLOCK,
+        vol.Required(PARAM_CLOCK): CLOCK,
         vol.Optional(PARAM_TWENTYFOUR): cv.boolean,
         vol.Optional(PARAM_WEATHER): cv.boolean,
         vol.Optional(PARAM_TEMP): cv.boolean,
@@ -90,7 +90,7 @@ SERVICE_SCHEMAS = {
     }),
     "light": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Optional(PARAM_BRIGHTNESS): PERCENT,
+        vol.Required(PARAM_BRIGHTNESS): PERCENT,
         vol.Optional(PARAM_COLOR): RGB,
     }),
     "on": vol.Schema({
@@ -120,7 +120,7 @@ SERVICE_SCHEMAS = {
     }),
     "design": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Optional(PARAM_NUMBER): BYTE,
+        vol.Required(PARAM_NUMBER): BYTE,
     }),
     "effects": vol.Schema({
         **TARGET_SCHEMA,
@@ -227,7 +227,7 @@ SERVICE_SCHEMAS = {
     }),
     "temperature": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Optional(PARAM_VALUE): vol.In(TEMPERATURE_UNITS),
+        vol.Required(PARAM_VALUE): vol.In(TEMPERATURE_UNITS),
         vol.Optional(PARAM_COLOR): RGB,
     }),
     "raw": vol.Schema({

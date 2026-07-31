@@ -107,7 +107,7 @@
         },
         "color": {
           "name": "Color",
-          "description": "The color of the light."
+          "description": "The color of the light. Leave it empty to fade through the colors."
         }
       }
     },
@@ -275,7 +275,7 @@
         },
         "value": {
           "name": "Time",
-          "description": "The concrete time for when the alarm should happen."
+          "description": "The concrete time for when the alarm should happen. Leave it empty to clear the slot."
         },
         "weekday": {
           "name": "Weekdays",
@@ -345,7 +345,7 @@
         },
         "value": {
           "name": "Date and time",
-          "description": "The date and time of the memorial. The year will be ignored."
+          "description": "The date and time of the memorial. The year will be ignored. Leave it empty to clear the slot."
         },
         "text": {
           "name": "Name",
@@ -593,7 +593,7 @@
         },
         "value": {
           "name": "Unit",
-          "description": "Changes between °C or °F unit. Defaults to °C."
+          "description": "Changes between °C or °F unit."
         },
         "color": {
           "name": "Color",
