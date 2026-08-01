@@ -43,6 +43,16 @@
   "issues": {
     "legacy_notify_usage": {
       "title": "Legacy Divoom notify actions still in use",
+      "reasons": {
+        "manual": "manual",
+        "blueprint": "based on a blueprint",
+        "templated_mode": "templated mode",
+        "unknown_mode": "unknown mode",
+        "unknown_device": "no matching device",
+        "unknown_field": "unknown option",
+        "missing_field": "missing option",
+        "schema": "invalid value"
+      },
       "fix_flow": {
         "step": {
           "init": {

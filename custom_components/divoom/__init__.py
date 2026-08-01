@@ -2,7 +2,7 @@
 import logging
 import voluptuous as vol
 
-from homeassistant.core import HomeAssistant, callback
+from homeassistant.core import HomeAssistant
 from homeassistant.components.notify import SERVICE_NOTIFY
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers import config_validation as cv
@@ -40,9 +40,8 @@ async def async_setup(hass: HomeAssistant, config: ConfigType) -> bool:
     hass.data.setdefault(DOMAIN, {})
     async_setup_services(hass)
 
-    @callback
-    def _rescan(_) -> None:
-        async_rescan(hass)
+    async def _rescan(_) -> None:
+        await async_rescan(hass)
 
     async_at_started(hass, _rescan)
 
@@ -65,7 +64,7 @@ async def async_setup_entry(hass: HomeAssistant, config: ConfigEntry) -> bool:
     await async_refresh_service_descriptions(hass)
 
     if hass.is_running:
-        async_rescan(hass)
+        await async_rescan(hass)
 
     _LOGGER.debug("Divoom: successfully setup a config entry for {} ({})".format(name, mac))
     return True

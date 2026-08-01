@@ -43,6 +43,16 @@
   "issues": {
     "legacy_notify_usage": {
       "title": "Przestarzałe akcje notify dla Divoom nadal w użyciu",
+      "reasons": {
+        "manual": "ręcznie",
+        "blueprint": "oparte na blueprincie",
+        "templated_mode": "tryb jako szablon",
+        "unknown_mode": "nieznany tryb",
+        "unknown_device": "brak pasującego urządzenia",
+        "unknown_field": "nieznana opcja",
+        "missing_field": "brakująca opcja",
+        "schema": "nieprawidłowa wartość"
+      },
       "fix_flow": {
         "step": {
           "init": {

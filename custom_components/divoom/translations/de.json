@@ -43,6 +43,16 @@
   "issues": {
     "legacy_notify_usage": {
       "title": "Veraltete Divoom-notify-Aktionen weiterhin in Benutzung",
+      "reasons": {
+        "manual": "manuell",
+        "blueprint": "basiert auf einem Blueprint",
+        "templated_mode": "Modus als Template",
+        "unknown_mode": "unbekannter Modus",
+        "unknown_device": "kein passendes Gerät",
+        "unknown_field": "unbekannte Option",
+        "missing_field": "fehlende Option",
+        "schema": "ungültiger Wert"
+      },
       "fix_flow": {
         "step": {
           "init": {

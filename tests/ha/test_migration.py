@@ -31,11 +31,16 @@ from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from custom_components.divoom.migration import (
     ISSUE_LEGACY_NOTIFY,
+    REASON_BLUEPRINT,
+    REASON_MANUAL,
     REASON_MISSING_FIELD,
+    REASON_SCHEMA,
     REASON_TEMPLATED_MODE,
+    REASON_UNKNOWN_DEVICE,
     REASON_UNKNOWN_FIELD,
     REASON_UNKNOWN_MODE,
     async_migrate,
+    async_reason_labels,
     async_rescan,
     async_scan,
     convert_config,
@@ -329,9 +334,10 @@ gute_nacht:
 """
 
 
-def register_entry(hass, name="Divoom Test", mac="11:22:33:44:55:66"):
+def register_entry(hass, name="Divoom Test", mac="11:22:33:44:55:66", title=None):
+    """An entry created as name, optionally renamed to title afterwards."""
     entry = MockConfigEntry(
-        domain=DOMAIN, data={CONF_MAC: mac, CONF_NAME: name}, title=name
+        domain=DOMAIN, data={CONF_MAC: mac, CONF_NAME: name}, title=title or name
     )
     entry.add_to_hass(hass)
     return entry
@@ -350,6 +356,67 @@ async def test_service_map_derives_the_notify_name_from_the_entry(hass):
     entry = register_entry(hass, name="Divoom Test")
 
     assert service_map(hass) == {"notify.divoom_test": device_slug(entry)}
+
+
+async def test_service_map_knows_the_name_from_before_and_after_a_rename(hass):
+    register_entry(hass, name="Divoom DitooPlus-Light", title="Divoom Ditoo")
+
+    assert service_map(hass) == {
+        "notify.divoom_ditooplus_light": "divoom_ditooplus_light",
+        "notify.divoom_ditoo": "divoom_ditoo",
+    }
+
+
+@pytest.mark.parametrize(
+    "service,device",
+    [
+        ("notify.divoom_ditoo", "divoom_ditoo"),
+        ("notify.divoom_ditooplus_light", "divoom_ditooplus_light"),
+    ],
+)
+async def test_a_renamed_entry_is_matched_by_either_name(hass, service, device):
+    register_entry(hass, name="Divoom DitooPlus-Light", title="Divoom Ditoo")
+
+    conversion = convert_step(step("on", {}, service=service), service_map(hass))
+
+    assert conversion.ok
+    assert conversion.mode == "on"
+    assert conversion.data == {CONF_DEVICE: device}
+
+
+async def test_a_manually_added_entry_is_matched_by_its_title(hass):
+    """The config flow names those Divoom Device, the user renames them."""
+    register_entry(hass, name="Divoom Device", title="Divoom PixooMax")
+
+    conversion = convert_step(
+        step("image", {"file": "silvester.gif"}, service="notify.divoom_pixoomax"),
+        service_map(hass),
+    )
+
+    assert conversion.ok
+    assert conversion.data == {CONF_DEVICE: "divoom_pixoomax", "file": "silvester.gif"}
+
+
+@pytest.mark.parametrize(
+    "legacy",
+    [
+        step("clock", {"clock": 0}, service="notify.divoom_gone"),
+        step("{{ states('input_text.mode') }}", {}, service="notify.divoom_gone"),
+    ],
+    ids=["known mode", "templated mode"],
+)
+def test_a_divoom_notify_without_an_entry_is_never_dropped(legacy):
+    conversion = convert_step(legacy, SERVICES)
+
+    assert conversion is not None
+    assert not conversion.ok
+    assert conversion.reason == REASON_UNKNOWN_DEVICE
+    assert conversion.data is None
+
+
+def test_a_divoom_notify_without_a_divoom_payload_is_left_alone():
+    """Someone else's notify.divoom_* - flagging it would never clear."""
+    assert convert_step(step("Hello there", service="notify.divoom_group"), SERVICES) is None
 
 
 async def test_migrate_rewrites_both_files(hass, yaml_files):
@@ -557,6 +624,29 @@ async def test_scan_flags_unconvertible_entries_as_manual(hass):
     assert result.manual and not result.writable
 
 
+async def test_scan_flags_a_call_no_entry_answers_to(hass):
+    """The bug that let a renamed device slip through: another entry exists, so
+    the scan runs, but nothing answers to the name the automation calls."""
+    register_entry(hass, name="Divoom Pixoo", mac="aa:bb:cc:dd:ee:ff")
+    await setup_automation(
+        hass,
+        [
+            {
+                "id": "abc",
+                "alias": "Ditoo",
+                "trigger": [],
+                "action": [step("on", {}, service="notify.divoom_ditoo")],
+            }
+        ],
+    )
+
+    result = async_scan(hass)
+
+    assert result.findings[0].reasons == [REASON_UNKNOWN_DEVICE]
+    assert not result.findings[0].writable
+    assert result.manual and not result.writable
+
+
 async def test_scan_is_empty_without_a_config_entry(hass):
     await setup_automation(
         hass,
@@ -574,16 +664,17 @@ async def test_rescan_raises_and_clears_the_issue(hass):
     )
     registry = ir.async_get(hass)
 
-    async_rescan(hass)
+    await async_rescan(hass)
     issue = registry.async_get_issue(DOMAIN, ISSUE_LEGACY_NOTIFY)
     assert issue is not None
     assert issue.is_fixable
     assert issue.severity == ir.IssueSeverity.WARNING
     assert issue.translation_placeholders["count"] == "1"
 
-    # with the device gone there is no notify.divoom_test left to call
+    # without an entry there is nothing to migrate to, so a pure YAML setup
+    # keeps working without being nagged
     await hass.config_entries.async_remove(entry.entry_id)
-    async_rescan(hass)
+    await async_rescan(hass)
 
     assert registry.async_get_issue(DOMAIN, ISSUE_LEGACY_NOTIFY) is None
 
@@ -624,6 +715,57 @@ async def test_issue_translations_are_reachable_for_the_frontend(hass, language)
     assert expected <= set(resources)
     assert resources["{0}.title".format(prefix)]
     assert resources["{0}.fix_flow.step.init.menu_options.apply".format(prefix)]
+
+
+def test_every_manual_reason_is_translated_everywhere():
+    """The listing must never fall back to a raw slug in any language."""
+    expected = {
+        REASON_BLUEPRINT,
+        REASON_MANUAL,
+        REASON_MISSING_FIELD,
+        REASON_SCHEMA,
+        REASON_TEMPLATED_MODE,
+        REASON_UNKNOWN_DEVICE,
+        REASON_UNKNOWN_FIELD,
+        REASON_UNKNOWN_MODE,
+    }
+
+    files = [COMPONENT_PATH / "strings.json"]
+    files.extend(sorted((COMPONENT_PATH / "translations").glob("*.json")))
+    assert len(files) == 10
+
+    for path in files:
+        strings = json.loads(path.read_text(encoding="utf-8"))
+        reasons = strings["issues"][ISSUE_LEGACY_NOTIFY]["reasons"]
+        assert set(reasons) == expected, path.name
+        assert all(reasons.values()), path.name
+
+
+@pytest.mark.parametrize(
+    "language,manual,reason",
+    [("en", "manual", "no matching device"), ("de", "manuell", "kein passendes Gerät")],
+)
+async def test_the_listing_names_the_reason_in_the_users_language(hass, language, manual, reason):
+    hass.config.language = language
+    register_entry(hass, name="Divoom Pixoo", mac="aa:bb:cc:dd:ee:ff")
+    await setup_automation(
+        hass,
+        [
+            {
+                "id": "abc",
+                "alias": "Ditoo",
+                "trigger": [],
+                "action": [step("on", {}, service="notify.divoom_ditoo")],
+            }
+        ],
+    )
+
+    result = await async_rescan(hass)
+    labels = await async_reason_labels(hass)
+
+    assert result.markdown(labels) == "- [Ditoo](/config/automation/edit/abc) — {0} ({1})".format(
+        manual, reason
+    )
 
 
 # --- the repair flow --------------------------------------------------------
@@ -727,7 +869,7 @@ async def test_flow_ignore_marks_the_issue_ignored(hass):
         hass,
         [{"id": "abc", "alias": "Legacy", "trigger": [], "action": [step("on", {})]}],
     )
-    async_rescan(hass)
+    await async_rescan(hass)
     flow = await start_flow(hass)
 
     result = await flow.async_step_ignore()

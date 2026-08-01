@@ -43,6 +43,16 @@
   "issues": {
     "legacy_notify_usage": {
       "title": "Zastaralé akce notify pro Divoom se stále používají",
+      "reasons": {
+        "manual": "ručně",
+        "blueprint": "založeno na blueprintu",
+        "templated_mode": "režim jako šablona",
+        "unknown_mode": "neznámý režim",
+        "unknown_device": "žádné odpovídající zařízení",
+        "unknown_field": "neznámá volba",
+        "missing_field": "chybějící volba",
+        "schema": "neplatná hodnota"
+      },
       "fix_flow": {
         "step": {
           "init": {

@@ -18,7 +18,7 @@ from homeassistant.config import AUTOMATION_CONFIG_PATH, SCRIPT_CONFIG_PATH
 from homeassistant.const import CONF_NAME
 from homeassistant.core import HomeAssistant, callback
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers import issue_registry as ir
+from homeassistant.helpers import issue_registry as ir, translation
 from homeassistant.util import slugify
 from homeassistant.util.dt import utcnow
 from homeassistant.util.file import write_utf8_file_atomic
@@ -43,7 +43,6 @@ from .services import (
     KEYBOARD_VALUES,
     SERVICE_SCHEMAS,
     TEMPERATURE_UNITS,
-    device_slug,
 )
 
 _LOGGER = logging.getLogger(__package__)
@@ -64,11 +63,17 @@ DATA_KEYS = ("data", "data_template")
 
 TEMPLATE_MARKERS = ("{{", "{%")
 
+LEGACY_PREFIX = re.compile(r"^notify\.divoom(_|$)")
+
 REASON_TEMPLATED_MODE = "templated_mode"
 REASON_UNKNOWN_MODE = "unknown_mode"
+REASON_UNKNOWN_DEVICE = "unknown_device"
 REASON_UNKNOWN_FIELD = "unknown_field"
 REASON_MISSING_FIELD = "missing_field"
 REASON_SCHEMA = "schema"
+
+REASON_BLUEPRINT = "blueprint"
+REASON_MANUAL = "manual"
 
 
 @dataclass
@@ -111,13 +116,17 @@ def iter_steps(node):
 
 
 def legacy_service(step, services) -> str | None:
-    """The notify service this step calls, if it is one of ours."""
+    """The notify service this step calls, if it looks like one of ours.
+
+    A service no entry answers to any more still counts, so that a device
+    renamed between the update and the migration cannot slip through.
+    """
     if not isinstance(step, dict):
         return None
 
     for key in ACTION_KEYS:
         name = step.get(key)
-        if isinstance(name, str) and name in services:
+        if isinstance(name, str) and (name in services or LEGACY_PREFIX.match(name)):
             return name
 
     return None
@@ -276,8 +285,14 @@ def convert_step(step, services) -> Conversion | None:
 
     outer, inner = _payload(step)
     mode = inner.get(PARAM_MODE) or outer.get(ATTR_MESSAGE)
+    templated = has_template(mode)
 
-    if has_template(mode):
+    if service not in services:
+        if not templated and mode not in VALID_MODES:
+            return None
+        return Conversion(None, None, REASON_UNKNOWN_DEVICE)
+
+    if templated:
         return Conversion(None, None, REASON_TEMPLATED_MODE)
 
     if mode not in VALID_MODES:
@@ -390,25 +405,45 @@ class ScanResult:
     def manual(self) -> list[Finding]:
         return [finding for finding in self.findings if not finding.writable]
 
-    def markdown(self) -> str:
+    def markdown(self, labels=None) -> str:
+        """The listing for the repair issue, with why an entry needs a human.
+
+        Without labels the raw reason slugs are used, which keeps the engine
+        tests independent of the translations.
+        """
+        labels = labels or {}
         lines = []
         for finding in self.findings:
             label = "`{0}`".format(finding.entity_id)
             if finding.link:
                 label = "[{0}]({1})".format(finding.name, finding.link)
-            note = "" if finding.writable else " — manuell"
+
+            note = ""
+            if not finding.writable:
+                reasons = finding.reasons or [REASON_BLUEPRINT]
+                note = " — {0} ({1})".format(
+                    labels.get(REASON_MANUAL, REASON_MANUAL),
+                    ", ".join(labels.get(reason, reason) for reason in reasons),
+                )
+
             lines.append("- {0}{1}".format(label, note))
         return "\n".join(lines)
 
 
 @callback
 def service_map(hass: HomeAssistant) -> dict[str, str]:
-    """Every notify service this integration owns, mapped to its device slug."""
+    """Every notify service name an entry answers to, by device value.
+
+    The entry keeps the name it was created with, renaming it only changes the
+    title - so an automation may call either spelling. Both slugs resolve, see
+    _find_entry in services.py.
+    """
     services = {}
     for entry in hass.config_entries.async_entries(DOMAIN):
-        name = entry.data.get(CONF_NAME)
-        if name:
-            services["notify.{0}".format(slugify(name))] = device_slug(entry)
+        for name in (entry.data.get(CONF_NAME), entry.title):
+            if name:
+                slug = slugify(name)
+                services["notify.{0}".format(slug)] = slug
     return services
 
 
@@ -581,13 +616,26 @@ async def async_migrate(hass: HomeAssistant):
     return changed, converted, {}
 
 
-@callback
-def async_update_issue(hass: HomeAssistant, result: ScanResult) -> None:
+async def async_reason_labels(hass: HomeAssistant) -> dict[str, str]:
+    """The translated wording for why an entry needs manual work."""
+    prefix = "component.{0}.issues.{1}.reasons.".format(DOMAIN, ISSUE_LEGACY_NOTIFY)
+    translations = await translation.async_get_translations(
+        hass, hass.config.language, "issues", {DOMAIN}
+    )
+    return {
+        key[len(prefix):]: value
+        for key, value in translations.items()
+        if key.startswith(prefix)
+    }
+
+
+async def async_update_issue(hass: HomeAssistant, result: ScanResult) -> None:
     """Raise, refresh or clear the repair issue for the current scan."""
     if not result.findings:
         ir.async_delete_issue(hass, DOMAIN, ISSUE_LEGACY_NOTIFY)
         return
 
+    labels = await async_reason_labels(hass)
     ir.async_create_issue(
         hass,
         DOMAIN,
@@ -598,15 +646,14 @@ def async_update_issue(hass: HomeAssistant, result: ScanResult) -> None:
         translation_key=ISSUE_LEGACY_NOTIFY,
         translation_placeholders={
             "count": str(result.total),
-            "items": result.markdown(),
+            "items": result.markdown(labels),
         },
     )
 
 
-@callback
-def async_rescan(hass: HomeAssistant) -> ScanResult:
+async def async_rescan(hass: HomeAssistant) -> ScanResult:
     """Scan and bring the issue in line with the result."""
     result = async_scan(hass)
-    async_update_issue(hass, result)
+    await async_update_issue(hass, result)
     _LOGGER.debug("Divoom: found {} legacy notify calls".format(result.total))
     return result

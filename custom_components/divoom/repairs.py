@@ -8,7 +8,14 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers import issue_registry as ir
 
 from .const import DOMAIN
-from .migration import ISSUE_LEGACY_NOTIFY, async_migrate, async_preview, async_rescan, async_scan
+from .migration import (
+    ISSUE_LEGACY_NOTIFY,
+    async_migrate,
+    async_preview,
+    async_reason_labels,
+    async_rescan,
+    async_scan,
+)
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -23,12 +30,13 @@ class LegacyNotifyRepairFlow(RepairsFlow):
         if not result.findings:
             return self.async_abort(reason="nothing_to_do")
 
+        labels = await async_reason_labels(self.hass)
         return self.async_show_menu(
             step_id="init",
             menu_options=["apply", "preview", "ignore"],
             description_placeholders={
                 "count": str(result.total),
-                "items": result.markdown(),
+                "items": result.markdown(labels),
             },
         )
 
@@ -36,13 +44,14 @@ class LegacyNotifyRepairFlow(RepairsFlow):
         result = async_scan(self.hass)
 
         if user_input is None:
+            labels = await async_reason_labels(self.hass)
             return self.async_show_form(
                 step_id="apply",
                 data_schema=vol.Schema({vol.Required(CONF_CONFIRM, default=False): bool}),
                 description_placeholders={
                     "writable": str(len(result.writable)),
                     "manual": str(len(result.manual)),
-                    "items": result.markdown(),
+                    "items": result.markdown(labels),
                 },
             )
 
@@ -66,13 +75,14 @@ class LegacyNotifyRepairFlow(RepairsFlow):
                 },
             )
 
-        remaining = async_rescan(self.hass)
+        remaining = await async_rescan(self.hass)
         if remaining.findings:
+            labels = await async_reason_labels(self.hass)
             return self.async_abort(
                 reason="manual_migration_required",
                 description_placeholders={
                     "converted": str(converted),
-                    "items": remaining.markdown(),
+                    "items": remaining.markdown(labels),
                 },
             )
 

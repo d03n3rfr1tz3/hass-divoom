@@ -43,6 +43,16 @@
   "issues": {
     "legacy_notify_usage": {
       "title": "Ações notify do Divoom obsoletas ainda em uso",
+      "reasons": {
+        "manual": "manual",
+        "blueprint": "baseado num blueprint",
+        "templated_mode": "modo com template",
+        "unknown_mode": "modo desconhecido",
+        "unknown_device": "nenhum dispositivo correspondente",
+        "unknown_field": "opção desconhecida",
+        "missing_field": "opção em falta",
+        "schema": "valor inválido"
+      },
       "fix_flow": {
         "step": {
           "init": {
