@@ -24,3 +24,15 @@ import pytest
 def _skip_bluetooth_dependency_setup(hass):
     hass.config.components.add("bluetooth_adapters")
     hass.config.components.add("bluetooth")
+
+
+@pytest.fixture
+def config_dir(hass, tmp_path):
+    """Point hass.config.path() at a throwaway directory.
+
+    Config.config_dir is a plain attribute and path() just joins onto it, so
+    this is all it takes to let the migration read and write real files
+    without going near the developer's own configuration.
+    """
+    hass.config.config_dir = str(tmp_path)
+    return tmp_path

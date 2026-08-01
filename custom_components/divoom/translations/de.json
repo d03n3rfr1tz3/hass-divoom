@@ -40,6 +40,42 @@
       "invalid_discovery_info": "Das gefundene Gerät hat nicht die Informationen geliefert, die zur Einrichtung nötig sind."
     }
   },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Veraltete Divoom-notify-Aktionen weiterhin in Benutzung",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Veraltete Divoom-Aktionen umstellen",
+            "description": "{count} Aktion(en) rufen weiterhin den veralteten Dienst `notify.divoom_*` statt der `divoom.*`-Aktionen auf:\n\n{items}\n\nWähle, wie es weitergehen soll.",
+            "menu_options": {
+              "apply": "Automatisch umstellen",
+              "preview": "Anzeigen, was sich ändern würde",
+              "ignore": "Diese Meldung ignorieren"
+            }
+          },
+          "apply": {
+            "title": "Automatisch umstellen",
+            "description": "{writable} der Einträge können automatisch umgestellt werden, {manual} brauchen Handarbeit:\n\n{items}\n\nVorher wird neben jeder Datei eine Sicherung abgelegt. Beachte, dass `automations.yaml` und `scripts.yaml` komplett neu geschrieben werden und dabei Kommentare und Formatierung verloren gehen.",
+            "data": {
+              "confirm": "Ja, meine Automatisierungen und Skripte umschreiben"
+            }
+          },
+          "preview": {
+            "title": "Was sich ändern würde",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "Die Meldung wird ignoriert. Du kannst das in der Reparaturübersicht rückgängig machen.",
+          "manual_migration_required": "{converted} Aktion(en) wurden umgestellt. Diese brauchen weiterhin Handarbeit:\n\n{items}",
+          "migration_failed": "Die Umstellung ist fehlgeschlagen, es wurde nichts geschrieben: {error}",
+          "nothing_to_do": "Es ist nichts mehr umzustellen.",
+          "unsafe_file": "{files} kann nicht sicher neu geschrieben werden, weil dort {reason} verwendet wird. Beim Neuschreiben würde das aufgelöst und das Original ginge verloren. Bitte stelle die Datei von Hand um."
+        }
+      }
+    }
+  },
   "exceptions": {
     "entry_not_found": {
       "message": "Für den Konfigurationseintrag {entry_id} wurde kein Divoom-Gerät gefunden."

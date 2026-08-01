@@ -40,6 +40,42 @@
       "invalid_discovery_info": "The discovered device did not provide the information needed to configure it."
     }
   },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Legacy Divoom notify actions still in use",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Migrate legacy Divoom actions",
+            "description": "{count} action(s) still call the deprecated `notify.divoom_*` service instead of the `divoom.*` actions:\n\n{items}\n\nChoose how you want to continue.",
+            "menu_options": {
+              "apply": "Convert automatically",
+              "preview": "Show what would change",
+              "ignore": "Ignore this issue"
+            }
+          },
+          "apply": {
+            "title": "Convert automatically",
+            "description": "{writable} of the entries can be converted automatically, {manual} need manual work:\n\n{items}\n\nA backup is written next to each file first. Be aware that `automations.yaml` and `scripts.yaml` are rewritten as a whole, so comments and formatting are lost.",
+            "data": {
+              "confirm": "Yes, rewrite my automations and scripts"
+            }
+          },
+          "preview": {
+            "title": "What would change",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "The issue is ignored. You can undo this in the repairs overview.",
+          "manual_migration_required": "{converted} action(s) were converted. These still need manual work:\n\n{items}",
+          "migration_failed": "The migration failed and nothing was written: {error}",
+          "nothing_to_do": "There is nothing left to migrate.",
+          "unsafe_file": "{files} cannot be rewritten safely because it uses {reason}. Rewriting would resolve it and lose the original. Please migrate it by hand."
+        }
+      }
+    }
+  },
   "exceptions": {
     "entry_not_found": {
       "message": "No Divoom device found for the config entry {entry_id}."

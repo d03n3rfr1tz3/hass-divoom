@@ -40,6 +40,42 @@
       "invalid_discovery_info": "L'appareil détecté n'a pas fourni les informations nécessaires à sa configuration."
     }
   },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Actions notify Divoom obsolètes toujours utilisées",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Migrer les actions Divoom obsolètes",
+            "description": "{count} action(s) appellent encore le service obsolète `notify.divoom_*` au lieu des actions `divoom.*` :\n\n{items}\n\nChoisissez comment continuer.",
+            "menu_options": {
+              "apply": "Convertir automatiquement",
+              "preview": "Afficher ce qui changerait",
+              "ignore": "Ignorer ce problème"
+            }
+          },
+          "apply": {
+            "title": "Convertir automatiquement",
+            "description": "{writable} des entrées peuvent être converties automatiquement, {manual} nécessitent une intervention manuelle :\n\n{items}\n\nUne sauvegarde est d'abord écrite à côté de chaque fichier. Notez que `automations.yaml` et `scripts.yaml` sont entièrement réécrits, ce qui fait perdre les commentaires et la mise en forme.",
+            "data": {
+              "confirm": "Oui, réécrire mes automatisations et scripts"
+            }
+          },
+          "preview": {
+            "title": "Ce qui changerait",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "Le problème est ignoré. Vous pouvez annuler cela dans la vue des réparations.",
+          "manual_migration_required": "{converted} action(s) ont été converties. Celles-ci nécessitent encore une intervention manuelle :\n\n{items}",
+          "migration_failed": "La migration a échoué et rien n'a été écrit : {error}",
+          "nothing_to_do": "Il n'y a plus rien à migrer.",
+          "unsafe_file": "{files} ne peut pas être réécrit sans risque car il utilise {reason}. La réécriture le résoudrait et l'original serait perdu. Veuillez le migrer à la main."
+        }
+      }
+    }
+  },
   "exceptions": {
     "entry_not_found": {
       "message": "Aucun appareil Divoom n'a été trouvé pour l'entrée de configuration {entry_id}."

@@ -40,6 +40,42 @@
       "invalid_discovery_info": "Nalezené zařízení neposkytlo informace potřebné k jeho konfiguraci."
     }
   },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Zastaralé akce notify pro Divoom se stále používají",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Převést zastaralé akce Divoom",
+            "description": "{count} akce stále volají zastaralou službu `notify.divoom_*` místo akcí `divoom.*`:\n\n{items}\n\nVyber, jak chceš pokračovat.",
+            "menu_options": {
+              "apply": "Převést automaticky",
+              "preview": "Zobrazit, co se změní",
+              "ignore": "Ignorovat toto hlášení"
+            }
+          },
+          "apply": {
+            "title": "Převést automaticky",
+            "description": "{writable} položek lze převést automaticky, {manual} vyžadují ruční zásah:\n\n{items}\n\nVedle každého souboru se nejprve vytvoří záloha. Ber na vědomí, že `automations.yaml` a `scripts.yaml` se přepíší celé, takže komentáře a formátování se ztratí.",
+            "data": {
+              "confirm": "Ano, přepiš moje automatizace a skripty"
+            }
+          },
+          "preview": {
+            "title": "Co se změní",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "Hlášení je ignorováno. Můžeš to vrátit zpět v přehledu oprav.",
+          "manual_migration_required": "Bylo převedeno {converted} akcí. Tyto stále vyžadují ruční zásah:\n\n{items}",
+          "migration_failed": "Převod selhal a nic nebylo zapsáno: {error}",
+          "nothing_to_do": "Není už co převádět.",
+          "unsafe_file": "{files} nelze bezpečně přepsat, protože používá {reason}. Přepsáním by se to rozvinulo a původní zápis by se ztratil. Proveď převod ručně."
+        }
+      }
+    }
+  },
   "exceptions": {
     "entry_not_found": {
       "message": "Pro konfigurační záznam {entry_id} nebylo nalezeno žádné zařízení Divoom."

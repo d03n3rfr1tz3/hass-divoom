@@ -40,6 +40,42 @@
       "invalid_discovery_info": "Il dispositivo rilevato non ha fornito le informazioni necessarie per configurarlo."
     }
   },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Azioni notify Divoom obsolete ancora in uso",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Migrare le azioni Divoom obsolete",
+            "description": "{count} azione/i chiamano ancora il servizio obsoleto `notify.divoom_*` invece delle azioni `divoom.*`:\n\n{items}\n\nScegli come procedere.",
+            "menu_options": {
+              "apply": "Converti automaticamente",
+              "preview": "Mostra cosa cambierebbe",
+              "ignore": "Ignora questo problema"
+            }
+          },
+          "apply": {
+            "title": "Converti automaticamente",
+            "description": "{writable} delle voci possono essere convertite automaticamente, {manual} richiedono un intervento manuale:\n\n{items}\n\nPrima viene scritto un backup accanto a ogni file. Tieni presente che `automations.yaml` e `scripts.yaml` vengono riscritti per intero, quindi commenti e formattazione vanno persi.",
+            "data": {
+              "confirm": "Sì, riscrivi le mie automazioni e i miei script"
+            }
+          },
+          "preview": {
+            "title": "Cosa cambierebbe",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "Il problema viene ignorato. Puoi annullare questa scelta nella panoramica delle riparazioni.",
+          "manual_migration_required": "{converted} azione/i sono state convertite. Queste richiedono ancora un intervento manuale:\n\n{items}",
+          "migration_failed": "La migrazione non è riuscita e non è stato scritto nulla: {error}",
+          "nothing_to_do": "Non c'è più nulla da migrare.",
+          "unsafe_file": "{files} non può essere riscritto in sicurezza perché utilizza {reason}. La riscrittura lo risolverebbe e l'originale andrebbe perso. Esegui la migrazione a mano."
+        }
+      }
+    }
+  },
   "exceptions": {
     "entry_not_found": {
       "message": "Nessun dispositivo Divoom trovato per la voce di configurazione {entry_id}."

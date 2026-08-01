@@ -40,6 +40,42 @@
       "invalid_discovery_info": "Het gevonden apparaat heeft niet de informatie geleverd die nodig is om het te configureren."
     }
   },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Verouderde Divoom-notify-acties nog in gebruik",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Verouderde Divoom-acties migreren",
+            "description": "{count} actie(s) roepen nog de verouderde dienst `notify.divoom_*` aan in plaats van de `divoom.*`-acties:\n\n{items}\n\nKies hoe je verder wilt gaan.",
+            "menu_options": {
+              "apply": "Automatisch omzetten",
+              "preview": "Tonen wat er zou veranderen",
+              "ignore": "Deze melding negeren"
+            }
+          },
+          "apply": {
+            "title": "Automatisch omzetten",
+            "description": "{writable} van de items kunnen automatisch worden omgezet, {manual} vergen handwerk:\n\n{items}\n\nEr wordt eerst een back-up naast elk bestand geschreven. Let op: `automations.yaml` en `scripts.yaml` worden volledig herschreven, waardoor opmerkingen en opmaak verloren gaan.",
+            "data": {
+              "confirm": "Ja, mijn automatiseringen en scripts herschrijven"
+            }
+          },
+          "preview": {
+            "title": "Wat er zou veranderen",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "De melding wordt genegeerd. Je kunt dit ongedaan maken in het reparatieoverzicht.",
+          "manual_migration_required": "{converted} actie(s) zijn omgezet. Deze vergen nog handwerk:\n\n{items}",
+          "migration_failed": "De migratie is mislukt, er is niets geschreven: {error}",
+          "nothing_to_do": "Er valt niets meer te migreren.",
+          "unsafe_file": "{files} kan niet veilig worden herschreven omdat daar {reason} wordt gebruikt. Bij herschrijven zou dat worden opgelost en gaat het origineel verloren. Migreer het bestand handmatig."
+        }
+      }
+    }
+  },
   "exceptions": {
     "entry_not_found": {
       "message": "Er is geen Divoom-apparaat gevonden voor configuratie-item {entry_id}."

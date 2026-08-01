@@ -40,6 +40,42 @@
       "invalid_discovery_info": "O dispositivo detetado não forneceu as informações necessárias para o configurar."
     }
   },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Ações notify do Divoom obsoletas ainda em uso",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Migrar as ações obsoletas do Divoom",
+            "description": "{count} ação(ões) ainda chamam o serviço obsoleto `notify.divoom_*` em vez das ações `divoom.*`:\n\n{items}\n\nEscolhe como queres continuar.",
+            "menu_options": {
+              "apply": "Converter automaticamente",
+              "preview": "Mostrar o que mudaria",
+              "ignore": "Ignorar este problema"
+            }
+          },
+          "apply": {
+            "title": "Converter automaticamente",
+            "description": "{writable} das entradas podem ser convertidas automaticamente, {manual} precisam de trabalho manual:\n\n{items}\n\nPrimeiro é escrita uma cópia de segurança junto de cada ficheiro. Nota que `automations.yaml` e `scripts.yaml` são reescritos por completo, pelo que os comentários e a formatação se perdem.",
+            "data": {
+              "confirm": "Sim, reescrever as minhas automações e scripts"
+            }
+          },
+          "preview": {
+            "title": "O que mudaria",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "O problema é ignorado. Podes anular isto na vista de reparações.",
+          "manual_migration_required": "{converted} ação(ões) foram convertidas. Estas ainda precisam de trabalho manual:\n\n{items}",
+          "migration_failed": "A migração falhou e nada foi escrito: {error}",
+          "nothing_to_do": "Já não há nada para migrar.",
+          "unsafe_file": "{files} não pode ser reescrito em segurança porque utiliza {reason}. A reescrita resolveria isso e o original perder-se-ia. Migra o ficheiro à mão."
+        }
+      }
+    }
+  },
   "exceptions": {
     "entry_not_found": {
       "message": "Não foi encontrado nenhum dispositivo Divoom para a entrada de configuração {entry_id}."
