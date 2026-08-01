@@ -39,5 +39,686 @@
       "already_configured": "Er is al een Divoom-apparaat met dit MAC-adres geconfigureerd.",
       "invalid_discovery_info": "Het gevonden apparaat heeft niet de informatie geleverd die nodig is om het te configureren."
     }
+  },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Verouderde Divoom-notify-acties nog in gebruik",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Verouderde Divoom-acties migreren",
+            "description": "{count} actie(s) roepen nog de verouderde dienst `notify.divoom_*` aan in plaats van de `divoom.*`-acties:\n\n{items}\n\nKies hoe je verder wilt gaan.",
+            "menu_options": {
+              "apply": "Automatisch omzetten",
+              "preview": "Tonen wat er zou veranderen",
+              "ignore": "Deze melding negeren"
+            }
+          },
+          "apply": {
+            "title": "Automatisch omzetten",
+            "description": "{writable} van de items kunnen automatisch worden omgezet, {manual} vergen handwerk:\n\n{items}\n\nEr wordt eerst een back-up naast elk bestand geschreven. Let op: `automations.yaml` en `scripts.yaml` worden volledig herschreven, waardoor opmerkingen en opmaak verloren gaan.",
+            "data": {
+              "confirm": "Ja, mijn automatiseringen en scripts herschrijven"
+            }
+          },
+          "preview": {
+            "title": "Wat er zou veranderen",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "De melding wordt genegeerd. Je kunt dit ongedaan maken in het reparatieoverzicht.",
+          "manual_migration_required": "{converted} actie(s) zijn omgezet. Deze vergen nog handwerk:\n\n{items}",
+          "migration_failed": "De migratie is mislukt, er is niets geschreven: {error}",
+          "nothing_to_do": "Er valt niets meer te migreren.",
+          "unsafe_file": "{files} kan niet veilig worden herschreven omdat daar {reason} wordt gebruikt. Bij herschrijven zou dat worden opgelost en gaat het origineel verloren. Migreer het bestand handmatig."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "device_not_found": {
+      "message": "Er is geen Divoom-apparaat gevonden voor {device}."
+    },
+    "device_not_loaded": {
+      "message": "Het Divoom-apparaat {title} is niet geladen. Controleer of de integratie correct is ingesteld."
+    },
+    "mode_failed": {
+      "message": "De actie {mode} is mislukt. Bekijk het Home Assistant-logboek voor details."
+    },
+    "mode_unsupported": {
+      "message": "Het apparaat {device} ondersteunt de actie {mode} niet."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Klok",
+      "description": "Toont het klokkanaal op een Divoom-apparaat. Op oudere apparaten zoals de Aurabox of de Timebox Mini is deze modus sterk beperkt.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "clock": {
+          "name": "Klokstijl",
+          "description": "De klokstijl die getoond wordt, als getal vanaf 0 tot wat het Divoom-apparaat ondersteunt. Bekijk de officiële Divoom-app voor de beschikbare stijlen."
+        },
+        "twentyfour": {
+          "name": "24-uursnotatie",
+          "description": "Toont de tijd in 24-uursnotatie in plaats van 12-uursnotatie."
+        },
+        "weather": {
+          "name": "Weer tonen",
+          "description": "Toont het huidige weer."
+        },
+        "temp": {
+          "name": "Temperatuur tonen",
+          "description": "Toont de huidige temperatuur."
+        },
+        "calendar": {
+          "name": "Datum tonen",
+          "description": "Toont de huidige datum."
+        },
+        "color": {
+          "name": "Kleur",
+          "description": "De kleur van de cijfers van de klok."
+        },
+        "hot": {
+          "name": "Populaire afbeeldingen tonen",
+          "description": "Doorloopt de populaire afbeeldingen van de Divoom-community."
+        }
+      }
+    },
+    "light": {
+      "name": "Licht",
+      "description": "Toont het lichtkanaal op een Divoom-apparaat. Op de Aurabox is deze modus sterk beperkt, omdat die maar 8 kleuren ondersteunt.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "brightness": {
+          "name": "Helderheid",
+          "description": "De helderheidswaarde tussen 0 en 100."
+        },
+        "color": {
+          "name": "Kleur",
+          "description": "De kleur van het licht. Laat leeg om de kleuren te laten doorlopen."
+        }
+      }
+    },
+    "on": {
+      "name": "Inschakelen",
+      "description": "Schakelt het scherm in door de pixels op zwart, de helderheid op 100 en een specifieke power-vlag op 1 te zetten. Omdat de pixels zwart blijven en er geen automatische weg terug is naar de eerder getoonde modus, kun je daarna het beste nog een actie zoals 'Klok' sturen.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    },
+    "off": {
+      "name": "Uitschakelen",
+      "description": "Schakelt het scherm uit door de pixels op zwart, de helderheid op 0 en een specifieke power-vlag op 0 te zetten.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Helderheid",
+      "description": "Stelt de helderheid van een Divoom-apparaat in.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "brightness": {
+          "name": "Helderheid",
+          "description": "De helderheidswaarde tussen 0 en 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Afbeelding",
+      "description": "Toont een statische of geanimeerde afbeelding op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "file": {
+          "name": "Afbeeldingsbestand",
+          "description": "Het weer te geven afbeeldingsbestand, relatief ten opzichte van de ingestelde mediamap."
+        },
+        "time": {
+          "name": "Framewisseltijd",
+          "description": "De tijd in milliseconden tussen elk frame. Standaard wordt de timing van de GIF gebruikt."
+        }
+      }
+    },
+    "text": {
+      "name": "Tekst",
+      "description": "Toont tekst als schuivende animatie op een Divoom-apparaat. Een langere tekst of een breed lettertype past mogelijk niet binnen de limiet van ongeveer 60 frames.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "text": {
+          "name": "Tekst",
+          "description": "De tekst die geanimeerd wordt."
+        },
+        "font": {
+          "name": "Lettertype",
+          "description": "De naam of bestandsnaam van het te gebruiken lettertype. Deze lettertypen zijn meegeleverd: arcade.ttf, arial.ttf, divoom.ttf, impact.ttf en pixelpowerline.ttf. Standaard wordt een generiek lettertype gebruikt."
+        },
+        "size": {
+          "name": "Lettergrootte",
+          "description": "De lettergrootte in pixels. Standaard de schermgrootte van het apparaat."
+        },
+        "time": {
+          "name": "Framewisseltijd",
+          "description": "De tijd in milliseconden tussen elk frame. Standaard 100 ms per frame."
+        },
+        "foreground_color": {
+          "name": "Tekstkleur",
+          "description": "De kleur van de tekst. Standaard wit."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "De kleur van de achtergrond. Standaard zwart."
+        }
+      }
+    },
+    "design": {
+      "name": "Ontwerp",
+      "description": "Toont het ontwerpkanaal op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Ontwerp",
+          "description": "Het nummer van het concrete ontwerp, als getal vanaf 0 tot wat het Divoom-apparaat ondersteunt."
+        }
+      }
+    },
+    "effects": {
+      "name": "Effecten",
+      "description": "Toont het effectenkanaal op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Effect",
+          "description": "Het nummer van het concrete effect. Dit kan per Divoom-apparaat verschillen. Bekijk de app op je telefoon en tel ze."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Visualisatie",
+      "description": "Toont het visualisatiekanaal op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Visualisatie",
+          "description": "Het nummer van de concrete visualisatie. Dit kan per Divoom-apparaat verschillen. Bekijk de app op je telefoon en tel ze."
+        },
+        "foreground_color": {
+          "name": "Voorgrondkleur",
+          "description": "De kleur van de voorgrond. Wordt alleen door de oudste apparaten ondersteund."
+        },
+        "background_color": {
+          "name": "Achtergrondkleur",
+          "description": "De kleur van de achtergrond. Wordt alleen door de oudste apparaten ondersteund."
+        }
+      }
+    },
+    "signal": {
+      "name": "Signaal",
+      "description": "Toont het signaalkanaal op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Signaal",
+          "description": "Het nummer van het concrete signaal. Bekijk de app op je telefoon en tel ze."
+        }
+      }
+    },
+    "alarm": {
+      "name": "Wekker",
+      "description": "Stelt een wekker in op een Divoom-apparaat. Je moet mogelijk uitproberen welke opties je Divoom-apparaat ondersteunt en wat ze werkelijk veranderen. Niet-ondersteunde waarden worden genegeerd of, indien mogelijk, direct op nul gezet om vreemd gedrag te voorkomen.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Wekkerplek",
+          "description": "De concrete plek voor de wekker. Hoeveel plekken er werkelijk zijn, zie je eventueel in de app op je telefoon."
+        },
+        "value": {
+          "name": "Tijd",
+          "description": "Het concrete tijdstip waarop de wekker moet afgaan. Laat leeg om de plek te legen."
+        },
+        "weekday": {
+          "name": "Weekdagen",
+          "description": "De gebruikelijke lijst met weekdagen waarop de wekker moet afgaan."
+        },
+        "alarmmode": {
+          "name": "Wekkermodus",
+          "description": "De wekkermodus. Bekijk de app op je telefoon voor wat je Divoom-apparaat ondersteunt."
+        },
+        "triggermode": {
+          "name": "Triggermodus",
+          "description": "De triggermodus. Bekijk de app op je telefoon voor wat je Divoom-apparaat ondersteunt."
+        },
+        "frequency": {
+          "name": "Radiofrequentie",
+          "description": "De in te stellen radiofrequentie."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Het volume van de wekker."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Aftelklok",
+      "description": "Toont het aftelhulpmiddel op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Regelt de start/stop-status."
+        },
+        "countdown": {
+          "name": "Aftelklok",
+          "description": "De concrete aftelklok in de notatie mm:ss. Opgegeven als hh:mm:ss worden de uren genegeerd."
+        }
+      }
+    },
+    "timer": {
+      "name": "Stopwatch",
+      "description": "Toont het stopwatch-hulpmiddel op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Regelt de start/stop-status."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Gedenkdag",
+      "description": "Stelt een gedenkdag (herinnering) in op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Gedenkdagplek",
+          "description": "De concrete plek voor de gedenkdag. Hoeveel plekken er werkelijk zijn, zie je eventueel in de app op je telefoon."
+        },
+        "value": {
+          "name": "Datum en tijd",
+          "description": "De datum en tijd van de gedenkdag. Het jaar wordt genegeerd. Laat leeg om de plek te legen."
+        },
+        "text": {
+          "name": "Naam",
+          "description": "De naam van je gedenkdag, zoals die in de app op je telefoon verschijnt. Beperkt tot 16 tekens. Standaard Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Scorebord",
+      "description": "Toont het scorebordkanaal of -hulpmiddel op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "player1": {
+          "name": "Speler een",
+          "description": "De te tonen score van speler een."
+        },
+        "player2": {
+          "name": "Speler twee",
+          "description": "De te tonen score van speler twee."
+        }
+      }
+    },
+    "noise": {
+      "name": "Geluidsmeter",
+      "description": "Toont de geluidsmeter op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Regelt de start/stop-status."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Slaapstand",
+      "description": "Toont de slaapstand op een Divoom-apparaat, die rustgevende geluiden afspeelt, optioneel met timer en licht.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Starten",
+          "description": "Regelt de start/stop-status."
+        },
+        "time": {
+          "name": "Slaaptimer",
+          "description": "De tijd in minuten waarna de slaapstand stopt. Standaard 120 als er niets wordt opgegeven."
+        },
+        "sleepmode": {
+          "name": "Geluidseffect",
+          "description": "Het af te spelen geluidseffect. Kijk in de app hoeveel opties beschikbaar zijn."
+        },
+        "frequency": {
+          "name": "Radiofrequentie",
+          "description": "De in te stellen radiofrequentie."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "De volumewaarde tussen 0 en 100."
+        },
+        "color": {
+          "name": "Kleur",
+          "description": "De kleur van het scherm."
+        },
+        "brightness": {
+          "name": "Helderheid",
+          "description": "De helderheidswaarde tussen 0 en 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Datum en tijd",
+      "description": "Stelt de datum en tijd van een Divoom-apparaat in.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Datum en tijd",
+          "description": "De in te stellen datum en tijd. Laat leeg om simpelweg de huidige datum en tijd te gebruiken."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Equalizer",
+      "description": "Start de muziekequalizer op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "number": {
+          "name": "Equalizer",
+          "description": "Het nummer van de concrete equalizer. Bekijk de app op je telefoon en tel ze."
+        },
+        "audiomode": {
+          "name": "Originele audiomodus",
+          "description": "Activeert de originele audiomodus."
+        },
+        "backgroundmode": {
+          "name": "Achtergrond-audiomodus",
+          "description": "Activeert de achtergrond-audiomodus."
+        },
+        "streammode": {
+          "name": "Streaming-audiomodus",
+          "description": "Activeert de streaming-audiomodus."
+        }
+      }
+    },
+    "volume": {
+      "name": "Volume",
+      "description": "Stelt het volume van een Divoom-apparaat in. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "De volumewaarde tussen 0 en 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Afspeelstatus",
+      "description": "Stelt de afspeelstatus van de momenteel afgespeelde muziek op een Divoom-apparaat in. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Afspelen",
+          "description": "Regelt de afspelen/pauze-status."
+        }
+      }
+    },
+    "radio": {
+      "name": "Radio",
+      "description": "Toont en speelt het radiokanaal op een Divoom-apparaat. Wordt alleen ondersteund door Divoom-apparaten met radiofunctie.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Aan",
+          "description": "Regelt de aan/uit-status."
+        },
+        "frequency": {
+          "name": "Radiofrequentie",
+          "description": "De in te stellen radiofrequentie."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Songteksten",
+      "description": "Toont het songtekstkanaal op een Divoom-apparaat. Wordt mogelijk niet door elk Divoom-apparaat ondersteund.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Toetsenbord",
+      "description": "Bestuurt de toetsenbordverlichting, specifiek op de Ditoo.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Effect",
+          "description": "Wijzigt het verlichtingseffect van het toetsenbord."
+        }
+      }
+    },
+    "game": {
+      "name": "Spel",
+      "description": "Toont een spel op een Divoom-apparaat. Het is theoretisch mogelijk om spellen te openen die niet in de app op je telefoon staan, maar die werken mogelijk niet goed.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Spel",
+          "description": "Het nummer van het concrete spel. Afhankelijk van je apparaat kan het aantal spellen verschillen. Bekijk de app op je telefoon en tel ze."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Spelbesturing",
+      "description": "Stuurt bedieningsopdrachten naar het momenteel geopende spel op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Opdracht",
+          "description": "De opdracht die naar het spel wordt gestuurd."
+        }
+      }
+    },
+    "weather": {
+      "name": "Weer",
+      "description": "Stelt het weer in.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Temperatuur",
+          "description": "De temperatuur in graden."
+        },
+        "unit": {
+          "name": "Eenheid",
+          "description": "De temperatuureenheid Celsius of Fahrenheit. Zonder opgave behoudt het apparaat zijn huidige eenheid."
+        },
+        "weather": {
+          "name": "Weertype",
+          "description": "Het daadwerkelijke weertype."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Temperatuur",
+      "description": "Toont het temperatuurkanaal op een Divoom-apparaat.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "value": {
+          "name": "Eenheid",
+          "description": "Wisselt tussen de eenheden °C en °F."
+        },
+        "color": {
+          "name": "Kleur",
+          "description": "De kleur van de temperatuur."
+        }
+      }
+    },
+    "raw": {
+      "name": "Ruw commando",
+      "description": "Stuurt ruwe data naar het Divoom-apparaat. Dat kan nuttig zijn als er iets misgaat of iets niet door de andere modi wordt ondersteund.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "raw": {
+          "name": "Bytes",
+          "description": "De te verzenden bytes."
+        }
+      }
+    },
+    "connect": {
+      "name": "Verbinden",
+      "description": "Maakt expliciet verbinding met het geconfigureerde Divoom-apparaat. Dat kan nuttig zijn als je alleen wilt verbinden zonder iets te wijzigen. Normaal wordt de verbinding bij elke modus automatisch geopend.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Verbinding verbreken",
+      "description": "Verbreekt expliciet de verbinding met het geconfigureerde Divoom-apparaat. Dat kan nuttig zijn als je met je telefoon of andere apparaten geen verbinding kunt maken. Normaal houdt deze component de verbinding met je Divoom-apparaat open.",
+      "fields": {
+        "device": {
+          "name": "Apparaat",
+          "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Maandag",
+        "tue": "Dinsdag",
+        "wed": "Woensdag",
+        "thu": "Donderdag",
+        "fri": "Vrijdag",
+        "sat": "Zaterdag",
+        "sun": "Zondag"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Vorig effect",
+        "toggle": "In-/uitschakelen",
+        "next": "Volgend effect"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Go",
+        "left": "Links",
+        "right": "Rechts",
+        "up": "Omhoog",
+        "down": "Omlaag",
+        "ok": "OK"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Helder, nacht",
+        "cloudy": "Bewolkt",
+        "exceptional": "Uitzonderlijk",
+        "fog": "Mist",
+        "hail": "Hagel",
+        "lightning": "Onweer",
+        "lightning-rainy": "Onweer met regen",
+        "partlycloudy": "Gedeeltelijk bewolkt",
+        "pouring": "Stortregen",
+        "rainy": "Regenachtig",
+        "snowy": "Sneeuw",
+        "snowy-rainy": "Sneeuw met regen",
+        "sunny": "Zonnig",
+        "windy": "Winderig",
+        "windy-variant": "Winderig en bewolkt"
+      }
+    }
   }
 }

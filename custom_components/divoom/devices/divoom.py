@@ -1,11 +1,21 @@
 """Provides class Divoom that encapsulates the Divoom Bluetooth communication."""
 
-import datetime, errno, itertools, logging, math, os, select, socket, time
+import datetime, errno, itertools, logging, math, os, re, select, socket, time
 from PIL import Image, ImageDraw, ImageFont
+
+TEMPERATURE_PATTERN = re.compile(r"^\s*(-?\d+(?:[.,]\d+)?)?\s*°?\s*([CF])?\s*$", re.IGNORECASE)
+
+class DivoomUnsupportedError(Exception):
+    """Raised when a device cannot do what a mode asks of it."""
+
+    def __init__(self, device, feature):
+        self.device = device
+        self.feature = feature
+        Exception.__init__(self, "{0}: {1}".format(device, feature))
 
 class Divoom:
     """Class Divoom encapsulates the Divoom Bluetooth communication."""
-    
+
     COMMANDS = {
         "set radio": 0x05,
         "set volume": 0x08,
@@ -55,6 +65,16 @@ class Divoom:
             logger = logging.getLogger(self.type)
         self.logger = logger
 
+    def unsupported(self, feature):
+        """Refuse a feature this device does not have"""
+        self.logger.warning("{0}: this device does not support {1}.".format(self.type, feature))
+        raise DivoomUnsupportedError(self.type, feature)
+
+    def unimplemented(self):
+        """Refuse a feature that is not implemented for this device yet"""
+        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+        raise DivoomUnsupportedError(self.type, "the implementation is missing")
+
     def __del__(self):
         self.disconnect()
 
@@ -73,6 +93,21 @@ class Divoom:
                 return [int(frequency % 100), int(frequency / 100)]
 
         return [0x00, 0x00]
+
+    def _parse_temperature(self, value):
+        """Split "25°C" into the number 25.0 and the unit flag 1 (0 = °C, 1 = °F).
+        Both parts are optional, an unparsable value gives (None, None)."""
+        if value == None: return None, None
+        if isinstance(value, bool): return float(value), None
+        if isinstance(value, (int, float)): return float(value), None
+
+        match = TEMPERATURE_PATTERN.match(str(value))
+        if match == None: return None, None
+
+        number, unit = match.groups()
+        if number != None: number = float(number.replace(',', '.'))
+        if unit != None: unit = 1 if unit.upper() == "F" else 0
+        return number, unit
 
     def connect(self):
         """Open a connection to the Divoom device."""
@@ -528,7 +563,7 @@ class Divoom:
 
         if time != None:
             args += int(time[0:2]).to_bytes(1, byteorder='big')
-            args += int(time[3:]).to_bytes(1, byteorder='big')
+            args += int(time[3:5]).to_bytes(1, byteorder='big')
         else:
             args += [0x00, 0x00]
         if weekdays != None:
@@ -598,8 +633,9 @@ class Divoom:
         args = [0x03]
         args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
         if countdown != None:
+            countdown = countdown[-5:] # the optional leading "hh:" is not used
             args += int(countdown[0:2]).to_bytes(1, byteorder='big')
-            args += int(countdown[3:]).to_bytes(1, byteorder='big')
+            args += int(countdown[3:5]).to_bytes(1, byteorder='big')
         else:
             args += [0x00, 0x00]
         return self.send_command("set tool", args)
@@ -644,7 +680,7 @@ class Divoom:
         return self.send_command("set view", args)
 
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+        self.unimplemented()
 
     def show_game(self, value=None):
         """Show game on the Divoom device"""
@@ -705,7 +741,7 @@ class Divoom:
         return result
 
     def send_keyboard(self, value=None):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+        self.unimplemented()
 
     def show_light(self, color, brightness=None, power=None):
         """Show light on the Divoom device in the color"""
@@ -726,7 +762,7 @@ class Divoom:
         return self.send_command("set view", args)
 
     def show_lyrics(self):
-        self.logger.warning("{0}: the implementation is missing.".format(self.type))
+        self.unimplemented()
 
     def show_memorial(self, number=None, value=None, text=None, animate=True):
         """Show memorial tool on the Divoom device"""
@@ -784,7 +820,7 @@ class Divoom:
         return result
 
     def show_scoreboard(self, blue=None, red=None):
-        self.logger.warning("{0}: the implementation is missing. it needs a decision, in which way the scoreboard can be accessed (set view or set tool).".format(self.type))
+        self.unimplemented() # needs a decision, in which way the scoreboard can be accessed (set view or set tool)
 
     def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
         """Show sleep mode on the Divoom device and optionally sets mode, volume, time, color, frequency and brightness"""
@@ -814,10 +850,7 @@ class Divoom:
         return self.send_command("set sleeptime", args)
 
     def show_temperature(self, value=None, color=None):
-        """Show temperature on the Divoom device in the color"""
-        result = self.show_clock(clock=None, twentyfour=None, weather=None, temp=True, calendar=None, color=color, hot=None)
-        self.send_command("set temp type", [0x01 if value == True or value == 1 else 0x00])
-        return result
+        self.unsupported("the temperature mode")
 
     def show_text(self, text, font, size=None, time=None, color1=None, color2=None):
         """Show image or animation on the Divoom device"""
@@ -855,6 +888,9 @@ class Divoom:
         args += value.to_bytes(1, byteorder='big')
         return self.send_command("set tool", args)
 
+    def show_signal(self, number, color1=None, color2=None):
+        self.unsupported("the signal mode")
+
     def show_visualization(self, number, color1, color2):
         """Show visualization on the Divoom device"""
         if number == None: return
@@ -873,15 +909,17 @@ class Divoom:
         args += int(value * 15 / 100).to_bytes(1, byteorder='big')
         return self.send_command("set volume", args, skipRead=True)
 
-    def send_weather(self, value=None, weather=None):
+    def send_weather(self, value=None, weather=None, unit=None):
         """Send weather to the Divoom device"""
-        if value == None: return
+        number, parsedUnit = self._parse_temperature(value)
+        if number == None: return
         if weather == None: weather = 0
         if isinstance(weather, str): weather = int(weather)
+        
+        if unit == None: unit = parsedUnit
+        elif isinstance(unit, str): unit = self._parse_temperature(unit)[1]
 
-        unit = value[-2:]
-        number = float(value[0:-2])
-        if unit == "°F":
+        if unit == 1:
             number = (number - 32) * 5 / 9
 
         args = []
@@ -889,10 +927,8 @@ class Divoom:
         args += weather.to_bytes(1, byteorder='big')
         result = self.send_command("set temp", args)
 
-        if unit == "°C":
-            self.send_command("set temp type", [0x00])
-        if unit == "°F":
-            self.send_command("set temp type", [0x01])
+        if unit != None:
+            self.send_command("set temp type", [0x01 if unit == 1 else 0x00])
         return result
 
     def clear_input_buffer(self):

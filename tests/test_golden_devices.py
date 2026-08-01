@@ -32,6 +32,7 @@ import os
 
 import pytest
 
+from custom_components.divoom.devices.divoom import DivoomUnsupportedError
 from tests.cases import DEVICE_CLASSES, all_cases
 from tests.support import (
     GOLDEN_DIR,
@@ -70,6 +71,8 @@ def test_golden_master(device_type, case_name):
     device, recorder, server_sock = make_connected_device(device_cls)
     try:
         case_fn(device)
+    except DivoomUnsupportedError:
+        pass # a refused mode sends nothing, so the golden stays empty
     finally:
         device.disconnect()
         server_sock.close()

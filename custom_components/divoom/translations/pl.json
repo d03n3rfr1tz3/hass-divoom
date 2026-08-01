@@ -39,5 +39,686 @@
       "already_configured": "Urządzenie Divoom o tym adresie MAC jest już skonfigurowane.",
       "invalid_discovery_info": "Wykryte urządzenie nie dostarczyło informacji potrzebnych do jego skonfigurowania."
     }
+  },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Przestarzałe akcje notify dla Divoom nadal w użyciu",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Migracja przestarzałych akcji Divoom",
+            "description": "{count} akcji nadal wywołuje przestarzałą usługę `notify.divoom_*` zamiast akcji `divoom.*`:\n\n{items}\n\nWybierz, jak chcesz kontynuować.",
+            "menu_options": {
+              "apply": "Przekonwertuj automatycznie",
+              "preview": "Pokaż, co się zmieni",
+              "ignore": "Zignoruj to zgłoszenie"
+            }
+          },
+          "apply": {
+            "title": "Przekonwertuj automatycznie",
+            "description": "{writable} pozycji można przekonwertować automatycznie, {manual} wymaga pracy ręcznej:\n\n{items}\n\nNajpierw obok każdego pliku zapisywana jest kopia zapasowa. Pamiętaj, że `automations.yaml` i `scripts.yaml` są przepisywane w całości, więc komentarze i formatowanie zostaną utracone.",
+            "data": {
+              "confirm": "Tak, przepisz moje automatyzacje i skrypty"
+            }
+          },
+          "preview": {
+            "title": "Co się zmieni",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "Zgłoszenie jest ignorowane. Możesz to cofnąć w przeglądzie napraw.",
+          "manual_migration_required": "Przekonwertowano {converted} akcji. Te nadal wymagają pracy ręcznej:\n\n{items}",
+          "migration_failed": "Migracja nie powiodła się i nic nie zostało zapisane: {error}",
+          "nothing_to_do": "Nie ma już nic do migracji.",
+          "unsafe_file": "Pliku {files} nie można bezpiecznie przepisać, ponieważ używa {reason}. Przepisanie rozwinęłoby to i oryginał zostałby utracony. Wykonaj migrację ręcznie."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "device_not_found": {
+      "message": "Nie znaleziono urządzenia Divoom dla {device}."
+    },
+    "device_not_loaded": {
+      "message": "Urządzenie Divoom {title} nie jest załadowane. Sprawdź, czy integracja została poprawnie skonfigurowana."
+    },
+    "mode_failed": {
+      "message": "Akcja {mode} nie powiodła się. Szczegóły znajdziesz w dzienniku Home Assistanta."
+    },
+    "mode_unsupported": {
+      "message": "Urządzenie {device} nie obsługuje akcji {mode}."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Zegar",
+      "description": "Wyświetla kanał zegara na urządzeniu Divoom. Na starszych urządzeniach, takich jak Aurabox czy Timebox Mini, ten tryb jest mocno ograniczony.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "clock": {
+          "name": "Styl zegara",
+          "description": "Styl zegara do wyświetlenia, jako liczba od 0 w górę, aż do wartości obsługiwanej przez urządzenie Divoom. Dostępne style można obejrzeć w oficjalnej aplikacji Divoom."
+        },
+        "twentyfour": {
+          "name": "Format 24-godzinny",
+          "description": "Wyświetla godzinę w formacie 24-godzinnym zamiast 12-godzinnego."
+        },
+        "weather": {
+          "name": "Pokaż pogodę",
+          "description": "Wyświetla aktualną pogodę."
+        },
+        "temp": {
+          "name": "Pokaż temperaturę",
+          "description": "Wyświetla aktualną temperaturę."
+        },
+        "calendar": {
+          "name": "Pokaż datę",
+          "description": "Wyświetla aktualną datę."
+        },
+        "color": {
+          "name": "Kolor",
+          "description": "Kolor cyfr zegara."
+        },
+        "hot": {
+          "name": "Pokaż popularne obrazy",
+          "description": "Przewija popularne obrazy społeczności Divoom."
+        }
+      }
+    },
+    "light": {
+      "name": "Światło",
+      "description": "Wyświetla kanał światła na urządzeniu Divoom. Na Auraboksie ten tryb jest mocno ograniczony, ponieważ obsługuje on tylko 8 kolorów.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "brightness": {
+          "name": "Jasność",
+          "description": "Wartość jasności od 0 do 100."
+        },
+        "color": {
+          "name": "Kolor",
+          "description": "Kolor światła. Pozostaw puste, aby kolory płynnie się zmieniały."
+        }
+      }
+    },
+    "on": {
+      "name": "Włącz",
+      "description": "Włącza wyświetlacz, ustawiając piksele na czarny, jasność na 100 oraz specjalną flagę zasilania na 1. Ponieważ piksele pozostają czarne i nie ma automatycznego powrotu do poprzednio wyświetlanego trybu, warto następnie wysłać kolejną akcję, na przykład „Zegar”.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        }
+      }
+    },
+    "off": {
+      "name": "Wyłącz",
+      "description": "Wyłącza wyświetlacz, ustawiając piksele na czarny, jasność na 0 oraz specjalną flagę zasilania na 0.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Jasność",
+      "description": "Ustawia jasność urządzenia Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "brightness": {
+          "name": "Jasność",
+          "description": "Wartość jasności od 0 do 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Obraz",
+      "description": "Wyświetla statyczny lub animowany obraz na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "file": {
+          "name": "Plik obrazu",
+          "description": "Plik obrazu do wyświetlenia, względem skonfigurowanego katalogu multimediów."
+        },
+        "time": {
+          "name": "Czas klatki",
+          "description": "Czas w milisekundach między kolejnymi klatkami. Domyślnie używane jest tempo pliku GIF."
+        }
+      }
+    },
+    "text": {
+      "name": "Tekst",
+      "description": "Wyświetla tekst jako przewijaną animację na urządzeniu Divoom. Dłuższy tekst lub szeroka czcionka mogą nie zmieścić się w limicie około 60 klatek.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "text": {
+          "name": "Tekst",
+          "description": "Tekst, który zostanie zanimowany."
+        },
+        "font": {
+          "name": "Czcionka",
+          "description": "Nazwa lub nazwa pliku czcionki, która ma zostać użyta. Dołączone czcionki: arcade.ttf, arial.ttf, divoom.ttf, impact.ttf i pixelpowerline.ttf. Domyślnie używana jest ogólna czcionka."
+        },
+        "size": {
+          "name": "Rozmiar czcionki",
+          "description": "Rozmiar czcionki w pikselach. Domyślnie rozmiar ekranu urządzenia."
+        },
+        "time": {
+          "name": "Czas klatki",
+          "description": "Czas w milisekundach między kolejnymi klatkami. Domyślnie 100 ms na klatkę."
+        },
+        "foreground_color": {
+          "name": "Kolor tekstu",
+          "description": "Kolor tekstu. Domyślnie biały."
+        },
+        "background_color": {
+          "name": "Kolor tła",
+          "description": "Kolor tła. Domyślnie czarny."
+        }
+      }
+    },
+    "design": {
+      "name": "Wzór",
+      "description": "Wyświetla kanał wzorów na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "number": {
+          "name": "Wzór",
+          "description": "Numer konkretnego wzoru, jako liczba od 0 w górę, aż do wartości obsługiwanej przez urządzenie Divoom."
+        }
+      }
+    },
+    "effects": {
+      "name": "Efekty",
+      "description": "Wyświetla kanał efektów na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "number": {
+          "name": "Efekt",
+          "description": "Numer konkretnego efektu. Może się różnić w zależności od urządzenia Divoom. Sprawdź w aplikacji na telefonie i policz je."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Wizualizacja",
+      "description": "Wyświetla kanał wizualizacji na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "number": {
+          "name": "Wizualizacja",
+          "description": "Numer konkretnej wizualizacji. Może się różnić w zależności od urządzenia Divoom. Sprawdź w aplikacji na telefonie i policz je."
+        },
+        "foreground_color": {
+          "name": "Kolor pierwszego planu",
+          "description": "Kolor pierwszego planu. Obsługiwany tylko przez najstarsze urządzenia."
+        },
+        "background_color": {
+          "name": "Kolor tła",
+          "description": "Kolor tła. Obsługiwany tylko przez najstarsze urządzenia."
+        }
+      }
+    },
+    "signal": {
+      "name": "Sygnał",
+      "description": "Wyświetla kanał sygnału na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "number": {
+          "name": "Sygnał",
+          "description": "Numer konkretnego sygnału. Sprawdź w aplikacji na telefonie i policz je."
+        }
+      }
+    },
+    "alarm": {
+      "name": "Budzik",
+      "description": "Ustawia budzik na urządzeniu Divoom. Być może trzeba poeksperymentować, które opcje obsługuje Twoje urządzenie Divoom i co faktycznie zmieniają. Nieobsługiwane wartości są ignorowane lub, jeśli to możliwe, od razu zerowane, aby zapobiec dziwnemu zachowaniu.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "number": {
+          "name": "Slot budzika",
+          "description": "Konkretny slot dla budzika. Rzeczywistą liczbę slotów sprawdzisz w aplikacji na telefonie."
+        },
+        "value": {
+          "name": "Godzina",
+          "description": "Konkretna godzina, o której budzik ma zadzwonić. Pozostaw puste, aby wyczyścić slot."
+        },
+        "weekday": {
+          "name": "Dni tygodnia",
+          "description": "Typowa lista dni tygodnia, w które budzik ma dzwonić."
+        },
+        "alarmmode": {
+          "name": "Tryb budzika",
+          "description": "Tryb budzika. Sprawdź w aplikacji na telefonie, co obsługuje Twoje urządzenie Divoom."
+        },
+        "triggermode": {
+          "name": "Tryb wyzwalania",
+          "description": "Tryb wyzwalania. Sprawdź w aplikacji na telefonie, co obsługuje Twoje urządzenie Divoom."
+        },
+        "frequency": {
+          "name": "Częstotliwość radiowa",
+          "description": "Częstotliwość radiowa do ustawienia."
+        },
+        "volume": {
+          "name": "Głośność",
+          "description": "Głośność budzika."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Odliczanie",
+      "description": "Wyświetla narzędzie odliczania na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Steruje stanem start/stop."
+        },
+        "countdown": {
+          "name": "Odliczanie",
+          "description": "Konkretny czas odliczania w formacie mm:ss. Podany jako hh:mm:ss, godziny są ignorowane."
+        }
+      }
+    },
+    "timer": {
+      "name": "Stoper",
+      "description": "Wyświetla narzędzie stopera na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Steruje stanem start/stop."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Rocznica",
+      "description": "Ustawia rocznicę (przypomnienie) na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "number": {
+          "name": "Slot rocznicy",
+          "description": "Konkretny slot dla rocznicy. Rzeczywistą liczbę slotów sprawdzisz w aplikacji na telefonie."
+        },
+        "value": {
+          "name": "Data i godzina",
+          "description": "Data i godzina rocznicy. Rok jest ignorowany. Pozostaw puste, aby wyczyścić slot."
+        },
+        "text": {
+          "name": "Nazwa",
+          "description": "Nazwa rocznicy, tak jak pojawi się w aplikacji na telefonie. Ograniczona do 16 znaków. Domyślnie Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Tablica wyników",
+      "description": "Wyświetla kanał lub narzędzie tablicy wyników na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "player1": {
+          "name": "Gracz pierwszy",
+          "description": "Wynik pierwszego gracza do wyświetlenia."
+        },
+        "player2": {
+          "name": "Gracz drugi",
+          "description": "Wynik drugiego gracza do wyświetlenia."
+        }
+      }
+    },
+    "noise": {
+      "name": "Miernik hałasu",
+      "description": "Wyświetla miernik hałasu na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Steruje stanem start/stop."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Tryb snu",
+      "description": "Wyświetla tryb snu na urządzeniu Divoom, który odtwarza kojące dźwięki, opcjonalnie z minutnikiem i światłem.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Steruje stanem start/stop."
+        },
+        "time": {
+          "name": "Minutnik snu",
+          "description": "Czas w minutach, po którym tryb snu zostanie zakończony. Domyślnie 120, jeśli nie podano."
+        },
+        "sleepmode": {
+          "name": "Efekt dźwiękowy",
+          "description": "Efekt dźwiękowy do odtworzenia. Sprawdź w aplikacji, ile opcji jest dostępnych."
+        },
+        "frequency": {
+          "name": "Częstotliwość radiowa",
+          "description": "Częstotliwość radiowa do ustawienia."
+        },
+        "volume": {
+          "name": "Głośność",
+          "description": "Wartość głośności od 0 do 100."
+        },
+        "color": {
+          "name": "Kolor",
+          "description": "Kolor wyświetlacza."
+        },
+        "brightness": {
+          "name": "Jasność",
+          "description": "Wartość jasności od 0 do 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Data i godzina",
+      "description": "Ustawia datę i godzinę urządzenia Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Data i godzina",
+          "description": "Data i godzina do ustawienia. Pozostaw puste, aby użyć bieżącej daty i godziny."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Korektor",
+      "description": "Uruchamia korektor muzyczny na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "number": {
+          "name": "Korektor",
+          "description": "Numer konkretnego korektora. Sprawdź w aplikacji na telefonie i policz je."
+        },
+        "audiomode": {
+          "name": "Oryginalny tryb audio",
+          "description": "Włącza oryginalny tryb audio."
+        },
+        "backgroundmode": {
+          "name": "Tryb audio w tle",
+          "description": "Włącza tryb audio w tle."
+        },
+        "streammode": {
+          "name": "Tryb audio strumieniowego",
+          "description": "Włącza tryb audio strumieniowego."
+        }
+      }
+    },
+    "volume": {
+      "name": "Głośność",
+      "description": "Ustawia głośność urządzenia Divoom. Obsługiwane tylko przez urządzenia Divoom z funkcjami audio.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "volume": {
+          "name": "Głośność",
+          "description": "Wartość głośności od 0 do 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Stan odtwarzania",
+      "description": "Ustawia stan odtwarzania aktualnie odtwarzanej muzyki na urządzeniu Divoom. Obsługiwane tylko przez urządzenia Divoom z funkcjami audio.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Odtwarzanie",
+          "description": "Steruje stanem odtwarzanie/pauza."
+        }
+      }
+    },
+    "radio": {
+      "name": "Radio",
+      "description": "Wyświetla i odtwarza kanał radiowy na urządzeniu Divoom. Obsługiwane tylko przez urządzenia Divoom z funkcją radia.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Włączone",
+          "description": "Steruje stanem włączone/wyłączone."
+        },
+        "frequency": {
+          "name": "Częstotliwość radiowa",
+          "description": "Częstotliwość radiowa do ustawienia."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Teksty piosenek",
+      "description": "Wyświetla kanał z tekstami piosenek na urządzeniu Divoom. Może nie być obsługiwany przez każde urządzenie Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Klawiatura",
+      "description": "Steruje podświetleniem klawiatury, w szczególności w Ditoo.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Efekt",
+          "description": "Zmienia efekt podświetlenia klawiatury."
+        }
+      }
+    },
+    "game": {
+      "name": "Gra",
+      "description": "Wyświetla grę na urządzeniu Divoom. Teoretycznie można otworzyć gry, które nie są pokazywane w aplikacji na telefonie, ale mogą działać niezbyt dobrze.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Gra",
+          "description": "Numer konkretnej gry. W zależności od urządzenia liczba gier może się różnić. Sprawdź w aplikacji na telefonie i policz je."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Sterowanie grą",
+      "description": "Wysyła polecenia sterujące do aktualnie otwartej gry na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Polecenie",
+          "description": "Polecenie wysyłane do gry."
+        }
+      }
+    },
+    "weather": {
+      "name": "Pogoda",
+      "description": "Ustawia pogodę.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Temperatura",
+          "description": "Temperatura w stopniach."
+        },
+        "unit": {
+          "name": "Jednostka",
+          "description": "Jednostka temperatury Celsjusza lub Fahrenheita. Bez podania urządzenie zachowuje swoją bieżącą jednostkę."
+        },
+        "weather": {
+          "name": "Rodzaj pogody",
+          "description": "Rzeczywisty rodzaj pogody."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Temperatura",
+      "description": "Wyświetla kanał temperatury na urządzeniu Divoom.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "value": {
+          "name": "Jednostka",
+          "description": "Przełącza między jednostkami °C i °F."
+        },
+        "color": {
+          "name": "Kolor",
+          "description": "Kolor temperatury."
+        }
+      }
+    },
+    "raw": {
+      "name": "Surowe polecenie",
+      "description": "Wysyła surowe dane do urządzenia Divoom. Może się przydać, gdy coś jest nie tak lub nie jest obsługiwane przez pozostałe tryby.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "raw": {
+          "name": "Bajty",
+          "description": "Bajty do wysłania."
+        }
+      }
+    },
+    "connect": {
+      "name": "Połącz",
+      "description": "Jawnie łączy się ze skonfigurowanym urządzeniem Divoom. Może się przydać, gdy chcesz tylko nawiązać połączenie bez zmieniania czegokolwiek. Zwykle połączenie jest otwierane automatycznie przy każdym trybie.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Rozłącz",
+      "description": "Jawnie rozłącza się ze skonfigurowanym urządzeniem Divoom. Może się przydać, gdy nie możesz połączyć się telefonem lub innymi urządzeniami. Zwykle ten komponent pozostawia połączenie z urządzeniem Divoom otwarte.",
+      "fields": {
+        "device": {
+          "name": "Urządzenie",
+          "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Poniedziałek",
+        "tue": "Wtorek",
+        "wed": "Środa",
+        "thu": "Czwartek",
+        "fri": "Piątek",
+        "sat": "Sobota",
+        "sun": "Niedziela"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Poprzedni efekt",
+        "toggle": "Włącz/wyłącz",
+        "next": "Następny efekt"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Start",
+        "left": "Lewo",
+        "right": "Prawo",
+        "up": "Góra",
+        "down": "Dół",
+        "ok": "OK"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Bezchmurnie, noc",
+        "cloudy": "Pochmurno",
+        "exceptional": "Wyjątkowo",
+        "fog": "Mgła",
+        "hail": "Grad",
+        "lightning": "Burza",
+        "lightning-rainy": "Burza z deszczem",
+        "partlycloudy": "Częściowe zachmurzenie",
+        "pouring": "Ulewa",
+        "rainy": "Deszczowo",
+        "snowy": "Śnieg",
+        "snowy-rainy": "Deszcz ze śniegiem",
+        "sunny": "Słonecznie",
+        "windy": "Wietrznie",
+        "windy-variant": "Wietrznie i pochmurno"
+      }
+    }
   }
 }

@@ -39,5 +39,686 @@
       "already_configured": "A Divoom device with that MAC address is already configured.",
       "invalid_discovery_info": "The discovered device did not provide the information needed to configure it."
     }
+  },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Legacy Divoom notify actions still in use",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Migrate legacy Divoom actions",
+            "description": "{count} action(s) still call the deprecated `notify.divoom_*` service instead of the `divoom.*` actions:\n\n{items}\n\nChoose how you want to continue.",
+            "menu_options": {
+              "apply": "Convert automatically",
+              "preview": "Show what would change",
+              "ignore": "Ignore this issue"
+            }
+          },
+          "apply": {
+            "title": "Convert automatically",
+            "description": "{writable} of the entries can be converted automatically, {manual} need manual work:\n\n{items}\n\nA backup is written next to each file first. Be aware that `automations.yaml` and `scripts.yaml` are rewritten as a whole, so comments and formatting are lost.",
+            "data": {
+              "confirm": "Yes, rewrite my automations and scripts"
+            }
+          },
+          "preview": {
+            "title": "What would change",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "The issue is ignored. You can undo this in the repairs overview.",
+          "manual_migration_required": "{converted} action(s) were converted. These still need manual work:\n\n{items}",
+          "migration_failed": "The migration failed and nothing was written: {error}",
+          "nothing_to_do": "There is nothing left to migrate.",
+          "unsafe_file": "{files} cannot be rewritten safely because it uses {reason}. Rewriting would resolve it and lose the original. Please migrate it by hand."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "device_not_found": {
+      "message": "No Divoom device found for {device}."
+    },
+    "device_not_loaded": {
+      "message": "The Divoom device {title} is not loaded. Check whether the integration was set up successfully."
+    },
+    "mode_failed": {
+      "message": "The {mode} action failed. See the Home Assistant log for details."
+    },
+    "mode_unsupported": {
+      "message": "The {device} does not support the {mode} action."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Clock",
+      "description": "Shows the clock channel on a Divoom device. This mode is very limited on older devices such as the Aurabox or the Timebox Mini.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "clock": {
+          "name": "Clock style",
+          "description": "The clock style to show, as a number starting from 0 up to what the Divoom device supports. Check the official Divoom app to see the available styles."
+        },
+        "twentyfour": {
+          "name": "24-hour format",
+          "description": "Shows the time in 24-hour format instead of 12-hour format."
+        },
+        "weather": {
+          "name": "Show weather",
+          "description": "Shows the current weather."
+        },
+        "temp": {
+          "name": "Show temperature",
+          "description": "Shows the current temperature."
+        },
+        "calendar": {
+          "name": "Show date",
+          "description": "Shows the current date."
+        },
+        "color": {
+          "name": "Color",
+          "description": "The color of the clock numbers."
+        },
+        "hot": {
+          "name": "Show trending images",
+          "description": "Cycles through the trending images of the Divoom community."
+        }
+      }
+    },
+    "light": {
+      "name": "Light",
+      "description": "Shows the light channel on a Divoom device. This mode is very limited on the Aurabox, because it only supports 8 colors.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "brightness": {
+          "name": "Brightness",
+          "description": "The brightness value between 0 and 100."
+        },
+        "color": {
+          "name": "Color",
+          "description": "The color of the light. Leave it empty to fade through the colors."
+        }
+      }
+    },
+    "on": {
+      "name": "Turn on",
+      "description": "Turns the display on, by setting the pixels to black, the brightness to 100 and also switching a specific power flag to 1. Because the pixels stay black and there is no automatic way back to the previously shown mode, you should send another action such as Clock afterwards.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    },
+    "off": {
+      "name": "Turn off",
+      "description": "Turns the display off, by setting the pixels to black, the brightness to 0 and also switching a specific power flag to 0.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Brightness",
+      "description": "Sets the brightness of a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "brightness": {
+          "name": "Brightness",
+          "description": "The brightness value between 0 and 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Image",
+      "description": "Shows a static or animated image on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "file": {
+          "name": "Image file",
+          "description": "The image file to display, relative to the configured media directory."
+        },
+        "time": {
+          "name": "Frame time",
+          "description": "The time in milliseconds between each frame. Defaults to the timing of the GIF."
+        }
+      }
+    },
+    "text": {
+      "name": "Text",
+      "description": "Shows text as a scrolling animation on a Divoom device. A longer text or a wide font might not fit into the frame limitation of ~60 frames.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "text": {
+          "name": "Text",
+          "description": "The text that will be animated."
+        },
+        "font": {
+          "name": "Font",
+          "description": "The font name or filename of the font that should be used. These fonts are included: arcade.ttf, arial.ttf, divoom.ttf, impact.ttf and pixelpowerline.ttf. Defaults to a generic font."
+        },
+        "size": {
+          "name": "Font size",
+          "description": "The font size in pixels. Defaults to the screen size of the device."
+        },
+        "time": {
+          "name": "Frame time",
+          "description": "The time in milliseconds between each frame. Defaults to 100ms per frame."
+        },
+        "foreground_color": {
+          "name": "Text color",
+          "description": "The color of the text. Defaults to white."
+        },
+        "background_color": {
+          "name": "Background color",
+          "description": "The color of the background. Defaults to black."
+        }
+      }
+    },
+    "design": {
+      "name": "Design",
+      "description": "Shows the design channel on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Design",
+          "description": "The number of the concrete design, as a number starting from 0 up to what the Divoom device supports."
+        }
+      }
+    },
+    "effects": {
+      "name": "Effects",
+      "description": "Shows the effects channel on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Effect",
+          "description": "The number of the concrete effect. This might differ for some Divoom devices. Look into your phone app and count them."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Visualization",
+      "description": "Shows the visualization channel on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Visualization",
+          "description": "The number of the concrete visualization. This might differ for some Divoom devices. Look into your phone app and count them."
+        },
+        "foreground_color": {
+          "name": "Foreground color",
+          "description": "The color of the foreground. Only supported by the oldest devices."
+        },
+        "background_color": {
+          "name": "Background color",
+          "description": "The color of the background. Only supported by the oldest devices."
+        }
+      }
+    },
+    "signal": {
+      "name": "Signal",
+      "description": "Shows the signal channel on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Signal",
+          "description": "The number of the concrete signal. Look into your phone app and count them."
+        }
+      }
+    },
+    "alarm": {
+      "name": "Alarm",
+      "description": "Sets an alarm on a Divoom device. You might have to experiment with the options your Divoom device supports and what it actually changes. Unsupported values will be ignored or if possible directly zeroed, to prevent strange behavior.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Alarm slot",
+          "description": "The concrete slot for the alarm. For the actual amount of slots you might have to look into the phone app."
+        },
+        "value": {
+          "name": "Time",
+          "description": "The concrete time for when the alarm should happen. Leave it empty to clear the slot."
+        },
+        "weekday": {
+          "name": "Weekdays",
+          "description": "The typical list of weekdays for when the alarm should happen."
+        },
+        "alarmmode": {
+          "name": "Alarm mode",
+          "description": "The alarm mode. Look into your phone app for what is supported by your Divoom device."
+        },
+        "triggermode": {
+          "name": "Trigger mode",
+          "description": "The trigger mode. Look into your phone app for what is supported by your Divoom device."
+        },
+        "frequency": {
+          "name": "Radio frequency",
+          "description": "The radio frequency to set."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "The volume of the alarm."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Countdown",
+      "description": "Shows the countdown tool on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Controls the start/stop state."
+        },
+        "countdown": {
+          "name": "Countdown",
+          "description": "The concrete countdown in the format mm:ss. Given as hh:mm:ss, the hours are ignored."
+        }
+      }
+    },
+    "timer": {
+      "name": "Timer",
+      "description": "Shows the timer tool on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Controls the start/stop state."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Memorial",
+      "description": "Sets a memorial (reminder) on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Memorial slot",
+          "description": "The concrete slot for the memorial. For the actual amount of slots you might have to look into the phone app."
+        },
+        "value": {
+          "name": "Date and time",
+          "description": "The date and time of the memorial. The year will be ignored. Leave it empty to clear the slot."
+        },
+        "text": {
+          "name": "Name",
+          "description": "The name of your memorial, as it will appear in the phone app. Limited to 16 characters. Defaults to Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Scoreboard",
+      "description": "Shows the scoreboard channel or tool on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "player1": {
+          "name": "Player one",
+          "description": "The score of player one to show."
+        },
+        "player2": {
+          "name": "Player two",
+          "description": "The score of player two to show."
+        }
+      }
+    },
+    "noise": {
+      "name": "Noise meter",
+      "description": "Shows the noise meter on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Controls the start/stop state."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Sleep mode",
+      "description": "Shows the sleep mode on a Divoom device, which plays soothing sounds, optionally with a timer and light.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Start",
+          "description": "Controls the start/stop state."
+        },
+        "time": {
+          "name": "Sleep timer",
+          "description": "The time in minutes after which to stop the sleep mode. Defaults to 120 when not provided."
+        },
+        "sleepmode": {
+          "name": "Sound effect",
+          "description": "The sound effect to play. Check in the app how many options are available."
+        },
+        "frequency": {
+          "name": "Radio frequency",
+          "description": "The radio frequency to set."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "The volume value between 0 and 100."
+        },
+        "color": {
+          "name": "Color",
+          "description": "The color of the display."
+        },
+        "brightness": {
+          "name": "Brightness",
+          "description": "The brightness value between 0 and 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Date and time",
+      "description": "Sets the date and time of a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Date and time",
+          "description": "The date and time to set. Leave it empty to just use the current date and time."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Equalizer",
+      "description": "Starts the music equalizer on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "number": {
+          "name": "Equalizer",
+          "description": "The number of the concrete equalizer. Look into your phone app and count them."
+        },
+        "audiomode": {
+          "name": "Original audio mode",
+          "description": "Activates the original audio mode."
+        },
+        "backgroundmode": {
+          "name": "Background audio mode",
+          "description": "Activates the background audio mode."
+        },
+        "streammode": {
+          "name": "Streaming audio mode",
+          "description": "Activates the streaming audio mode."
+        }
+      }
+    },
+    "volume": {
+      "name": "Volume",
+      "description": "Sets the volume of a Divoom device. Only supported by Divoom devices with audio features.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "The volume value between 0 and 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "Play state",
+      "description": "Sets the playstate for the currently played music on a Divoom device. Only supported by Divoom devices with audio features.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Play",
+          "description": "Controls the play/pause state."
+        }
+      }
+    },
+    "radio": {
+      "name": "Radio",
+      "description": "Shows and plays the radio channel on a Divoom device. Only supported by Divoom devices with the radio feature.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "On",
+          "description": "Controls the on/off state."
+        },
+        "frequency": {
+          "name": "Radio frequency",
+          "description": "The radio frequency to set."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Lyrics",
+      "description": "Shows the lyrics channel on a Divoom device. Might not be supported by every Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Keyboard",
+      "description": "Controls the keyboard LEDs, specifically on the Ditoo.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Effect",
+          "description": "Changes the keyboard LED effect."
+        }
+      }
+    },
+    "game": {
+      "name": "Game",
+      "description": "Shows a game on a Divoom device. It is theoretically possible to open games that are not shown in your phone app, but they might not work very well.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Game",
+          "description": "The number of the concrete game. Depending on your device you may have a different amount of games. Look into your phone app and count them."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Game control",
+      "description": "Sends controlling commands to the currently open game on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Command",
+          "description": "The command to send to the game."
+        }
+      }
+    },
+    "weather": {
+      "name": "Weather",
+      "description": "Sets the weather.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Temperature",
+          "description": "The temperature in degree."
+        },
+        "unit": {
+          "name": "Unit",
+          "description": "The temperature type for celsius or fahrenheit. Without any type the device keeps its current one."
+        },
+        "weather": {
+          "name": "Weather",
+          "description": "The actual type of the weather."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Temperature",
+      "description": "Shows the temperature channel on a Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "value": {
+          "name": "Unit",
+          "description": "Changes between °C or °F unit."
+        },
+        "color": {
+          "name": "Color",
+          "description": "The color of the temperature."
+        }
+      }
+    },
+    "raw": {
+      "name": "Raw command",
+      "description": "Sends raw data to the Divoom device. Might be useful, if there is something wrong or not supported by the other modes.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        },
+        "raw": {
+          "name": "Bytes",
+          "description": "The bytes to send."
+        }
+      }
+    },
+    "connect": {
+      "name": "Connect",
+      "description": "Explicitly connects to your configured Divoom device. Might be useful, if you just want to connect without changing anything. Typically the connection is opened automatically when using any mode.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Disconnect",
+      "description": "Explicitly disconnects from your configured Divoom device. Might be useful, if you cannot connect with your Phone or other devices. Typically this component leaves the connection open to your Divoom device.",
+      "fields": {
+        "device": {
+          "name": "Device",
+          "description": "The Divoom device to send this to."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Monday",
+        "tue": "Tuesday",
+        "wed": "Wednesday",
+        "thu": "Thursday",
+        "fri": "Friday",
+        "sat": "Saturday",
+        "sun": "Sunday"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Previous effect",
+        "toggle": "Toggle on/off",
+        "next": "Next effect"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Go",
+        "left": "Left",
+        "right": "Right",
+        "up": "Up",
+        "down": "Down",
+        "ok": "OK"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Clear, night",
+        "cloudy": "Cloudy",
+        "exceptional": "Exceptional",
+        "fog": "Fog",
+        "hail": "Hail",
+        "lightning": "Lightning",
+        "lightning-rainy": "Lightning, rainy",
+        "partlycloudy": "Partly cloudy",
+        "pouring": "Pouring",
+        "rainy": "Rainy",
+        "snowy": "Snowy",
+        "snowy-rainy": "Snowy, rainy",
+        "sunny": "Sunny",
+        "windy": "Windy",
+        "windy-variant": "Windy, cloudy"
+      }
+    }
   }
 }

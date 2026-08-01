@@ -153,7 +153,7 @@ def test_send_message_weather_mode_converts_weather_value(
 
     assert result is True
     service._device.send_weather.assert_called_once_with(
-        value="22°C", weather=expected_weathernum
+        value="22°C", weather=expected_weathernum, unit=None
     )
 
 

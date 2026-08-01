@@ -16,19 +16,19 @@ class Pixoo(Divoom):
         Divoom.show_alarm(self, number=number, time=time, weekdays=weekdays, alarmMode=0, triggerMode=0, frequency=0, volume=1)
 
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+        self.unsupported("the music equalizer mode")
 
     def send_keyboard(self, value=None):
-        self.logger.warning("{0}: this device does not support changing the keyboard light.".format(self.type))
+        self.unsupported("changing the keyboard light")
 
     def show_lyrics(self):
-        self.logger.warning("{0}: this device does not support lyrics view.".format(self.type))
+        self.unsupported("lyrics view")
 
     def send_playstate(self, value=None):
-        self.logger.warning("{0}: this device does not support sending the play/pause state.".format(self.type))
+        self.unsupported("sending the play/pause state")
 
     def show_radio(self, value=None, frequency=None):
-        self.logger.warning("{0}: this device does not support showing the radio.".format(self.type))
+        self.unsupported("showing the radio")
 
     def show_scoreboard(self, blue=None, red=None):
         """Show scoreboard on the Divoom device with specific score"""
@@ -43,4 +43,4 @@ class Pixoo(Divoom):
         return self.send_command("set view", args)
 
     def send_volume(self, value=None):
-        self.logger.warning("{0}: this device does not support sending the volume.".format(self.type))
+        self.unsupported("sending the volume")

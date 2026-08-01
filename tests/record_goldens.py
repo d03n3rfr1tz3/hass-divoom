@@ -15,6 +15,7 @@ import sys
 
 sys.path.insert(0, os.path.normpath(os.path.join(os.path.dirname(__file__), "..")))
 
+from custom_components.divoom.devices.divoom import DivoomUnsupportedError  # noqa: E402
 from tests.cases import DEVICE_CLASSES, all_cases  # noqa: E402
 from tests.support import GOLDEN_DIR, format_golden, make_connected_device  # noqa: E402
 
@@ -27,6 +28,8 @@ def record_all() -> None:
             device, recorder, server_sock = make_connected_device(device_cls)
             try:
                 case_fn(device)
+            except DivoomUnsupportedError:
+                pass # a refused mode sends nothing, so the golden stays empty
             finally:
                 device.disconnect()
                 server_sock.close()

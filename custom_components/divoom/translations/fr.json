@@ -39,5 +39,686 @@
       "already_configured": "Un appareil Divoom avec cette adresse MAC est déjà configuré.",
       "invalid_discovery_info": "L'appareil détecté n'a pas fourni les informations nécessaires à sa configuration."
     }
+  },
+  "issues": {
+    "legacy_notify_usage": {
+      "title": "Actions notify Divoom obsolètes toujours utilisées",
+      "fix_flow": {
+        "step": {
+          "init": {
+            "title": "Migrer les actions Divoom obsolètes",
+            "description": "{count} action(s) appellent encore le service obsolète `notify.divoom_*` au lieu des actions `divoom.*` :\n\n{items}\n\nChoisissez comment continuer.",
+            "menu_options": {
+              "apply": "Convertir automatiquement",
+              "preview": "Afficher ce qui changerait",
+              "ignore": "Ignorer ce problème"
+            }
+          },
+          "apply": {
+            "title": "Convertir automatiquement",
+            "description": "{writable} des entrées peuvent être converties automatiquement, {manual} nécessitent une intervention manuelle :\n\n{items}\n\nUne sauvegarde est d'abord écrite à côté de chaque fichier. Notez que `automations.yaml` et `scripts.yaml` sont entièrement réécrits, ce qui fait perdre les commentaires et la mise en forme.",
+            "data": {
+              "confirm": "Oui, réécrire mes automatisations et scripts"
+            }
+          },
+          "preview": {
+            "title": "Ce qui changerait",
+            "description": "{preview}"
+          }
+        },
+        "abort": {
+          "issue_ignored": "Le problème est ignoré. Vous pouvez annuler cela dans la vue des réparations.",
+          "manual_migration_required": "{converted} action(s) ont été converties. Celles-ci nécessitent encore une intervention manuelle :\n\n{items}",
+          "migration_failed": "La migration a échoué et rien n'a été écrit : {error}",
+          "nothing_to_do": "Il n'y a plus rien à migrer.",
+          "unsafe_file": "{files} ne peut pas être réécrit sans risque car il utilise {reason}. La réécriture le résoudrait et l'original serait perdu. Veuillez le migrer à la main."
+        }
+      }
+    }
+  },
+  "exceptions": {
+    "device_not_found": {
+      "message": "Aucun appareil Divoom n'a été trouvé pour {device}."
+    },
+    "device_not_loaded": {
+      "message": "L'appareil Divoom {title} n'est pas chargé. Vérifiez que l'intégration s'est configurée correctement."
+    },
+    "mode_failed": {
+      "message": "L'action {mode} a échoué. Consultez le journal de Home Assistant pour plus de détails."
+    },
+    "mode_unsupported": {
+      "message": "L'appareil {device} ne prend pas en charge l'action {mode}."
+    }
+  },
+  "services": {
+    "clock": {
+      "name": "Horloge",
+      "description": "Affiche le canal horloge sur un appareil Divoom. Ce mode est très limité sur les appareils plus anciens comme l'Aurabox ou la Timebox Mini.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "clock": {
+          "name": "Style d'horloge",
+          "description": "Le style d'horloge à afficher, sous forme d'un nombre à partir de 0 jusqu'à la valeur maximale prise en charge par l'appareil Divoom. Consultez l'application Divoom officielle pour voir les styles disponibles."
+        },
+        "twentyfour": {
+          "name": "Format 24 heures",
+          "description": "Affiche l'heure au format 24 heures au lieu du format 12 heures."
+        },
+        "weather": {
+          "name": "Afficher la météo",
+          "description": "Affiche la météo actuelle."
+        },
+        "temp": {
+          "name": "Afficher la température",
+          "description": "Affiche la température actuelle."
+        },
+        "calendar": {
+          "name": "Afficher la date",
+          "description": "Affiche la date actuelle."
+        },
+        "color": {
+          "name": "Couleur",
+          "description": "La couleur des chiffres de l'horloge."
+        },
+        "hot": {
+          "name": "Afficher les images populaires",
+          "description": "Fait défiler les images populaires de la communauté Divoom."
+        }
+      }
+    },
+    "light": {
+      "name": "Lumière",
+      "description": "Affiche le canal lumière sur un appareil Divoom. Ce mode est très limité sur l'Aurabox, car elle ne prend en charge que 8 couleurs.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "brightness": {
+          "name": "Luminosité",
+          "description": "La valeur de luminosité entre 0 et 100."
+        },
+        "color": {
+          "name": "Couleur",
+          "description": "La couleur de la lumière. Laissez vide pour faire défiler les couleurs en fondu."
+        }
+      }
+    },
+    "on": {
+      "name": "Allumer",
+      "description": "Allume l'écran en mettant les pixels en noir, la luminosité à 100 et un indicateur d'alimentation spécifique à 1. Comme les pixels restent noirs et qu'il n'existe aucun moyen automatique de revenir au mode affiché précédemment, il convient d'envoyer ensuite une autre action, par exemple « Horloge ».",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        }
+      }
+    },
+    "off": {
+      "name": "Éteindre",
+      "description": "Éteint l'écran en mettant les pixels en noir, la luminosité à 0 et un indicateur d'alimentation spécifique à 0.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        }
+      }
+    },
+    "brightness": {
+      "name": "Luminosité",
+      "description": "Règle la luminosité d'un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "brightness": {
+          "name": "Luminosité",
+          "description": "La valeur de luminosité entre 0 et 100."
+        }
+      }
+    },
+    "image": {
+      "name": "Image",
+      "description": "Affiche une image fixe ou animée sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "file": {
+          "name": "Fichier image",
+          "description": "Le fichier image à afficher, relatif au répertoire multimédia configuré."
+        },
+        "time": {
+          "name": "Durée par image",
+          "description": "Le temps en millisecondes entre chaque image. Par défaut, la synchronisation du GIF est utilisée."
+        }
+      }
+    },
+    "text": {
+      "name": "Texte",
+      "description": "Affiche du texte sous forme d'animation défilante sur un appareil Divoom. Un texte long ou une police large risque de ne pas tenir dans la limite d'environ 60 images.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "text": {
+          "name": "Texte",
+          "description": "Le texte qui sera animé."
+        },
+        "font": {
+          "name": "Police",
+          "description": "Le nom ou le nom de fichier de la police à utiliser. Ces polices sont incluses : arcade.ttf, arial.ttf, divoom.ttf, impact.ttf et pixelpowerline.ttf. Par défaut, une police générique est utilisée."
+        },
+        "size": {
+          "name": "Taille de police",
+          "description": "La taille de la police en pixels. Par défaut, la taille de l'écran de l'appareil."
+        },
+        "time": {
+          "name": "Durée par image",
+          "description": "Le temps en millisecondes entre chaque image. Par défaut, 100 ms par image."
+        },
+        "foreground_color": {
+          "name": "Couleur du texte",
+          "description": "La couleur du texte. Blanc par défaut."
+        },
+        "background_color": {
+          "name": "Couleur d'arrière-plan",
+          "description": "La couleur de l'arrière-plan. Noir par défaut."
+        }
+      }
+    },
+    "design": {
+      "name": "Design",
+      "description": "Affiche le canal design sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Design",
+          "description": "Le numéro du design concret, sous forme d'un nombre à partir de 0 jusqu'à la valeur maximale prise en charge par l'appareil Divoom."
+        }
+      }
+    },
+    "effects": {
+      "name": "Effets",
+      "description": "Affiche le canal effets sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Effet",
+          "description": "Le numéro de l'effet concret. Cela peut varier selon les appareils Divoom. Consultez l'application sur votre téléphone et comptez-les."
+        }
+      }
+    },
+    "visualization": {
+      "name": "Visualisation",
+      "description": "Affiche le canal visualisation sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Visualisation",
+          "description": "Le numéro de la visualisation concrète. Cela peut varier selon les appareils Divoom. Consultez l'application sur votre téléphone et comptez-les."
+        },
+        "foreground_color": {
+          "name": "Couleur de premier plan",
+          "description": "La couleur du premier plan. Uniquement prise en charge par les appareils les plus anciens."
+        },
+        "background_color": {
+          "name": "Couleur d'arrière-plan",
+          "description": "La couleur de l'arrière-plan. Uniquement prise en charge par les appareils les plus anciens."
+        }
+      }
+    },
+    "signal": {
+      "name": "Signal",
+      "description": "Affiche le canal signal sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Signal",
+          "description": "Le numéro du signal concret. Consultez l'application sur votre téléphone et comptez-les."
+        }
+      }
+    },
+    "alarm": {
+      "name": "Alarme",
+      "description": "Règle une alarme sur un appareil Divoom. Il faudra peut-être expérimenter pour savoir quelles options votre appareil Divoom prend en charge et ce qu'elles changent réellement. Les valeurs non prises en charge sont ignorées ou, si possible, directement mises à zéro, afin d'éviter un comportement étrange.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Emplacement d'alarme",
+          "description": "L'emplacement concret de l'alarme. Pour connaître le nombre réel d'emplacements, consultez éventuellement l'application sur votre téléphone."
+        },
+        "value": {
+          "name": "Heure",
+          "description": "L'heure concrète à laquelle l'alarme doit se déclencher. Laissez vide pour vider l'emplacement."
+        },
+        "weekday": {
+          "name": "Jours de la semaine",
+          "description": "La liste habituelle des jours de la semaine où l'alarme doit se déclencher."
+        },
+        "alarmmode": {
+          "name": "Mode d'alarme",
+          "description": "Le mode d'alarme. Consultez l'application sur votre téléphone pour savoir ce que votre appareil Divoom prend en charge."
+        },
+        "triggermode": {
+          "name": "Mode de déclenchement",
+          "description": "Le mode de déclenchement. Consultez l'application sur votre téléphone pour savoir ce que votre appareil Divoom prend en charge."
+        },
+        "frequency": {
+          "name": "Fréquence radio",
+          "description": "La fréquence radio à régler."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "Le volume de l'alarme."
+        }
+      }
+    },
+    "countdown": {
+      "name": "Compte à rebours",
+      "description": "Affiche l'outil de compte à rebours sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Démarrer",
+          "description": "Contrôle l'état marche/arrêt."
+        },
+        "countdown": {
+          "name": "Compte à rebours",
+          "description": "Le compte à rebours concret au format mm:ss. Indiqué en hh:mm:ss, les heures sont ignorées."
+        }
+      }
+    },
+    "timer": {
+      "name": "Chronomètre",
+      "description": "Affiche l'outil chronomètre sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Démarrer",
+          "description": "Contrôle l'état marche/arrêt."
+        }
+      }
+    },
+    "memorial": {
+      "name": "Date anniversaire",
+      "description": "Définit une date anniversaire (rappel) sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Emplacement",
+          "description": "L'emplacement concret de la date anniversaire. Pour connaître le nombre réel d'emplacements, consultez éventuellement l'application sur votre téléphone."
+        },
+        "value": {
+          "name": "Date et heure",
+          "description": "La date et l'heure de la date anniversaire. L'année est ignorée. Laissez vide pour vider l'emplacement."
+        },
+        "text": {
+          "name": "Nom",
+          "description": "Le nom de votre date anniversaire, tel qu'il apparaîtra dans l'application sur votre téléphone. Limité à 16 caractères. Par défaut : Home Assistant."
+        }
+      }
+    },
+    "scoreboard": {
+      "name": "Tableau de score",
+      "description": "Affiche le canal ou l'outil tableau de score sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "player1": {
+          "name": "Joueur un",
+          "description": "Le score du joueur un à afficher."
+        },
+        "player2": {
+          "name": "Joueur deux",
+          "description": "Le score du joueur deux à afficher."
+        }
+      }
+    },
+    "noise": {
+      "name": "Sonomètre",
+      "description": "Affiche le sonomètre sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Démarrer",
+          "description": "Contrôle l'état marche/arrêt."
+        }
+      }
+    },
+    "sleep": {
+      "name": "Mode sommeil",
+      "description": "Affiche le mode sommeil sur un appareil Divoom, qui diffuse des sons apaisants, éventuellement avec une minuterie et une lumière.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Démarrer",
+          "description": "Contrôle l'état marche/arrêt."
+        },
+        "time": {
+          "name": "Minuterie de sommeil",
+          "description": "Le temps en minutes au bout duquel le mode sommeil s'arrête. 120 par défaut lorsqu'il n'est pas fourni."
+        },
+        "sleepmode": {
+          "name": "Effet sonore",
+          "description": "L'effet sonore à diffuser. Vérifiez dans l'application combien d'options sont disponibles."
+        },
+        "frequency": {
+          "name": "Fréquence radio",
+          "description": "La fréquence radio à régler."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "La valeur de volume entre 0 et 100."
+        },
+        "color": {
+          "name": "Couleur",
+          "description": "La couleur de l'écran."
+        },
+        "brightness": {
+          "name": "Luminosité",
+          "description": "La valeur de luminosité entre 0 et 100."
+        }
+      }
+    },
+    "datetime": {
+      "name": "Date et heure",
+      "description": "Règle la date et l'heure d'un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Date et heure",
+          "description": "La date et l'heure à régler. Laissez vide pour utiliser simplement la date et l'heure actuelles."
+        }
+      }
+    },
+    "equalizer": {
+      "name": "Égaliseur",
+      "description": "Démarre l'égaliseur musical sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "number": {
+          "name": "Égaliseur",
+          "description": "Le numéro de l'égaliseur concret. Consultez l'application sur votre téléphone et comptez-les."
+        },
+        "audiomode": {
+          "name": "Mode audio original",
+          "description": "Active le mode audio original."
+        },
+        "backgroundmode": {
+          "name": "Mode audio en arrière-plan",
+          "description": "Active le mode audio en arrière-plan."
+        },
+        "streammode": {
+          "name": "Mode audio en streaming",
+          "description": "Active le mode audio en streaming."
+        }
+      }
+    },
+    "volume": {
+      "name": "Volume",
+      "description": "Règle le volume d'un appareil Divoom. Uniquement pris en charge par les appareils Divoom dotés de fonctions audio.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "volume": {
+          "name": "Volume",
+          "description": "La valeur de volume entre 0 et 100."
+        }
+      }
+    },
+    "playstate": {
+      "name": "État de lecture",
+      "description": "Définit l'état de lecture de la musique en cours sur un appareil Divoom. Uniquement pris en charge par les appareils Divoom dotés de fonctions audio.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Lecture",
+          "description": "Contrôle l'état lecture/pause."
+        }
+      }
+    },
+    "radio": {
+      "name": "Radio",
+      "description": "Affiche et diffuse le canal radio sur un appareil Divoom. Uniquement pris en charge par les appareils Divoom dotés de la fonction radio.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Allumé",
+          "description": "Contrôle l'état allumé/éteint."
+        },
+        "frequency": {
+          "name": "Fréquence radio",
+          "description": "La fréquence radio à régler."
+        }
+      }
+    },
+    "lyrics": {
+      "name": "Paroles",
+      "description": "Affiche le canal des paroles sur un appareil Divoom. Peut ne pas être pris en charge par tous les appareils Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        }
+      }
+    },
+    "keyboard": {
+      "name": "Clavier",
+      "description": "Contrôle les LED du clavier, en particulier sur le Ditoo.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Effet",
+          "description": "Change l'effet lumineux du clavier."
+        }
+      }
+    },
+    "game": {
+      "name": "Jeu",
+      "description": "Affiche un jeu sur un appareil Divoom. Il est théoriquement possible d'ouvrir des jeux qui n'apparaissent pas dans l'application sur votre téléphone, mais ils risquent de ne pas très bien fonctionner.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Jeu",
+          "description": "Le numéro du jeu concret. Selon votre appareil, le nombre de jeux peut varier. Consultez l'application sur votre téléphone et comptez-les."
+        }
+      }
+    },
+    "gamecontrol": {
+      "name": "Commande de jeu",
+      "description": "Envoie des commandes au jeu actuellement ouvert sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Commande",
+          "description": "La commande à envoyer au jeu."
+        }
+      }
+    },
+    "weather": {
+      "name": "Météo",
+      "description": "Définit la météo.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Température",
+          "description": "La température en degrés."
+        },
+        "unit": {
+          "name": "Unité",
+          "description": "L'unité de température Celsius ou Fahrenheit. Sans indication, l'appareil conserve son unité actuelle."
+        },
+        "weather": {
+          "name": "Conditions météo",
+          "description": "Les conditions météo réelles."
+        }
+      }
+    },
+    "temperature": {
+      "name": "Température",
+      "description": "Affiche le canal température sur un appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "value": {
+          "name": "Unité",
+          "description": "Bascule entre les unités °C et °F."
+        },
+        "color": {
+          "name": "Couleur",
+          "description": "La couleur de la température."
+        }
+      }
+    },
+    "raw": {
+      "name": "Commande brute",
+      "description": "Envoie des données brutes à l'appareil Divoom. Cela peut être utile si quelque chose ne fonctionne pas ou n'est pas pris en charge par les autres modes.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "raw": {
+          "name": "Octets",
+          "description": "Les octets à envoyer."
+        }
+      }
+    },
+    "connect": {
+      "name": "Connecter",
+      "description": "Se connecte explicitement à l'appareil Divoom configuré. Cela peut être utile si vous souhaitez uniquement établir la connexion sans rien changer. En principe, la connexion est ouverte automatiquement par n'importe quel mode.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        }
+      }
+    },
+    "disconnect": {
+      "name": "Déconnecter",
+      "description": "Se déconnecte explicitement de l'appareil Divoom configuré. Cela peut être utile si vous ne parvenez pas à vous connecter avec votre téléphone ou d'autres appareils. En principe, ce composant laisse la connexion ouverte vers votre appareil Divoom.",
+      "fields": {
+        "device": {
+          "name": "Appareil",
+          "description": "L'appareil Divoom auquel envoyer cette action."
+        }
+      }
+    }
+  },
+  "selector": {
+    "weekday": {
+      "options": {
+        "mon": "Lundi",
+        "tue": "Mardi",
+        "wed": "Mercredi",
+        "thu": "Jeudi",
+        "fri": "Vendredi",
+        "sat": "Samedi",
+        "sun": "Dimanche"
+      }
+    },
+    "keyboard_value": {
+      "options": {
+        "previous": "Effet précédent",
+        "toggle": "Activer/désactiver",
+        "next": "Effet suivant"
+      }
+    },
+    "gamecontrol_value": {
+      "options": {
+        "go": "Aller",
+        "left": "Gauche",
+        "right": "Droite",
+        "up": "Haut",
+        "down": "Bas",
+        "ok": "OK"
+      }
+    },
+    "weather_condition": {
+      "options": {
+        "clear-night": "Clair, nuit",
+        "cloudy": "Nuageux",
+        "exceptional": "Exceptionnel",
+        "fog": "Brouillard",
+        "hail": "Grêle",
+        "lightning": "Orage",
+        "lightning-rainy": "Orage avec pluie",
+        "partlycloudy": "Partiellement nuageux",
+        "pouring": "Pluie battante",
+        "rainy": "Pluvieux",
+        "snowy": "Neigeux",
+        "snowy-rainy": "Neige et pluie",
+        "sunny": "Ensoleillé",
+        "windy": "Venteux",
+        "windy-variant": "Venteux et nuageux"
+      }
+    }
   }
 }

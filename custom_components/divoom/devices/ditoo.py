@@ -13,12 +13,16 @@ class Ditoo(Divoom):
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
         
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
-        self.logger.warning("{0}: this device does not support the music equalizer mode.".format(self.type))
+        self.unsupported("the music equalizer mode")
 
     def send_keyboard(self, value=None):
         """Send keyboard command on the Divoom device"""
         if value == None: return
-        if isinstance(value, str): value = int(value)
+        if isinstance(value, str):
+            if value == "previous": value = -1
+            elif value == "toggle": value = 0
+            elif value == "next": value = 1
+            else: value = int(value)
 
         if value == 0: # toggle keyboard
             args = [0x02]

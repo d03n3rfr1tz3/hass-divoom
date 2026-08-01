@@ -29,7 +29,11 @@ class DitooMic(Divoom):
     def send_keyboard(self, value=None):
         """Send keyboard command on the Divoom device"""
         if value == None: return
-        if isinstance(value, str): value = int(value)
+        if isinstance(value, str):
+            if value == "previous": value = -1
+            elif value == "toggle": value = 0
+            elif value == "next": value = 1
+            else: value = int(value)
 
         if value == 0: # toggle keyboard
             args = [0x02]

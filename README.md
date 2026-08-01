@@ -5,9 +5,13 @@
 
 **Divoom Integration for Home Assistant**
 
-Allows you to send commands to your Divoom device through a Home Assistant notification service. It allows you to control your Divoom device
-in your automations and scripts however you want. Currently no reading commands or sensors are implemented, because everything works through
-a Notification Service. Just send controls/animations to your Divoom device through that Notification Service.
+Allows you to send commands to your Divoom device through Home Assistant actions. Every mode your device supports has its own action, like
+`divoom.clock` or `divoom.light`, with all its parameters available in the UI. It allows you to control your Divoom device in your automations
+and scripts however you want. Currently no reading commands or sensors are implemented, because everything works through actions. Just send
+controls/animations to your Divoom device through them.
+
+The older `notify.NOTIFIER_NAME` service still works exactly as before, so existing automations keep running. See
+[Legacy: Notify Service](#legacy-notify-service).
 
 ## Table of Contents
   * [Requirements](#requirements)
@@ -54,6 +58,7 @@ a Notification Service. Just send controls/animations to your Divoom device thro
       - [MODE visualization](#mode-visualization)
       - [MODE volume](#mode-volume)
       - [MODE weather](#mode-weather)
+    + [Legacy: Notify Service](#legacy-notify-service)
       - [YAML vs UI](#yaml-vs-ui)
     + [Examples per Device](#examples-per-device)
   * [Troubleshooting](#troubleshooting)
@@ -132,11 +137,18 @@ Second we need to enable/ configure the component. Again that can be done in two
 * Select your device type (e.g. `pixoo`, `ditoo` and such)
 * Click Send and then Finish
 
+After that your device can be picked in every `divoom.*` action.
+
 Beware that the UI configuration currently does not fully support my [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom).
 Currently it is supported through auto-discovery via ZeroConf, as well as through the UI configuration by setting the `host` option. It does not
 add to the list of discovered Bluetooth devices, which means you have to manually type the MAC address in that case.
 
 ### Manual Configuration
+This is the legacy way and only recommended, if the Easy Configuration does not work for you.
+A device configured like this has no config entry and therefore cannot be picked in the
+`divoom.*` actions. It is controlled through its `notify.NOTIFIER_NAME` service instead,
+which is described in [Legacy: Notify Service](#legacy-notify-service).
+
 This can be done by manually adding the following snippet to your `configuration.yaml`
 and filling in the capitalized placeholders. You can create a notify service for every
 Divoom device you have, therefore allowing you to add multiple of these snippets.
@@ -193,16 +205,9 @@ notify:
 
 ## Usage
 
-This custom component acts as a notify service. This means that the
-Service Data requires a message parameter, which basically is the
-command/mode we are sending to the device. Some commands/modes need
-additional parameters, which should be provided in the service data
-payload.
-
-There was also an older style, where the message would be left empty
-and the mode also passed in through the service data. It is still
-supported as of today, but because it looks odd and confuses people,
-it's not the preferred way anymore.
+This custom component provides one action per mode of your Divoom device.
+Every mode is its own action, so the UI shows you exactly which parameters
+it has, which of them are required and what they mean.
 
 ### Basic Modes
 The general structure for all modes are similar, but each mode has different parameter. Below the example
@@ -210,43 +215,39 @@ of the basic structure, you can find a documentation of each mode. Not all modes
 all devices. If in doubt, look into your mobile app if your device even has the corresponding feature
 and then look into the example files for your specific device.
 
-Modern:
 ```yaml
-service: notify.NOTIFIER_NAME
+action: divoom.MODE
 data:
-  message: "MODE"
-  data:
-    parameter: value
+  device: YOUR_DIVOOM_DEVICE
+  parameter: value
 ```
 
-Classic:
-```yaml
-service: notify.NOTIFIER_NAME
-data:
-  message: ""
-  data:
-    mode: "MODE"
-    parameter: value
-```
+`device` is required and picks the device you want to talk to.
+In the UI it is a dropdown listing your configured Divoom devices. Just put in the name of your configured divoom device.
+
+If your device does not support the mode you are calling, the action fails with an error telling you
+so, instead of silently doing nothing. Should you want an automation to carry on anyway, use the
+`continue_on_error: true` option that Home Assistant offers on every action.
 
 ### Examples
 
 #### MODE alarm
 Sets an alarm. You might have to experiment with the options your Divoom device supports and what it actually changes. Unsupported values will be ignored or if possible directly zeroed by this component, to prevent strange behavior.
 
-| Parameter | Description |
-| ---       | ---         |
-| `number`  | The concrete slot for the alarm. For the actual amount of slots you might have to look into the phone app. |
-| `value`   | The concrete time for when the alarm should happen in the format `mm:ss`. |
-| `weekday` | The typical list of weekdays for when the alarm should happen. |
-| `alarmmode` | The alarm mode. Look into your phone app for what is supported by your Divoom device. |
-| `triggermode` | The trigger mode. Look into your phone app for what is supported by your Divoom device. |
-| `frequency` | The radio frequency to set. |
-| `volume`  | The volume of the alarm. |
+| Parameter     | Required | Description |
+| ---           | :---:    | --- |
+| `number`      |          | The concrete slot for the alarm. For the actual amount of slots you might have to look into the phone app. |
+| `value`       |          | The concrete time for when the alarm should happen in the format `hh:mm`. The three-part format `hh:mm:ss` is accepted as well. Leave it empty to clear the slot. |
+| `weekday`     |          | The typical list of weekdays for when the alarm should happen. |
+| `alarmmode`   |          | The alarm mode. Look into your phone app for what is supported by your Divoom device. |
+| `triggermode` |          | The trigger mode. Look into your phone app for what is supported by your Divoom device. |
+| `frequency`   |          | The radio frequency to set. |
+| `volume`      |          | The volume of the alarm. |
 
-```
-message: 'alarm'
+```yaml
+action: divoom.alarm
 data:
+  device: YOUR_DIVOOM_DEVICE
   number: 0
   value: '07:30'
   weekday:
@@ -260,189 +261,204 @@ data:
 #### MODE brightness
 Sets the brightness.
 
-| Parameter | Description |
-| ---       | ---         |
-| `brightness` or `number` or `value` | The brightness value between 0 and 100. |
+| Parameter    | Required | Description |
+| ---          | :---:    | --- |
+| `brightness` | ✔        | The brightness value between 0 and 100. |
 
-```
-message: 'brightness'
+```yaml
+action: divoom.brightness
 data:
+  device: YOUR_DIVOOM_DEVICE
   brightness: 100
 ```
 
 #### MODE clock
 Shows the clock channel. Be aware, that this mode is very limited on older device like Aurabox or Timebox Mini.
 
-| Parameter | Description |
-| ---       | ---         |
-| `clock` | The style of the clock. Accepts a number between 0 and 9. <br/> `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen |
-| `twentyfour` | Changes between 12h or 24h format. <br/> `0` = 12h, `1` = 24h. |
-| `weather` | Actives or deactivates showing the weather with `0` or `1`. |
-| `temp`    | Actives or deactivates showing the temperature with `0` or `1`. |
-| `calendar` | Actives or deactivates showing the calendar date with `0` or `1`. |
-| `color`   | The color of the clock. Accepts an array of RGB color values. |
-| `hot`     | Actives or deactivates showing the slideshow of the best images with `0` or `1`, which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol |
+| Parameter    | Required | Description |
+| ---          | :---:    | --- |
+| `clock`      | ✔        | The style of the clock. Accepts a number starting from 0 up to what the Divoom device supports.<br/> Examples from Pixoo: `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen |
+| `twentyfour` |          | Changes between 12h or 24h format. <br/> `false` = 12h, `true` = 24h. |
+| `weather`    |          | Actives or deactivates showing the weather with `true` or `false`. |
+| `temp`       |          | Actives or deactivates showing the temperature with `true` or `false`. |
+| `calendar`   |          | Actives or deactivates showing the calendar date with `true` or `false`. |
+| `color`      |          | The color of the clock. Accepts an array of RGB color values. |
+| `hot`        |          | Actives or deactivates showing the slideshow of the best images with `true` or `false`, which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol |
 
-```
-message: 'clock'
+```yaml
+action: divoom.clock
 data:
+  device: YOUR_DIVOOM_DEVICE
   clock: 1
-  weather: 0
-  temp: 0
-  calendar: 1
+  weather: false
+  temp: false
+  calendar: true
   color: [250, 0, 0]
 ```
 
 #### MODE connect
 Explicitly connects to your configured Divoom device. Might be useful, if you just want to connect without changing anything. Typically the connection is opened automatically when using any mode.
 
-```
-message: 'connect'
+```yaml
+action: divoom.connect
 data:
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE countdown
 Shows the countdown tool.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | Controls the start/stop state. <br/> `0` = stop, `1` = start |
-| `countdown` | The concrete countdown in the format `mm:ss`. |
+| Parameter   | Required | Description |
+| ---         | :---:    | --- |
+| `value`     | ✔        | Controls the start/stop state. <br/> `false` = stop, `true` = start |
+| `countdown` |          | The concrete countdown in the format `mm:ss`. <br/> Given as `hh:mm:ss`, the hours are ignored. |
 
-```
-message: 'countdown'
+```yaml
+action: divoom.countdown
 data:
+  device: YOUR_DIVOOM_DEVICE
   countdown: '01:30'
+  value: true
 ```
 
 #### MODE datetime
 Sets the datetime.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | The date and time in the typical ISO datetime format. Leave it empty or null to just use the current date and time. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   |          | The date and time in the typical ISO datetime format. Leave it empty or null to just use the current date and time. |
 
-```
-message: 'datetime'
+```yaml
+action: divoom.datetime
 data:
+  device: YOUR_DIVOOM_DEVICE
   value: '2024-12-31 18:30:00'
 ```
 
 #### MODE design
 Shows the design channel.
 
-| Parameter | Description |
-| ---       | ---         |
-| `number`  | The number of the concrete design. Ranging from 0-2 you can specify the design 1-3. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `number`  | ✔        | The number of the concrete design. Accepts a number starting from 0 up to what the Divoom device supports.<br/> Examples from Pixoo: `0`-`2` for the designs 1-3 |
 
-```
-message: 'design'
+```yaml
+action: divoom.design
 data:
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 ```
 
 #### MODE disconnect
 Explicitly disconnects from your configured Divoom device. Might be useful, if you cannot connect with your Phone or other devices. Typically this component leaves the connection open to your Divoom device.
 
-```
-message: 'disconnect'
+```yaml
+action: divoom.disconnect
 data:
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE effects
 Shows the effects channel.
 
-| Parameter | Description |
-| ---       | ---         |
-| `number`  | The number of the concrete effect. Might differ for some Divoom devices. Look into your phone app and count them. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `number`  | ✔        | The number of the concrete effect. Might differ for some Divoom devices. Look into your phone app and count them. |
 
-```
-message: 'effects'
+```yaml
+action: divoom.effects
 data:
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 ```
 
 #### MODE equalizer
 Starts the music equalizer.
 
-| Parameter         | Description |
-| ---               | ---         |
-| `number`          | The number of the concrete equalizer. Look into your phone app and count them. |
-| `audiomode`       | Actives or deactivates the original audio mode with `0` or `1`. |
-| `backgroundmode`  | Actives or deactivates the background audio mode with `0` or `1`. |
-| `streammode`      | Actives or deactivates the streaming audio mode with `0` or `1`. |
+| Parameter        | Required | Description |
+| ---              | :---:    | --- |
+| `number`         | ✔        | The number of the concrete equalizer. Look into your phone app and count them. |
+| `audiomode`      |          | Actives or deactivates the original audio mode with `true` or `false`. |
+| `backgroundmode` |          | Actives or deactivates the background audio mode with `true` or `false`. |
+| `streammode`     |          | Actives or deactivates the streaming audio mode with `true` or `false`. |
 
-```
-message: 'equalizer'
+```yaml
+action: divoom.equalizer
 data:
+  device: YOUR_DIVOOM_DEVICE
   number: 2
-  audiomode: 1
+  audiomode: true
 ```
 
 #### MODE game
 Shows a game. It is theoretically possible to open games, that are not shown in your phone app, but they might not work very well.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | The number of the concrete game. Depending on your device you may have different amount of games. Look into your phone app and count them. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   |          | The number of the concrete game. Depending on your device you may have different amount of games. Look into your phone app and count them. |
 
-```
-message: 'game'
+```yaml
+action: divoom.game
 data:
+  device: YOUR_DIVOOM_DEVICE
   value: 2
 ```
 
 #### MODE gamecontrol
 Sends controlling commands to the currently open game.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | `0` or `go` = go, <br/> `1` or `left` = left, <br/> `2` or `right` = right, <br/> `3` or `up` = up, <br/> `4` or `down` = down, <br/> `5` or `ok` = ok |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   | ✔        | `go` = go, <br/> `left` = left, <br/> `right` = right, <br/> `up` = up, <br/> `down` = down, <br/> `ok` = ok |
 
-```
-message: 'gamecontrol'
+```yaml
+action: divoom.gamecontrol
 data:
+  device: YOUR_DIVOOM_DEVICE
   value: 'go'
 ```
 
 #### MODE image
 Shows a static or animated image.
 
-| Parameter | Description |
-| ---       | ---         |
-| `file`    | Specifes the image file relative to the configured media_directory, that will be displayed. |
-| `time`    | The time in milliseconds between each frame. Defaults to timing of the GIF if omitted. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `file`    | ✔        | Specifes the image file relative to the configured media_directory, that will be displayed. |
+| `time`    |          | The time in milliseconds between each frame. Defaults to timing of the GIF if omitted. |
 
-```
-message: 'image'
+```yaml
+action: divoom.image
 data:
+  device: YOUR_DIVOOM_DEVICE
   file: 'ha16.gif'
 ```
 
 #### MODE keyboard
 Controls the keyboard LEDs specifically on the Ditoo.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | Changes the keyboard LED effect. <br/> `-1` = previous effect, `0` = toggle on/off, `1` = next effect |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   | ✔        | Changes the keyboard LED effect. <br/> `previous` = previous effect, <br/> `toggle` = toggle on/off, <br/> `next` = next effect |
 
-```
-message: 'keyboard'
+```yaml
+action: divoom.keyboard
 data:
-  value: 1
+  device: YOUR_DIVOOM_DEVICE
+  value: 'next'
 ```
 
 #### MODE light
 Shows the light channel. Be aware, that this mode is very limited on the Aurabox, because it only supports 8 colors.
 
-| Parameter    | Description |
-| ---          | ---         |
-| `brightness` | The brightness value between 0 and 100. |
-| `color`      | The color of the light. Accepts an array of RGB color values. |
+| Parameter    | Required | Description |
+| ---          | :---:    | --- |
+| `brightness` | ✔        | The brightness value between 0 and 100. |
+| `color`      |          | The color of the light. Accepts an array of RGB color values. Leave it empty to fade through the colors. |
 
-```
-message: 'light'
+```yaml
+action: divoom.light
 data:
+  device: YOUR_DIVOOM_DEVICE
   brightness: 75
   color: [250, 0, 0]
 ```
@@ -450,27 +466,25 @@ data:
 #### MODE lyrics
 Shows the lyrics channel. Might not be supported by every Divoom device.
 
-| Parameter | Description |
-| ---       | ---         |
-| `number`  | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
-
-```
-message: 'lyrics'
+```yaml
+action: divoom.lyrics
 data:
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE memorial
 Sets a memorial (reminder).
 
-| Parameter | Description |
-| ---       | ---         |
-| `number`  | The concrete slot for the memorial. For the actual amount of slots you might have to look into the phone app. |
-| `value`   | The date and time in the typical ISO datetime format (year will be ignored). |
-| `text`    | Specifies the name of your memorial, as it will appear in the phone app (default: Home Assistant). Limited to 16 characters. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `number`  |          | The concrete slot for the memorial. For the actual amount of slots you might have to look into the phone app. |
+| `value`   |          | The date and time in the typical ISO datetime format (year will be ignored). Leave it empty to clear the slot. |
+| `text`    |          | Specifies the name of your memorial, as it will appear in the phone app (default: Home Assistant). Limited to 16 characters. |
 
-```
-message: 'memorial'
+```yaml
+action: divoom.memorial
 data:
+  device: YOUR_DIVOOM_DEVICE
   number: 0
   value: '2000-12-31 00:00:00'
   text: 'Happy New Year!'
@@ -479,119 +493,129 @@ data:
 #### MODE noise
 Shows the noise meter.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | Controls the start/stop state. <br/> `0` = stop, `1` = start |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   | ✔        | Controls the start/stop state. <br/> `false` = stop, `true` = start |
 
-```
-message: 'noise'
+```yaml
+action: divoom.noise
 data:
-  value: 1
+  device: YOUR_DIVOOM_DEVICE
+  value: true
 ```
 
 #### MODE off
 Turn the display off, by setting the pixels to black, the brightness to 0 and also switching a specific `power`-flag to 0.
 
-```
-message: 'off'
+```yaml
+action: divoom.off
 data:
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE on
 Turn the display on, by setting the pixels to black, the brightness to 100 and also switching a specific `power`-flag to 1.
 Because of the pixels still being black and no automatic way to go back to the previous shown mode, you should send another command (like MODE `clock`) afterwards.
 
-```
-message: 'on'
+```yaml
+action: divoom.on
 data:
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE playstate
 Sets the playstate for the currently played music. Only supported by Divoom devices with audio features.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | Controls the play/pause state. <br/> `0` = pause, `1` = play |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   | ✔        | Controls the play/pause state. <br/> `false` = pause, `true` = play |
 
-```
-message: 'playstate'
+```yaml
+action: divoom.playstate
 data:
-  value: 1
+  device: YOUR_DIVOOM_DEVICE
+  value: true
 ```
 
 #### MODE radio
 Shows and plays the radio channel. Only supported by Divoom devices with the radio feature.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | Controls the on/off state. <br/> `0` = off, `1` = on |
-| `frequency` | The radio frequency to set. |
+| Parameter   | Required | Description |
+| ---         | :---:    | --- |
+| `value`     | ✔        | Controls the on/off state. <br/> `false` = off, `true` = on |
+| `frequency` |          | The radio frequency to set. |
 
-```
-message: 'radio'
+```yaml
+action: divoom.radio
 data:
-  value: 1
+  device: YOUR_DIVOOM_DEVICE
+  value: true
   frequency: 100.3
 ```
 
 #### MODE raw
 Sends raw data to the Divoom device. Might be useful, if there is something wrong or not supported by the other modes.
 
-| Parameter | Description |
-| ---       | ---         |
-| `raw`     | The bytes to send. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `raw`     | ✔        | The bytes to send. |
 
-```
-message: 'raw'
+```yaml
+action: divoom.raw
 data:
+  device: YOUR_DIVOOM_DEVICE
   raw: [0x74, 0x64]
 ```
 
 #### MODE scoreboard
 Shows the scoreboard channel or tool.
 
-| Parameter | Description |
-| ---       | ---         |
-| `player1` | The score of player one to show. |
-| `player2` | The score of player two to show. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `player1` |          | The score of player one to show. |
+| `player2` |          | The score of player two to show. |
 
-```
-message: 'scoreboard'
+```yaml
+action: divoom.scoreboard
 data:
+  device: YOUR_DIVOOM_DEVICE
   player1: 2
   player2: 1
 ```
 
 #### MODE signal
-Shows the signal channel.
+Shows the signal channel specifically on the Backpack.
+It shows traffic signals, like a turn signal.
 
-| Parameter | Description |
-| ---       | ---         |
-| `number`  | The number of the concrete signal. Look into your phone app and count them. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `number`  | ✔        | The number of the concrete signal. Look into your phone app and count them. |
 
-```
-message: 'signal'
+```yaml
+action: divoom.signal
 data:
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 ```
 
 #### MODE sleep
 Shows the sleep mode, which plays soothing sounds, optionally with a timer and light.
 
-| Parameter    | Description |
-| ---          | ---         |
-| `value`      | Controls the start/stop state. <br/> `0` = stop, `1` = start |
-| `time`       | The time in minutes after which to stop the sleep mode. Defaults to `120` when not provided. |
-| `sleepmode`  | The sound effect to play. Check in the app how many options are available. Accepts a number. |
-| `frequency`  | The radio frequency to set. |
-| `volume`     | The volume value between 0 and 100. |
-| `color`      | The color of the display. Accepts an array of RGB color values. |
-| `brightness` | The brightness value between 0 and 100. |
+| Parameter    | Required | Description |
+| ---          | :---:    | --- |
+| `value`      | ✔        | Controls the start/stop state. <br/> `false` = stop, `true` = start |
+| `time`       |          | The time in minutes after which to stop the sleep mode. Defaults to `120` when not provided. |
+| `sleepmode`  |          | The sound effect to play. Check in the app how many options are available. Accepts a number. |
+| `frequency`  |          | The radio frequency to set. |
+| `volume`     |          | The volume value between 0 and 100. |
+| `color`      |          | The color of the display. Accepts an array of RGB color values. |
+| `brightness` |          | The brightness value between 0 and 100. |
 
-```
-message: 'sleep'
+```yaml
+action: divoom.sleep
 data:
-  value: 1
+  device: YOUR_DIVOOM_DEVICE
+  value: true
   time: 30
   sleepmode: 4
   volume: 10
@@ -600,99 +624,153 @@ data:
 ```
 
 #### MODE temperature
-Shows the temperature channel. Be aware, that this mode is specifically for Aurabox or Timebox Mini. It still works on other device, but utilizes the `clock` mode and therefore might change settings unintentional.
+Shows the temperature channel. Be aware, that this mode is only supported by the Aurabox and the Timebox Mini.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value` | Changes between °C or °F unit. <br/> `0` = °C, `1` = °F. Defaults to °C. |
-| `color`   | The color of the temperature. Accepts an array of RGB color values. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   | ✔        | Changes between °C or °F unit. |
+| `color`   |          | The color of the temperature. Accepts an array of RGB color values. |
 
-```
-message: 'temperature'
+```yaml
+action: divoom.temperature
 data:
-  value: 0
+  device: YOUR_DIVOOM_DEVICE
+  value: '°C'
   color: [250, 0, 0]
 ```
 
 #### MODE text
 Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the frame limitation of ~60 frames.
 
-| Parameter | Description |
-| ---       | ---         |
-| `text`    | The text that will be animated. |
-| `font`    | The font name or filename of the font that should be used. Defaults to a generic font. |
-| `time`    | The time in milliseconds between each frame. Defaults to 100ms per frame. |
-| `color`   | The colors for foreground and background. Accepts an array of an array of RGB color values. Defaults to white text on black background. |
+| Parameter          | Required | Description |
+| ---                | :---:    | --- |
+| `text`             | ✔        | The text that will be animated. |
+| `font`             |          | The font name or filename of the font that should be used. Defaults to a generic font. |
+| `size`             |          | The font size in pixels. Defaults to the screen size of the device. |
+| `time`             |          | The time in milliseconds between each frame. Defaults to 100ms per frame. |
+| `foreground_color` |          | The color of the text alone. Accepts an array of RGB color values. Defaults to white. |
+| `background_color` |          | The color of the background alone. Accepts an array of RGB color values. Defaults to black. |
 
-```
-message: 'text'
+```yaml
+action: divoom.text
 data:
+  device: YOUR_DIVOOM_DEVICE
   text: 'Hi Divoom'
   font: 'divoom.ttf'
-  color: [[250, 0, 0], [0, 0, 0]]
+  foreground_color: [250, 0, 0]
+  background_color: [0, 0, 0]
 ```
 
 #### MODE timer
 Shows the timer tool.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | Controls the start/stop state. <br/> `0` = stop, `1` = start |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   | ✔        | Controls the start/stop state. <br/> `false` = stop, `true` = start |
 
-```
-message: 'timer'
+```yaml
+action: divoom.timer
 data:
-  value: 1
+  device: YOUR_DIVOOM_DEVICE
+  value: true
 ```
 
 #### MODE visualization
-Shows the visualization channel.
+Shows the visualization channel. The Divoom Backpack does not support this mode, because it has no microphone. Use the `signal` mode there instead.
 
-| Parameter | Description |
-| ---       | ---         |
-| `number`  | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
-| `color`   | The colors for foreground and background. Accepts an array of an array of RGB color values. Only supported by the oldest devices. |
+| Parameter          | Required | Description |
+| ---                | :---:    | --- |
+| `number`           | ✔        | The number of the concrete visualization. Might differ for some Divoom devices. Look into your phone app and count them. |
+| `foreground_color` |          | The color of the foreground alone. Accepts an array of RGB color values. Only supported by the oldest devices. |
+| `background_color` |          | The color of the background alone. Accepts an array of RGB color values. Only supported by the oldest devices. |
 
-```
-message: 'visualization'
+```yaml
+action: divoom.visualization
 data:
+  device: YOUR_DIVOOM_DEVICE
   number: 2
-  color: [[250, 0, 0], [0, 0, 0]]
+  foreground_color: [250, 0, 0]
+  background_color: [0, 0, 0]
 ```
 
 #### MODE volume
 Sets the volume. Only supported by Divoom devices with audio features.
 
-| Parameter | Description |
-| ---       | ---         |
-| `volume` or `number` or `value` | The volume value between 0 and 100. |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `volume`  | ✔        | The volume value between 0 and 100. |
 
-```
-message: 'volume'
+```yaml
+action: divoom.volume
 data:
+  device: YOUR_DIVOOM_DEVICE
   volume: 75
 ```
 
 #### MODE weather
 Sets the weather.
 
-| Parameter | Description |
-| ---       | ---         |
-| `value`   | The temperature in degree including the temperature type for celsius or fahrenheit. |
-| `weather` | The actual type of the weather. <br/> `1` = clear, `3` = cloudy sky, `5` = thunderstorm, `6` = rain, `8` = snow, `9` = fog |
+| Parameter | Required | Description |
+| ---       | :---:    | --- |
+| `value`   | ✔        | The temperature in degree, optionally including the temperature type for celsius or fahrenheit as `°C` or `°F`. |
+| `unit`    |          | The temperature type for celsius or fahrenheit as `°C` or `°F`. Takes precedence over the type given in `value`. Without any type the device keeps its current one. |
+| `weather` |          | The actual type of the weather. <br/> `1` = clear, `3` = cloudy sky, `5` = thunderstorm, `6` = rain, `8` = snow, `9` = fog. <br/> The Home Assistant weather states (`sunny`, `rainy`, `partlycloudy`, ...) are accepted as well. |
 
-```
-message: 'weather'
+```yaml
+action: divoom.weather
 data:
+  device: YOUR_DIVOOM_DEVICE
   value: '25°C'
   weather: 6
 ```
+
+### Legacy: Notify Service
+
+Before the actions existed, everything went through a notify service named after your device.
+That way still works and is not going away, so existing automations and scripts keep running
+unchanged. It is also the only way to control a device from the [Manual Configuration](#manual-configuration),
+because such a device has no config entry to pick.
+
+The parameters are the same ones documented for each mode above, only the wrapping differs: the
+mode moves into `message` and the parameters move into a nested `data`.
+
+```yaml
+action: notify.NOTIFIER_NAME
+data:
+  message: "MODE"
+  data:
+    parameter: value
+```
+
+There is also an older style, where the message is left empty and the mode is passed in through
+the service data as well. It is still supported as of today, but because it looks odd and confuses
+people, it's not the preferred way anymore.
+
+```yaml
+action: notify.NOTIFIER_NAME
+data:
+  message: ""
+  data:
+    mode: "MODE"
+    parameter: value
+```
+
+A few more differences to the actions:
+
+* The notify service additionally accepts some alternative spellings: `number` or `value` instead
+  of `brightness` and `volume`, and the combined `color: [[foreground], [background]]` instead of
+  `foreground_color` and `background_color`.
+* Where the actions want a word, it also takes the raw protocol number: `-1`, `0` or `1` for the
+  keyboard effect, `0` to `5` for the game control and `0` or `1` instead of `°C` or `°F`.
+* It does not validate your parameters. A value out of range is passed to the device as it is.
+* A mode your device does not support only produces a warning in the log. It does not fail, so an
+  automation using it just carries on.
 
 #### YAML vs UI
 
 Modern:
 ```yaml
-service: notify.divoom_pixoo
+action: notify.divoom_pixoo
 data:
   message: "brightness"
   data:
@@ -701,7 +779,7 @@ data:
 
 Classic:
 ```yaml
-service: notify.divoom_pixoo
+action: notify.divoom_pixoo
 data:
   message: ""
   data:

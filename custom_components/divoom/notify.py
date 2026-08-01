@@ -1,4 +1,4 @@
-"""Switching states and sending images or animations to a divoom device."""
+"""Legacy notify service for divoom devices."""
 import logging, os, socket, threading
 import voluptuous as vol
 
@@ -15,6 +15,7 @@ from homeassistant.components.notify import (
 
 from homeassistant.const import CONF_HOST, CONF_MAC, CONF_PORT
 from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
+from .devices.divoom import DivoomUnsupportedError
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -26,6 +27,7 @@ PARAM_CLOCK = 'clock'
 PARAM_TWENTYFOUR = 'twentyfour'
 PARAM_WEATHER = 'weather'
 PARAM_TEMP = 'temp'
+PARAM_UNIT = 'unit'
 PARAM_CALENDAR = 'calendar'
 PARAM_HOT = 'hot'
 
@@ -35,6 +37,8 @@ PARAM_BACKGROUNDMODE = 'backgroundmode'
 PARAM_STREAMMODE = 'streammode'
 PARAM_TRIGGERMODE = 'triggermode'
 PARAM_BRIGHTNESS = 'brightness'
+PARAM_BACKGROUND_COLOR = 'background_color'
+PARAM_FOREGROUND_COLOR = 'foreground_color'
 PARAM_COLOR = 'color'
 PARAM_COUNTDOWN = 'countdown'
 PARAM_FREQUENCY = 'frequency'
@@ -243,6 +247,20 @@ class DivoomNotificationService(BaseNotificationService):
         with self._lock:
             self._device.disconnect()
 
+    def _resolve_colors(self, data):
+        """Foreground and background color, either packed into a single color
+        list or given as two separate params, which then take precedence."""
+        color = data.get(PARAM_COLOR)
+        color1 = color[0] if color is not None and len(color) > 0 else None
+        color2 = color[1] if color is not None and len(color) > 1 else None
+
+        foreground = data.get(PARAM_FOREGROUND_COLOR)
+        background = data.get(PARAM_BACKGROUND_COLOR)
+        if foreground is not None: color1 = foreground
+        if background is not None: color2 = background
+
+        return color1, color2
+
     def _resolve_path(self, base_directory, filename):
         joined = os.path.join(base_directory, filename)
         real_base = os.path.realpath(base_directory)
@@ -252,14 +270,23 @@ class DivoomNotificationService(BaseNotificationService):
         return joined
 
     def send_message(self, message="", **kwargs):
+        if message == "" and kwargs.get(ATTR_DATA) is None:
+            _LOGGER.error("Service call needs more information")
+            return False
+
+        data = kwargs.get(ATTR_DATA) or {}
+        return self.call_mode(data.get(PARAM_MODE) or message, data, continue_on_error=True)
+
+    def call_mode(self, mode, data, continue_on_error=False):
+        """Execute a single mode. Shared by send_message() and the divoom.* services."""
+        try:
+            return self._call_mode(mode, data)
+        except DivoomUnsupportedError:
+            if not continue_on_error: raise
+            return True # the device already logged the warning, the legacy path stays quiet
+
+    def _call_mode(self, mode, data):
         with self._lock:
-            if message == "" and kwargs.get(ATTR_DATA) is None:
-                _LOGGER.error("Service call needs more information")
-                return False
-        
-            data = kwargs.get(ATTR_DATA) or {}
-            mode = data.get(PARAM_MODE) or message
-        
             if mode != "connect" and mode != "disconnect":
                 skipPing = True if mode == "gamecontrol" or mode == "raw" else False
                 self._device.reconnect(skipPing=skipPing)
@@ -287,7 +314,9 @@ class DivoomNotificationService(BaseNotificationService):
                 self._device.show_alarm(number=number, time=time, weekdays=weekdays, alarmMode=alarm_mode, triggerMode=trigger_mode, frequency=frequency, volume=volume)
 
             elif mode == "brightness":
-                value = data.get(PARAM_BRIGHTNESS) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
+                value = data.get(PARAM_BRIGHTNESS)
+                if value is None: value = data.get(PARAM_NUMBER)
+                if value is None: value = data.get(PARAM_VALUE)
                 self._device.send_brightness(value=value)
 
             elif mode == "clock":
@@ -387,6 +416,11 @@ class DivoomNotificationService(BaseNotificationService):
                 player2 = data.get(PARAM_PLAYER2)
                 self._device.show_scoreboard(blue=player1, red=player2)
 
+            elif mode == "signal":
+                number = data.get(PARAM_NUMBER)
+                color1, color2 = self._resolve_colors(data)
+                self._device.show_signal(number=number, color1=color1, color2=color2)
+
             elif mode == "sleep":
                 sleepvalue = data.get(PARAM_VALUE)
                 sleeptime = data.get(PARAM_TIME)
@@ -413,17 +447,17 @@ class DivoomNotificationService(BaseNotificationService):
                         return False
                 size = data.get(PARAM_SIZE)
                 time = data.get(PARAM_TIME)
-                color = data.get(PARAM_COLOR)
-                self._device.show_text(text, font_path, size=size, time=time, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
+                color1, color2 = self._resolve_colors(data)
+                self._device.show_text(text, font_path, size=size, time=time, color1=color1, color2=color2)
 
             elif mode == "timer":
                 value = data.get(PARAM_VALUE)
                 self._device.show_timer(value=value)
 
-            elif mode == "visualization" or mode == "signal":
+            elif mode == "visualization":
                 number = data.get(PARAM_NUMBER)
-                color = data.get(PARAM_COLOR)
-                self._device.show_visualization(number=number, color1=color[0] if color is not None and len(color) > 0 else None, color2=color[1] if color is not None and len(color) > 1 else None)
+                color1, color2 = self._resolve_colors(data)
+                self._device.show_visualization(number=number, color1=color1, color2=color2)
 
             elif mode == "volume":
                 value = data.get(PARAM_VOLUME) or data.get(PARAM_NUMBER) or data.get(PARAM_VALUE)
@@ -431,6 +465,7 @@ class DivoomNotificationService(BaseNotificationService):
 
             elif mode == "weather":
                 value = data.get(PARAM_VALUE)
+                unit = data.get(PARAM_UNIT)
                 weather = data.get(PARAM_WEATHER)
 
                 weathernum = None
@@ -441,7 +476,7 @@ class DivoomNotificationService(BaseNotificationService):
                 elif isinstance(weather, str):
                     weathernum = WEATHER_MODES.get(weather) or None
 
-                self._device.send_weather(value=value, weather=weathernum)
+                self._device.send_weather(value=value, weather=weathernum, unit=unit)
 
             else:
                 validModes = ""
