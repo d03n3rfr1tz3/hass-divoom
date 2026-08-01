@@ -65,13 +65,13 @@ TEMPLATE_MARKERS = ("{{", "{%")
 
 LEGACY_PREFIX = re.compile(r"^notify\.divoom(_|$)")
 
+REASON_PREFIX = "migration_"
 REASON_TEMPLATED_MODE = "templated_mode"
 REASON_UNKNOWN_MODE = "unknown_mode"
 REASON_UNKNOWN_DEVICE = "unknown_device"
 REASON_UNKNOWN_FIELD = "unknown_field"
 REASON_MISSING_FIELD = "missing_field"
 REASON_SCHEMA = "schema"
-
 REASON_BLUEPRINT = "blueprint"
 REASON_MANUAL = "manual"
 
@@ -617,10 +617,14 @@ async def async_migrate(hass: HomeAssistant):
 
 
 async def async_reason_labels(hass: HomeAssistant) -> dict[str, str]:
-    """The translated wording for why an entry needs manual work."""
-    prefix = "component.{0}.issues.{1}.reasons.".format(DOMAIN, ISSUE_LEGACY_NOTIFY)
+    """The translated wording for why an entry needs manual work.
+
+    The labels live under `common`, because an issue may only carry a title and
+    its fix flow. The prefix is stripped again, so the reason slugs match.
+    """
+    prefix = "component.{0}.common.{1}".format(DOMAIN, REASON_PREFIX)
     translations = await translation.async_get_translations(
-        hass, hass.config.language, "issues", {DOMAIN}
+        hass, hass.config.language, "common", {DOMAIN}
     )
     return {
         key[len(prefix):]: value

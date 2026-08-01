@@ -1,4 +1,14 @@
 {
+  "common": {
+    "migration_manual": "ručně",
+    "migration_blueprint": "založeno na blueprintu",
+    "migration_templated_mode": "režim jako šablona",
+    "migration_unknown_mode": "neznámý režim",
+    "migration_unknown_device": "žádné odpovídající zařízení",
+    "migration_unknown_field": "neznámá volba",
+    "migration_missing_field": "chybějící volba",
+    "migration_schema": "neplatná hodnota"
+  },
   "config": {
     "flow_title": "{name} ({mac}{host_text})",
     "title": "Divoom (BT)",
@@ -43,16 +53,6 @@
   "issues": {
     "legacy_notify_usage": {
       "title": "Zastaralé akce notify pro Divoom se stále používají",
-      "reasons": {
-        "manual": "ručně",
-        "blueprint": "založeno na blueprintu",
-        "templated_mode": "režim jako šablona",
-        "unknown_mode": "neznámý režim",
-        "unknown_device": "žádné odpovídající zařízení",
-        "unknown_field": "neznámá volba",
-        "missing_field": "chybějící volba",
-        "schema": "neplatná hodnota"
-      },
       "fix_flow": {
         "step": {
           "init": {

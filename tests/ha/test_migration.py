@@ -34,6 +34,7 @@ from custom_components.divoom.migration import (
     REASON_BLUEPRINT,
     REASON_MANUAL,
     REASON_MISSING_FIELD,
+    REASON_PREFIX,
     REASON_SCHEMA,
     REASON_TEMPLATED_MODE,
     REASON_UNKNOWN_DEVICE,
@@ -717,28 +718,54 @@ async def test_issue_translations_are_reachable_for_the_frontend(hass, language)
     assert resources["{0}.fix_flow.step.init.menu_options.apply".format(prefix)]
 
 
-def test_every_manual_reason_is_translated_everywhere():
-    """The listing must never fall back to a raw slug in any language."""
-    expected = {
-        REASON_BLUEPRINT,
-        REASON_MANUAL,
-        REASON_MISSING_FIELD,
-        REASON_SCHEMA,
-        REASON_TEMPLATED_MODE,
-        REASON_UNKNOWN_DEVICE,
-        REASON_UNKNOWN_FIELD,
-        REASON_UNKNOWN_MODE,
-    }
+@pytest.mark.parametrize("language", ["en", "de"])
+async def test_the_common_category_is_reachable_for_the_reason_labels(hass, language):
+    """The reasons sit in their own category since hassfest rejected them under
+    the issue, so prove the loader hands that one out too."""
+    resources = await translation.async_get_translations(hass, language, "common", [DOMAIN])
 
+    strings = json.loads((COMPONENT_PATH / "strings.json").read_text(encoding="utf-8"))
+    expected = {"component.{0}.common.{1}".format(DOMAIN, key) for key in strings["common"]}
+
+    assert expected <= set(resources)
+
+
+def string_files():
+    """strings.json plus every translation next to it."""
     files = [COMPONENT_PATH / "strings.json"]
     files.extend(sorted((COMPONENT_PATH / "translations").glob("*.json")))
     assert len(files) == 10
+    return files
 
-    for path in files:
+
+def test_every_manual_reason_is_translated_everywhere():
+    """The listing must never fall back to a raw slug in any language."""
+    expected = {
+        REASON_PREFIX + reason
+        for reason in (
+            REASON_BLUEPRINT,
+            REASON_MANUAL,
+            REASON_MISSING_FIELD,
+            REASON_SCHEMA,
+            REASON_TEMPLATED_MODE,
+            REASON_UNKNOWN_DEVICE,
+            REASON_UNKNOWN_FIELD,
+            REASON_UNKNOWN_MODE,
+        )
+    }
+
+    for path in string_files():
         strings = json.loads(path.read_text(encoding="utf-8"))
-        reasons = strings["issues"][ISSUE_LEGACY_NOTIFY]["reasons"]
-        assert set(reasons) == expected, path.name
-        assert all(reasons.values()), path.name
+        assert set(strings["common"]) == expected, path.name
+        assert all(strings["common"].values()), path.name
+
+
+def test_the_issue_block_stays_within_the_hassfest_schema():
+    """hassfest lets an issue carry a title and its fix flow, nothing else -
+    anything extra belongs under `common`, see async_reason_labels."""
+    for path in string_files():
+        strings = json.loads(path.read_text(encoding="utf-8"))
+        assert set(strings["issues"][ISSUE_LEGACY_NOTIFY]) == {"title", "fix_flow"}, path.name
 
 
 @pytest.mark.parametrize(

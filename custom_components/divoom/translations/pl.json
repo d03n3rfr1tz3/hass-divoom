@@ -1,4 +1,14 @@
 {
+  "common": {
+    "migration_manual": "ręcznie",
+    "migration_blueprint": "oparte na blueprincie",
+    "migration_templated_mode": "tryb jako szablon",
+    "migration_unknown_mode": "nieznany tryb",
+    "migration_unknown_device": "brak pasującego urządzenia",
+    "migration_unknown_field": "nieznana opcja",
+    "migration_missing_field": "brakująca opcja",
+    "migration_schema": "nieprawidłowa wartość"
+  },
   "config": {
     "flow_title": "{name} ({mac}{host_text})",
     "title": "Divoom (BT)",
@@ -43,16 +53,6 @@
   "issues": {
     "legacy_notify_usage": {
       "title": "Przestarzałe akcje notify dla Divoom nadal w użyciu",
-      "reasons": {
-        "manual": "ręcznie",
-        "blueprint": "oparte na blueprincie",
-        "templated_mode": "tryb jako szablon",
-        "unknown_mode": "nieznany tryb",
-        "unknown_device": "brak pasującego urządzenia",
-        "unknown_field": "nieznana opcja",
-        "missing_field": "brakująca opcja",
-        "schema": "nieprawidłowa wartość"
-      },
       "fix_flow": {
         "step": {
           "init": {
