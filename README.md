@@ -218,14 +218,12 @@ and then look into the example files for your specific device.
 ```yaml
 action: divoom.MODE
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   parameter: value
 ```
 
-`entry_id` is required and picks the device you want to talk to. In the UI it is a dropdown listing
-your configured Divoom devices, so you never type it by hand. `YOUR_DIVOOM_DEVICE` in the examples
-below is just a placeholder for it. To get the actual value for a YAML automation, click the action
-together in the UI and then switch that action to `Edit in YAML`.
+`device` is required and picks the device you want to talk to.
+In the UI it is a dropdown listing your configured Divoom devices. Just put in the name of your configured divoom device.
 
 If your device does not support the mode you are calling, the action fails with an error telling you
 so, instead of silently doing nothing. Should you want an automation to carry on anyway, use the
@@ -249,7 +247,7 @@ Sets an alarm. You might have to experiment with the options your Divoom device 
 ```yaml
 action: divoom.alarm
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 0
   value: '07:30'
   weekday:
@@ -270,7 +268,7 @@ Sets the brightness.
 ```yaml
 action: divoom.brightness
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   brightness: 100
 ```
 
@@ -290,7 +288,7 @@ Shows the clock channel. Be aware, that this mode is very limited on older devic
 ```yaml
 action: divoom.clock
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   clock: 1
   weather: false
   temp: false
@@ -304,7 +302,7 @@ Explicitly connects to your configured Divoom device. Might be useful, if you ju
 ```yaml
 action: divoom.connect
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE countdown
@@ -318,7 +316,7 @@ Shows the countdown tool.
 ```yaml
 action: divoom.countdown
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   countdown: '01:30'
   value: true
 ```
@@ -333,7 +331,7 @@ Sets the datetime.
 ```yaml
 action: divoom.datetime
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: '2024-12-31 18:30:00'
 ```
 
@@ -347,7 +345,7 @@ Shows the design channel.
 ```yaml
 action: divoom.design
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 ```
 
@@ -357,7 +355,7 @@ Explicitly disconnects from your configured Divoom device. Might be useful, if y
 ```yaml
 action: divoom.disconnect
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE effects
@@ -370,7 +368,7 @@ Shows the effects channel.
 ```yaml
 action: divoom.effects
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 ```
 
@@ -387,7 +385,7 @@ Starts the music equalizer.
 ```yaml
 action: divoom.equalizer
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
   audiomode: true
 ```
@@ -402,7 +400,7 @@ Shows a game. It is theoretically possible to open games, that are not shown in 
 ```yaml
 action: divoom.game
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: 2
 ```
 
@@ -416,7 +414,7 @@ Sends controlling commands to the currently open game.
 ```yaml
 action: divoom.gamecontrol
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: 'go'
 ```
 
@@ -431,7 +429,7 @@ Shows a static or animated image.
 ```yaml
 action: divoom.image
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   file: 'ha16.gif'
 ```
 
@@ -445,7 +443,7 @@ Controls the keyboard LEDs specifically on the Ditoo.
 ```yaml
 action: divoom.keyboard
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: 'next'
 ```
 
@@ -460,7 +458,7 @@ Shows the light channel. Be aware, that this mode is very limited on the Aurabox
 ```yaml
 action: divoom.light
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   brightness: 75
   color: [250, 0, 0]
 ```
@@ -471,7 +469,7 @@ Shows the lyrics channel. Might not be supported by every Divoom device.
 ```yaml
 action: divoom.lyrics
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE memorial
@@ -486,7 +484,7 @@ Sets a memorial (reminder).
 ```yaml
 action: divoom.memorial
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 0
   value: '2000-12-31 00:00:00'
   text: 'Happy New Year!'
@@ -502,7 +500,7 @@ Shows the noise meter.
 ```yaml
 action: divoom.noise
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
 ```
 
@@ -512,7 +510,7 @@ Turn the display off, by setting the pixels to black, the brightness to 0 and al
 ```yaml
 action: divoom.off
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE on
@@ -522,7 +520,7 @@ Because of the pixels still being black and no automatic way to go back to the p
 ```yaml
 action: divoom.on
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
 ```
 
 #### MODE playstate
@@ -535,7 +533,7 @@ Sets the playstate for the currently played music. Only supported by Divoom devi
 ```yaml
 action: divoom.playstate
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
 ```
 
@@ -550,7 +548,7 @@ Shows and plays the radio channel. Only supported by Divoom devices with the rad
 ```yaml
 action: divoom.radio
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
   frequency: 100.3
 ```
@@ -565,7 +563,7 @@ Sends raw data to the Divoom device. Might be useful, if there is something wron
 ```yaml
 action: divoom.raw
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   raw: [0x74, 0x64]
 ```
 
@@ -580,7 +578,7 @@ Shows the scoreboard channel or tool.
 ```yaml
 action: divoom.scoreboard
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   player1: 2
   player2: 1
 ```
@@ -596,7 +594,7 @@ It shows traffic signals, like a turn signal.
 ```yaml
 action: divoom.signal
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 ```
 
@@ -616,7 +614,7 @@ Shows the sleep mode, which plays soothing sounds, optionally with a timer and l
 ```yaml
 action: divoom.sleep
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
   time: 30
   sleepmode: 4
@@ -636,7 +634,7 @@ Shows the temperature channel. Be aware, that this mode is only supported by the
 ```yaml
 action: divoom.temperature
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: '°C'
   color: [250, 0, 0]
 ```
@@ -656,7 +654,7 @@ Shows text as a scrolling animation. Font can be any TrueType or OpenType font i
 ```yaml
 action: divoom.text
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   text: 'Hi Divoom'
   font: 'divoom.ttf'
   foreground_color: [250, 0, 0]
@@ -673,7 +671,7 @@ Shows the timer tool.
 ```yaml
 action: divoom.timer
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
 ```
 
@@ -689,7 +687,7 @@ Shows the visualization channel. The Divoom Backpack does not support this mode,
 ```yaml
 action: divoom.visualization
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
   foreground_color: [250, 0, 0]
   background_color: [0, 0, 0]
@@ -705,7 +703,7 @@ Sets the volume. Only supported by Divoom devices with audio features.
 ```yaml
 action: divoom.volume
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   volume: 75
 ```
 
@@ -721,7 +719,7 @@ Sets the weather.
 ```yaml
 action: divoom.weather
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: '25°C'
   weather: 6
 ```

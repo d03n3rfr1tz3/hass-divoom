@@ -77,10 +77,10 @@
     }
   },
   "exceptions": {
-    "entry_not_found": {
-      "message": "Nie znaleziono urządzenia Divoom dla wpisu konfiguracyjnego {entry_id}."
+    "device_not_found": {
+      "message": "Nie znaleziono urządzenia Divoom dla {device}."
     },
-    "entry_not_loaded": {
+    "device_not_loaded": {
       "message": "Urządzenie Divoom {title} nie jest załadowane. Sprawdź, czy integracja została poprawnie skonfigurowana."
     },
     "mode_failed": {
@@ -95,7 +95,7 @@
       "name": "Zegar",
       "description": "Wyświetla kanał zegara na urządzeniu Divoom. Na starszych urządzeniach, takich jak Aurabox czy Timebox Mini, ten tryb jest mocno ograniczony.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -133,7 +133,7 @@
       "name": "Światło",
       "description": "Wyświetla kanał światła na urządzeniu Divoom. Na Auraboksie ten tryb jest mocno ograniczony, ponieważ obsługuje on tylko 8 kolorów.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -151,7 +151,7 @@
       "name": "Włącz",
       "description": "Włącza wyświetlacz, ustawiając piksele na czarny, jasność na 100 oraz specjalną flagę zasilania na 1. Ponieważ piksele pozostają czarne i nie ma automatycznego powrotu do poprzednio wyświetlanego trybu, warto następnie wysłać kolejną akcję, na przykład „Zegar”.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         }
@@ -161,7 +161,7 @@
       "name": "Wyłącz",
       "description": "Wyłącza wyświetlacz, ustawiając piksele na czarny, jasność na 0 oraz specjalną flagę zasilania na 0.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         }
@@ -171,7 +171,7 @@
       "name": "Jasność",
       "description": "Ustawia jasność urządzenia Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -185,7 +185,7 @@
       "name": "Obraz",
       "description": "Wyświetla statyczny lub animowany obraz na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -203,7 +203,7 @@
       "name": "Tekst",
       "description": "Wyświetla tekst jako przewijaną animację na urządzeniu Divoom. Dłuższy tekst lub szeroka czcionka mogą nie zmieścić się w limicie około 60 klatek.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -237,7 +237,7 @@
       "name": "Wzór",
       "description": "Wyświetla kanał wzorów na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -251,7 +251,7 @@
       "name": "Efekty",
       "description": "Wyświetla kanał efektów na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -265,7 +265,7 @@
       "name": "Wizualizacja",
       "description": "Wyświetla kanał wizualizacji na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -287,7 +287,7 @@
       "name": "Sygnał",
       "description": "Wyświetla kanał sygnału na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -301,7 +301,7 @@
       "name": "Budzik",
       "description": "Ustawia budzik na urządzeniu Divoom. Być może trzeba poeksperymentować, które opcje obsługuje Twoje urządzenie Divoom i co faktycznie zmieniają. Nieobsługiwane wartości są ignorowane lub, jeśli to możliwe, od razu zerowane, aby zapobiec dziwnemu zachowaniu.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -339,7 +339,7 @@
       "name": "Odliczanie",
       "description": "Wyświetla narzędzie odliczania na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -357,7 +357,7 @@
       "name": "Stoper",
       "description": "Wyświetla narzędzie stopera na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -371,7 +371,7 @@
       "name": "Rocznica",
       "description": "Ustawia rocznicę (przypomnienie) na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -393,7 +393,7 @@
       "name": "Tablica wyników",
       "description": "Wyświetla kanał lub narzędzie tablicy wyników na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -411,7 +411,7 @@
       "name": "Miernik hałasu",
       "description": "Wyświetla miernik hałasu na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -425,7 +425,7 @@
       "name": "Tryb snu",
       "description": "Wyświetla tryb snu na urządzeniu Divoom, który odtwarza kojące dźwięki, opcjonalnie z minutnikiem i światłem.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -463,7 +463,7 @@
       "name": "Data i godzina",
       "description": "Ustawia datę i godzinę urządzenia Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -477,7 +477,7 @@
       "name": "Korektor",
       "description": "Uruchamia korektor muzyczny na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -503,7 +503,7 @@
       "name": "Głośność",
       "description": "Ustawia głośność urządzenia Divoom. Obsługiwane tylko przez urządzenia Divoom z funkcjami audio.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -517,7 +517,7 @@
       "name": "Stan odtwarzania",
       "description": "Ustawia stan odtwarzania aktualnie odtwarzanej muzyki na urządzeniu Divoom. Obsługiwane tylko przez urządzenia Divoom z funkcjami audio.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -531,7 +531,7 @@
       "name": "Radio",
       "description": "Wyświetla i odtwarza kanał radiowy na urządzeniu Divoom. Obsługiwane tylko przez urządzenia Divoom z funkcją radia.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -549,7 +549,7 @@
       "name": "Teksty piosenek",
       "description": "Wyświetla kanał z tekstami piosenek na urządzeniu Divoom. Może nie być obsługiwany przez każde urządzenie Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         }
@@ -559,7 +559,7 @@
       "name": "Klawiatura",
       "description": "Steruje podświetleniem klawiatury, w szczególności w Ditoo.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -573,7 +573,7 @@
       "name": "Gra",
       "description": "Wyświetla grę na urządzeniu Divoom. Teoretycznie można otworzyć gry, które nie są pokazywane w aplikacji na telefonie, ale mogą działać niezbyt dobrze.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -587,7 +587,7 @@
       "name": "Sterowanie grą",
       "description": "Wysyła polecenia sterujące do aktualnie otwartej gry na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -601,7 +601,7 @@
       "name": "Pogoda",
       "description": "Ustawia pogodę.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -623,7 +623,7 @@
       "name": "Temperatura",
       "description": "Wyświetla kanał temperatury na urządzeniu Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -641,7 +641,7 @@
       "name": "Surowe polecenie",
       "description": "Wysyła surowe dane do urządzenia Divoom. Może się przydać, gdy coś jest nie tak lub nie jest obsługiwane przez pozostałe tryby.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         },
@@ -655,7 +655,7 @@
       "name": "Połącz",
       "description": "Jawnie łączy się ze skonfigurowanym urządzeniem Divoom. Może się przydać, gdy chcesz tylko nawiązać połączenie bez zmieniania czegokolwiek. Zwykle połączenie jest otwierane automatycznie przy każdym trybie.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         }
@@ -665,7 +665,7 @@
       "name": "Rozłącz",
       "description": "Jawnie rozłącza się ze skonfigurowanym urządzeniem Divoom. Może się przydać, gdy nie możesz połączyć się telefonem lub innymi urządzeniami. Zwykle ten komponent pozostawia połączenie z urządzeniem Divoom otwarte.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
         }

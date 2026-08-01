@@ -14,7 +14,7 @@ from homeassistant.util import slugify
 from homeassistant.const import CONF_NAME, CONF_MAC, CONF_PORT, Platform
 from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN, PLATFORMS  # pylint:disable=unused-import
 from .migration import async_rescan
-from .services import async_setup_services
+from .services import async_refresh_service_descriptions, async_setup_services
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -62,6 +62,8 @@ async def async_setup_entry(hass: HomeAssistant, config: ConfigEntry) -> bool:
         config, [platform for platform in PLATFORMS if platform != Platform.NOTIFY]
     )
 
+    await async_refresh_service_descriptions(hass)
+
     if hass.is_running:
         async_rescan(hass)
 
@@ -90,3 +92,8 @@ async def async_unload_entry(hass: HomeAssistant, config: ConfigEntry) -> bool:
 
     _LOGGER.debug("Divoom: successfully unloaded a config entry for {} ({})".format(name, mac))
     return True
+
+async def async_remove_entry(hass: HomeAssistant, config: ConfigEntry) -> None:
+    """Drop the removed device from the picker the actions offer."""
+
+    await async_refresh_service_descriptions(hass)

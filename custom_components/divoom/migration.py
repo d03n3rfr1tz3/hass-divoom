@@ -24,7 +24,7 @@ from homeassistant.util.dt import utcnow
 from homeassistant.util.file import write_utf8_file_atomic
 from homeassistant.util.yaml import dump, load_yaml, load_yaml_dict, parse_yaml
 
-from .const import CONF_ENTRY_ID, DOMAIN
+from .const import CONF_DEVICE, DOMAIN
 from .notify import (
     PARAM_BRIGHTNESS,
     PARAM_COLOR,
@@ -38,7 +38,13 @@ from .notify import (
     PARAM_VOLUME,
     VALID_MODES,
 )
-from .services import GAMECONTROL_VALUES, KEYBOARD_VALUES, SERVICE_SCHEMAS, TEMPERATURE_UNITS
+from .services import (
+    GAMECONTROL_VALUES,
+    KEYBOARD_VALUES,
+    SERVICE_SCHEMAS,
+    TEMPERATURE_UNITS,
+    device_slug,
+)
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -278,7 +284,7 @@ def convert_step(step, services) -> Conversion | None:
         return Conversion(mode if isinstance(mode, str) else None, None, REASON_UNKNOWN_MODE)
 
     params = convert_params(mode, inner)
-    params = {CONF_ENTRY_ID: services[service], **params}
+    params = {CONF_DEVICE: services[service], **params}
 
     reason = _check(mode, params)
     return Conversion(mode, params if reason is None else None, reason)
@@ -397,12 +403,12 @@ class ScanResult:
 
 @callback
 def service_map(hass: HomeAssistant) -> dict[str, str]:
-    """Every notify service this integration owns, mapped to its config entry."""
+    """Every notify service this integration owns, mapped to its device slug."""
     services = {}
     for entry in hass.config_entries.async_entries(DOMAIN):
         name = entry.data.get(CONF_NAME)
         if name:
-            services["notify.{0}".format(slugify(name))] = entry.entry_id
+            services["notify.{0}".format(slugify(name))] = device_slug(entry)
     return services
 
 

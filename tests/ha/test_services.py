@@ -19,12 +19,14 @@ import voluptuous as vol
 
 from homeassistant.const import CONF_MAC
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
+from homeassistant.helpers.selector import selector
+from homeassistant.helpers.service import async_get_all_descriptions
 from homeassistant.setup import async_setup_component
 from homeassistant.util.yaml import load_yaml, parse_yaml
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
 from custom_components.divoom import notify as notify_module
-from custom_components.divoom.const import CONF_ENTRY_ID, DOMAIN
+from custom_components.divoom.const import CONF_DEVICE, DOMAIN
 from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.backpack import Backpack
 from custom_components.divoom.devices.ditoo import Ditoo
@@ -32,7 +34,12 @@ from custom_components.divoom.devices.divoom import DivoomUnsupportedError
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from custom_components.divoom.notify import VALID_MODES
-from custom_components.divoom.services import SERVICE_SCHEMAS, _resolve_target
+from custom_components.divoom.services import (
+    SERVICE_SCHEMAS,
+    _resolve_target,
+    async_refresh_service_descriptions,
+    device_slug,
+)
 
 from .test_notify import make_mocked_service
 
@@ -64,32 +71,49 @@ async def test_async_setup_registers_clock_service(hass):
     assert hass.services.has_service(DOMAIN, "clock")
 
 
-async def test_resolve_target_returns_loaded_device_for_entry(hass):
+async def test_resolve_target_returns_loaded_device_for_slug(hass):
     entry, service = register_device(hass)
 
-    assert _resolve_target(hass, {CONF_ENTRY_ID: entry.entry_id}) is service
+    assert _resolve_target(hass, {CONF_DEVICE: device_slug(entry)}) is service
 
 
-async def test_resolve_target_unknown_entry_raises(hass):
+@pytest.mark.parametrize("device", ["Divoom Test", "divoom test", "DIVOOM_TEST"])
+async def test_resolve_target_accepts_the_name_in_any_spelling(hass, device):
+    """The slug is what the UI writes, but a handwritten automation naming the
+    device the way it is shown has to hit the same entry."""
+    _, service = register_device(hass)
+
+    assert _resolve_target(hass, {CONF_DEVICE: device}) is service
+
+
+async def test_resolve_target_still_accepts_a_raw_entry_id(hass):
+    """What the config_entry picker used to write, so automations built
+    before the rename keep working."""
+    entry, service = register_device(hass)
+
+    assert _resolve_target(hass, {CONF_DEVICE: entry.entry_id}) is service
+
+
+async def test_resolve_target_unknown_device_raises(hass):
     register_device(hass)
 
     with pytest.raises(ServiceValidationError) as error:
-        _resolve_target(hass, {CONF_ENTRY_ID: "not-a-real-entry-id"})
+        _resolve_target(hass, {CONF_DEVICE: "divoom_kitchen"})
 
-    assert error.value.translation_key == "entry_not_found"
+    assert error.value.translation_key == "device_not_found"
 
 
 async def test_resolve_target_entry_of_another_domain_raises(hass):
-    """async_get_entry looks up across all domains, so an entry_id belonging
+    """async_get_entry looks up across all domains, so an entry id belonging
     to some other integration must not resolve here."""
     foreign = MockConfigEntry(domain="not_divoom", data={CONF_MAC: "11:22:33:44:55:66"})
     foreign.add_to_hass(hass)
     register_device(hass)
 
     with pytest.raises(ServiceValidationError) as error:
-        _resolve_target(hass, {CONF_ENTRY_ID: foreign.entry_id})
+        _resolve_target(hass, {CONF_DEVICE: foreign.entry_id})
 
-    assert error.value.translation_key == "entry_not_found"
+    assert error.value.translation_key == "device_not_found"
 
 
 async def test_resolve_target_entry_without_loaded_device_raises(hass):
@@ -98,17 +122,51 @@ async def test_resolve_target_entry_without_loaded_device_raises(hass):
     entry, _ = register_device(hass, loaded=False)
 
     with pytest.raises(ServiceValidationError) as error:
-        _resolve_target(hass, {CONF_ENTRY_ID: entry.entry_id})
+        _resolve_target(hass, {CONF_DEVICE: device_slug(entry)})
 
-    assert error.value.translation_key == "entry_not_loaded"
+    assert error.value.translation_key == "device_not_loaded"
 
 
-async def test_clock_service_requires_entry_id(hass):
+async def test_clock_service_requires_device(hass):
     assert await async_setup_component(hass, DOMAIN, {})
     register_device(hass)
 
     with pytest.raises(vol.Invalid):
         await hass.services.async_call(DOMAIN, "clock", {"clock": 1}, blocking=True)
+
+
+async def _device_field(hass, mode="clock"):
+    descriptions = await async_get_all_descriptions(hass)
+    return descriptions[DOMAIN][mode]["fields"][CONF_DEVICE]
+
+
+async def test_device_field_offers_the_configured_devices(hass):
+    """services.yaml can only describe a static field, so the picker is built
+    at runtime - and it has to offer the very value _resolve_target takes."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, _ = register_device(hass)
+
+    await async_refresh_service_descriptions(hass)
+
+    for mode in SERVICE_SCHEMAS:
+        field = await _device_field(hass, mode)
+        assert field["required"] is True, mode
+        assert field["selector"]["select"]["options"] == [
+            {"value": device_slug(entry), "label": entry.title}
+        ], mode
+
+        # a key the frontend doesn't know would just show nothing
+        selector(field["selector"])
+
+
+async def test_device_field_falls_back_to_the_static_selector(hass):
+    """Without a config entry there is nothing to pick, so the text field from
+    services.yaml has to survive the refresh."""
+    assert await async_setup_component(hass, DOMAIN, {})
+
+    await async_refresh_service_descriptions(hass)
+
+    assert await _device_field(hass) == SERVICES_YAML["clock"]["fields"][CONF_DEVICE]
 
 
 async def test_clock_service_rejects_negative_style(hass):
@@ -117,7 +175,7 @@ async def test_clock_service_rejects_negative_style(hass):
 
     with pytest.raises(vol.Invalid):
         await hass.services.async_call(
-            DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": -1}, blocking=True
+            DOMAIN, "clock", {CONF_DEVICE: device_slug(entry), "clock": -1}, blocking=True
         )
 
     service._device.show_clock.assert_not_called()
@@ -138,7 +196,7 @@ async def test_clock_service_calls_show_clock_off_the_event_loop(hass):
     await hass.services.async_call(
         DOMAIN,
         "clock",
-        {CONF_ENTRY_ID: entry.entry_id, "clock": 1, "calendar": True, "color": [250, 0, 0]},
+        {CONF_DEVICE: device_slug(entry), "clock": 1, "calendar": True, "color": [250, 0, 0]},
         blocking=True,
     )
 
@@ -158,7 +216,7 @@ async def test_clock_service_omits_unset_fields(hass):
     entry, service = register_device(hass)
 
     await hass.services.async_call(
-        DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": 1}, blocking=True
+        DOMAIN, "clock", {CONF_DEVICE: device_slug(entry), "clock": 1}, blocking=True
     )
 
     service._device.show_clock.assert_called_once_with(
@@ -172,7 +230,7 @@ async def test_clock_service_reconnects_first(hass):
     entry, service = register_device(hass)
 
     await hass.services.async_call(
-        DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": 1}, blocking=True
+        DOMAIN, "clock", {CONF_DEVICE: device_slug(entry), "clock": 1}, blocking=True
     )
 
     service._device.reconnect.assert_called_once_with(skipPing=False)
@@ -187,7 +245,7 @@ async def test_clock_service_raises_when_call_mode_fails(hass):
 
     with pytest.raises(HomeAssistantError) as error:
         await hass.services.async_call(
-            DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, "clock": 1}, blocking=True
+            DOMAIN, "clock", {CONF_DEVICE: device_slug(entry), "clock": 1}, blocking=True
         )
 
     assert error.value.translation_key == "mode_failed"
@@ -212,7 +270,7 @@ async def test_notify_and_service_clock_paths_produce_identical_show_clock_call(
     }
 
     await hass.services.async_call(
-        DOMAIN, "clock", {CONF_ENTRY_ID: entry.entry_id, **params}, blocking=True
+        DOMAIN, "clock", {CONF_DEVICE: device_slug(entry), **params}, blocking=True
     )
     via_notify.send_message(data={"mode": "clock", **params})
 
@@ -367,7 +425,7 @@ async def test_service_dispatches_to_device(hass, mode, params, notify_data, met
     entry, service = register_device(hass)
 
     await hass.services.async_call(
-        DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id, **params}, blocking=True
+        DOMAIN, mode, {CONF_DEVICE: device_slug(entry), **params}, blocking=True
     )
 
     getattr(service._device, method).assert_called_once_with(*args, **kwargs)
@@ -384,7 +442,7 @@ async def test_notify_and_service_paths_match(hass, mode, params, notify_data, m
     via_notify = make_mocked_service()
 
     await hass.services.async_call(
-        DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id, **params}, blocking=True
+        DOMAIN, mode, {CONF_DEVICE: device_slug(entry), **params}, blocking=True
     )
     via_notify.send_message(data={"mode": mode, **notify_data})
 
@@ -427,7 +485,7 @@ async def test_service_requires_mandatory_field(hass, mode, params):
 
     with pytest.raises(vol.Invalid):
         await hass.services.async_call(
-            DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id, **params}, blocking=True
+            DOMAIN, mode, {CONF_DEVICE: device_slug(entry), **params}, blocking=True
         )
 
     assert service._device.mock_calls == []
@@ -440,7 +498,7 @@ async def test_on_off_services_take_no_parameters(hass, mode):
 
     with pytest.raises(vol.Invalid):
         await hass.services.async_call(
-            DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id, "brightness": 50}, blocking=True
+            DOMAIN, mode, {CONF_DEVICE: device_slug(entry), "brightness": 50}, blocking=True
         )
 
 
@@ -454,7 +512,7 @@ async def test_image_outside_media_directory_raises(hass):
         await hass.services.async_call(
             DOMAIN,
             "image",
-            {CONF_ENTRY_ID: entry.entry_id, "file": "../../secrets.yaml"},
+            {CONF_DEVICE: device_slug(entry), "file": "../../secrets.yaml"},
             blocking=True,
         )
 
@@ -469,7 +527,7 @@ async def test_brightness_zero_is_sent(hass):
     entry, service = register_device(hass)
 
     await hass.services.async_call(
-        DOMAIN, "brightness", {CONF_ENTRY_ID: entry.entry_id, "brightness": 0}, blocking=True
+        DOMAIN, "brightness", {CONF_DEVICE: device_slug(entry), "brightness": 0}, blocking=True
     )
 
     service._device.send_brightness.assert_called_once_with(value=0)
@@ -574,7 +632,7 @@ async def test_connect_and_disconnect_services_skip_the_reconnect(hass, mode):
     entry, service = register_device(hass)
 
     await hass.services.async_call(
-        DOMAIN, mode, {CONF_ENTRY_ID: entry.entry_id}, blocking=True
+        DOMAIN, mode, {CONF_DEVICE: device_slug(entry)}, blocking=True
     )
 
     service._device.reconnect.assert_not_called()
@@ -647,7 +705,7 @@ async def test_unsupported_mode_raises_a_translated_error(hass):
 
     with pytest.raises(HomeAssistantError) as error:
         await hass.services.async_call(
-            DOMAIN, "radio", {CONF_ENTRY_ID: entry.entry_id, "value": True}, blocking=True
+            DOMAIN, "radio", {CONF_DEVICE: device_slug(entry), "value": True}, blocking=True
         )
 
     assert error.value.translation_key == "mode_unsupported"
@@ -809,7 +867,7 @@ def test_number_fields_stop_at_the_protocol_limit(mode, field):
     catch it first, while the limit itself still has to be reachable."""
     limit = _number_selector(SERVICES_YAML[mode]["fields"][field])["max"]
     schema = SERVICE_SCHEMAS[mode]
-    payload = {CONF_ENTRY_ID: "entry", **VALID_PARAMS.get(mode, {})}
+    payload = {CONF_DEVICE: "divoom_test", **VALID_PARAMS.get(mode, {})}
 
     schema({**payload, field: limit})
 
@@ -872,7 +930,7 @@ def test_every_service_field_is_a_known_notify_param():
     }
 
     for mode, schema in SERVICE_SCHEMAS.items():
-        fields = {str(marker) for marker in schema.schema} - {CONF_ENTRY_ID}
+        fields = {str(marker) for marker in schema.schema} - {CONF_DEVICE}
         assert fields <= notify_params, (mode, fields - notify_params)
 
 
@@ -904,8 +962,8 @@ def test_services_yaml_strings_and_translations_stay_in_sync():
 
     # every translation_key raised by services.py must be translatable
     assert set(strings["exceptions"]) == {
-        "entry_not_found",
-        "entry_not_loaded",
+        "device_not_found",
+        "device_not_loaded",
         "mode_failed",
         "mode_unsupported",
     }

@@ -77,10 +77,10 @@
     }
   },
   "exceptions": {
-    "entry_not_found": {
-      "message": "Pro konfigurační záznam {entry_id} nebylo nalezeno žádné zařízení Divoom."
+    "device_not_found": {
+      "message": "Pro {device} nebylo nalezeno žádné zařízení Divoom."
     },
-    "entry_not_loaded": {
+    "device_not_loaded": {
       "message": "Zařízení Divoom {title} není načteno. Zkontrolujte, zda se integrace správně nastavila."
     },
     "mode_failed": {
@@ -95,7 +95,7 @@
       "name": "Hodiny",
       "description": "Zobrazí kanál s hodinami na zařízení Divoom. Na starších zařízeních, jako je Aurabox nebo Timebox Mini, je tento režim značně omezený.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -133,7 +133,7 @@
       "name": "Světlo",
       "description": "Zobrazí kanál se světlem na zařízení Divoom. Na Auraboxu je tento režim značně omezený, protože podporuje pouze 8 barev.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -151,7 +151,7 @@
       "name": "Zapnout",
       "description": "Zapne displej tak, že nastaví pixely na černou, jas na 100 a zvláštní příznak napájení na 1. Protože pixely zůstanou černé a neexistuje automatická cesta zpět k dříve zobrazenému režimu, měl by následovat další příkaz, například „Hodiny“.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         }
@@ -161,7 +161,7 @@
       "name": "Vypnout",
       "description": "Vypne displej tak, že nastaví pixely na černou, jas na 0 a zvláštní příznak napájení na 0.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         }
@@ -171,7 +171,7 @@
       "name": "Jas",
       "description": "Nastaví jas zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -185,7 +185,7 @@
       "name": "Obrázek",
       "description": "Zobrazí statický nebo animovaný obrázek na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -203,7 +203,7 @@
       "name": "Text",
       "description": "Zobrazí text jako posouvající se animaci na zařízení Divoom. Delší text nebo široké písmo se nemusí vejít do limitu přibližně 60 snímků.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -237,7 +237,7 @@
       "name": "Design",
       "description": "Zobrazí kanál s designy na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -251,7 +251,7 @@
       "name": "Efekty",
       "description": "Zobrazí kanál s efekty na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -265,7 +265,7 @@
       "name": "Vizualizace",
       "description": "Zobrazí kanál s vizualizacemi na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -287,7 +287,7 @@
       "name": "Signál",
       "description": "Zobrazí kanál se signály na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -301,7 +301,7 @@
       "name": "Budík",
       "description": "Nastaví budík na zařízení Divoom. Možná budete muset vyzkoušet, které možnosti vaše zařízení Divoom podporuje a co skutečně mění. Nepodporované hodnoty se ignorují, případně se rovnou vynulují, aby nedocházelo k podivnému chování.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -339,7 +339,7 @@
       "name": "Odpočet",
       "description": "Zobrazí nástroj odpočtu na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -357,7 +357,7 @@
       "name": "Stopky",
       "description": "Zobrazí nástroj stopek na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -371,7 +371,7 @@
       "name": "Výročí",
       "description": "Nastaví výročí (připomínku) na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -393,7 +393,7 @@
       "name": "Ukazatel skóre",
       "description": "Zobrazí kanál nebo nástroj ukazatele skóre na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -411,7 +411,7 @@
       "name": "Hlukoměr",
       "description": "Zobrazí hlukoměr na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -425,7 +425,7 @@
       "name": "Režim spánku",
       "description": "Zobrazí režim spánku na zařízení Divoom, který přehrává uklidňující zvuky, volitelně s časovačem a světlem.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -463,7 +463,7 @@
       "name": "Datum a čas",
       "description": "Nastaví datum a čas zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -477,7 +477,7 @@
       "name": "Ekvalizér",
       "description": "Spustí hudební ekvalizér na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -503,7 +503,7 @@
       "name": "Hlasitost",
       "description": "Nastaví hlasitost zařízení Divoom. Podporují to pouze zařízení Divoom se zvukovými funkcemi.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -517,7 +517,7 @@
       "name": "Stav přehrávání",
       "description": "Nastaví stav přehrávání aktuálně přehrávané hudby na zařízení Divoom. Podporují to pouze zařízení Divoom se zvukovými funkcemi.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -531,7 +531,7 @@
       "name": "Rádio",
       "description": "Zobrazí a přehrává kanál rádia na zařízení Divoom. Podporují to pouze zařízení Divoom s funkcí rádia.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -549,7 +549,7 @@
       "name": "Texty písní",
       "description": "Zobrazí kanál s texty písní na zařízení Divoom. Nemusí být podporováno každým zařízením Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         }
@@ -559,7 +559,7 @@
       "name": "Klávesnice",
       "description": "Ovládá podsvícení klávesnice, konkrétně na zařízení Ditoo.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -573,7 +573,7 @@
       "name": "Hra",
       "description": "Zobrazí hru na zařízení Divoom. Teoreticky je možné otevřít i hry, které se v aplikaci v telefonu nezobrazují, nemusí ale fungovat dobře.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -587,7 +587,7 @@
       "name": "Ovládání hry",
       "description": "Odesílá ovládací příkazy aktuálně otevřené hře na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -601,7 +601,7 @@
       "name": "Počasí",
       "description": "Nastaví počasí.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -623,7 +623,7 @@
       "name": "Teplota",
       "description": "Zobrazí kanál teploty na zařízení Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -641,7 +641,7 @@
       "name": "Surový příkaz",
       "description": "Odešle surová data do zařízení Divoom. Může se hodit, pokud něco nefunguje nebo to ostatní režimy nepodporují.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
@@ -655,7 +655,7 @@
       "name": "Připojit",
       "description": "Výslovně se připojí ke konfigurovanému zařízení Divoom. Může se hodit, pokud chceš pouze navázat spojení, aniž bys cokoli měnil. Spojení se obvykle otevře automaticky při použití libovolného režimu.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         }
@@ -665,7 +665,7 @@
       "name": "Odpojit",
       "description": "Výslovně odpojí konfigurované zařízení Divoom. Může se hodit, pokud se nemůžeš připojit telefonem nebo jinými zařízeními. Tato komponenta obvykle nechává spojení se zařízením Divoom otevřené.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         }

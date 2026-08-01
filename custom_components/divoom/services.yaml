@@ -1,10 +1,10 @@
 clock:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     clock:
       required: true
       example: 1
@@ -40,11 +40,11 @@ clock:
 
 light:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     brightness:
       required: true
       example: 75
@@ -61,27 +61,27 @@ light:
 
 "on":
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
 
 "off":
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
 
 brightness:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     brightness:
       required: true
       example: 100
@@ -94,11 +94,11 @@ brightness:
 
 image:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     file:
       required: true
       example: "ha16.gif"
@@ -115,11 +115,11 @@ image:
 
 text:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     text:
       required: true
       example: "Hi Divoom"
@@ -155,11 +155,11 @@ text:
 
 design:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     number:
       required: true
       example: 2
@@ -171,11 +171,11 @@ design:
 
 effects:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     number:
       required: true
       example: 2
@@ -187,11 +187,11 @@ effects:
 
 visualization:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     number:
       required: true
       example: 2
@@ -211,11 +211,11 @@ visualization:
 
 signal:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     number:
       required: true
       example: 2
@@ -227,11 +227,11 @@ signal:
 
 alarm:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     number:
       example: 0
       selector:
@@ -291,11 +291,11 @@ alarm:
 
 countdown:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: true
@@ -308,11 +308,11 @@ countdown:
 
 timer:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: true
@@ -321,11 +321,11 @@ timer:
 
 memorial:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     number:
       example: 0
       selector:
@@ -344,11 +344,11 @@ memorial:
 
 scoreboard:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     player1:
       example: 2
       selector:
@@ -366,11 +366,11 @@ scoreboard:
 
 noise:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: true
@@ -379,11 +379,11 @@ noise:
 
 sleep:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: true
@@ -436,11 +436,11 @@ sleep:
 
 datetime:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       example: "2024-12-31 18:30:00"
       selector:
@@ -448,11 +448,11 @@ datetime:
 
 equalizer:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     number:
       required: true
       example: 2
@@ -476,11 +476,11 @@ equalizer:
 
 volume:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     volume:
       required: true
       example: 75
@@ -493,11 +493,11 @@ volume:
 
 playstate:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: true
@@ -506,11 +506,11 @@ playstate:
 
 radio:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: true
@@ -528,19 +528,19 @@ radio:
 
 lyrics:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
 
 keyboard:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: next
@@ -554,11 +554,11 @@ keyboard:
 
 game:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       example: 2
       selector:
@@ -569,11 +569,11 @@ game:
 
 gamecontrol:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: go
@@ -590,11 +590,11 @@ gamecontrol:
 
 weather:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: 25
@@ -634,11 +634,11 @@ weather:
 
 temperature:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     value:
       required: true
       example: "°C"
@@ -654,11 +654,11 @@ temperature:
 
 raw:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
     raw:
       required: true
       example: [0x74, 0x64]
@@ -667,16 +667,16 @@ raw:
 
 connect:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:
 
 disconnect:
   fields:
-    entry_id:
+    device:
       required: true
+      example: divoom_ditoo
       selector:
-        config_entry:
-          integration: divoom
+        text:

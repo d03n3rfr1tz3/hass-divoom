@@ -77,10 +77,10 @@
     }
   },
   "exceptions": {
-    "entry_not_found": {
-      "message": "Er is geen Divoom-apparaat gevonden voor configuratie-item {entry_id}."
+    "device_not_found": {
+      "message": "Er is geen Divoom-apparaat gevonden voor {device}."
     },
-    "entry_not_loaded": {
+    "device_not_loaded": {
       "message": "Het Divoom-apparaat {title} is niet geladen. Controleer of de integratie correct is ingesteld."
     },
     "mode_failed": {
@@ -95,7 +95,7 @@
       "name": "Klok",
       "description": "Toont het klokkanaal op een Divoom-apparaat. Op oudere apparaten zoals de Aurabox of de Timebox Mini is deze modus sterk beperkt.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -133,7 +133,7 @@
       "name": "Licht",
       "description": "Toont het lichtkanaal op een Divoom-apparaat. Op de Aurabox is deze modus sterk beperkt, omdat die maar 8 kleuren ondersteunt.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -151,7 +151,7 @@
       "name": "Inschakelen",
       "description": "Schakelt het scherm in door de pixels op zwart, de helderheid op 100 en een specifieke power-vlag op 1 te zetten. Omdat de pixels zwart blijven en er geen automatische weg terug is naar de eerder getoonde modus, kun je daarna het beste nog een actie zoals 'Klok' sturen.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         }
@@ -161,7 +161,7 @@
       "name": "Uitschakelen",
       "description": "Schakelt het scherm uit door de pixels op zwart, de helderheid op 0 en een specifieke power-vlag op 0 te zetten.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         }
@@ -171,7 +171,7 @@
       "name": "Helderheid",
       "description": "Stelt de helderheid van een Divoom-apparaat in.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -185,7 +185,7 @@
       "name": "Afbeelding",
       "description": "Toont een statische of geanimeerde afbeelding op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -203,7 +203,7 @@
       "name": "Tekst",
       "description": "Toont tekst als schuivende animatie op een Divoom-apparaat. Een langere tekst of een breed lettertype past mogelijk niet binnen de limiet van ongeveer 60 frames.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -237,7 +237,7 @@
       "name": "Ontwerp",
       "description": "Toont het ontwerpkanaal op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -251,7 +251,7 @@
       "name": "Effecten",
       "description": "Toont het effectenkanaal op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -265,7 +265,7 @@
       "name": "Visualisatie",
       "description": "Toont het visualisatiekanaal op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -287,7 +287,7 @@
       "name": "Signaal",
       "description": "Toont het signaalkanaal op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -301,7 +301,7 @@
       "name": "Wekker",
       "description": "Stelt een wekker in op een Divoom-apparaat. Je moet mogelijk uitproberen welke opties je Divoom-apparaat ondersteunt en wat ze werkelijk veranderen. Niet-ondersteunde waarden worden genegeerd of, indien mogelijk, direct op nul gezet om vreemd gedrag te voorkomen.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -339,7 +339,7 @@
       "name": "Aftelklok",
       "description": "Toont het aftelhulpmiddel op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -357,7 +357,7 @@
       "name": "Stopwatch",
       "description": "Toont het stopwatch-hulpmiddel op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -371,7 +371,7 @@
       "name": "Gedenkdag",
       "description": "Stelt een gedenkdag (herinnering) in op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -393,7 +393,7 @@
       "name": "Scorebord",
       "description": "Toont het scorebordkanaal of -hulpmiddel op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -411,7 +411,7 @@
       "name": "Geluidsmeter",
       "description": "Toont de geluidsmeter op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -425,7 +425,7 @@
       "name": "Slaapstand",
       "description": "Toont de slaapstand op een Divoom-apparaat, die rustgevende geluiden afspeelt, optioneel met timer en licht.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -463,7 +463,7 @@
       "name": "Datum en tijd",
       "description": "Stelt de datum en tijd van een Divoom-apparaat in.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -477,7 +477,7 @@
       "name": "Equalizer",
       "description": "Start de muziekequalizer op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -503,7 +503,7 @@
       "name": "Volume",
       "description": "Stelt het volume van een Divoom-apparaat in. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -517,7 +517,7 @@
       "name": "Afspeelstatus",
       "description": "Stelt de afspeelstatus van de momenteel afgespeelde muziek op een Divoom-apparaat in. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -531,7 +531,7 @@
       "name": "Radio",
       "description": "Toont en speelt het radiokanaal op een Divoom-apparaat. Wordt alleen ondersteund door Divoom-apparaten met radiofunctie.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -549,7 +549,7 @@
       "name": "Songteksten",
       "description": "Toont het songtekstkanaal op een Divoom-apparaat. Wordt mogelijk niet door elk Divoom-apparaat ondersteund.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         }
@@ -559,7 +559,7 @@
       "name": "Toetsenbord",
       "description": "Bestuurt de toetsenbordverlichting, specifiek op de Ditoo.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -573,7 +573,7 @@
       "name": "Spel",
       "description": "Toont een spel op een Divoom-apparaat. Het is theoretisch mogelijk om spellen te openen die niet in de app op je telefoon staan, maar die werken mogelijk niet goed.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -587,7 +587,7 @@
       "name": "Spelbesturing",
       "description": "Stuurt bedieningsopdrachten naar het momenteel geopende spel op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -601,7 +601,7 @@
       "name": "Weer",
       "description": "Stelt het weer in.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -623,7 +623,7 @@
       "name": "Temperatuur",
       "description": "Toont het temperatuurkanaal op een Divoom-apparaat.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -641,7 +641,7 @@
       "name": "Ruw commando",
       "description": "Stuurt ruwe data naar het Divoom-apparaat. Dat kan nuttig zijn als er iets misgaat of iets niet door de andere modi wordt ondersteund.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
@@ -655,7 +655,7 @@
       "name": "Verbinden",
       "description": "Maakt expliciet verbinding met het geconfigureerde Divoom-apparaat. Dat kan nuttig zijn als je alleen wilt verbinden zonder iets te wijzigen. Normaal wordt de verbinding bij elke modus automatisch geopend.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         }
@@ -665,7 +665,7 @@
       "name": "Verbinding verbreken",
       "description": "Verbreekt expliciet de verbinding met het geconfigureerde Divoom-apparaat. Dat kan nuttig zijn als je met je telefoon of andere apparaten geen verbinding kunt maken. Normaal houdt deze component de verbinding met je Divoom-apparaat open.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         }

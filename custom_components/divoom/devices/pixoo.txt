@@ -1,18 +1,18 @@
 # turn off the display
 action: divoom.off
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
 
 # change brightness of the display
 action: divoom.brightness
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   brightness: 75
 
 # activate channel 'clock' in rainbow style with specific components
 action: divoom.clock
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   clock: 1
   weather: false
   temp: false
@@ -22,7 +22,7 @@ data:
 # activate channel 'clock' in analog style with specific components
 action: divoom.clock
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   clock: 5
   weather: true
   temp: true
@@ -32,84 +32,84 @@ data:
 # activate light mode with specific color
 action: divoom.light
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   brightness: 75
   color: [250, 0, 0]
 
 # activate light mode with fading colors
 action: divoom.light
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   brightness: 75
 
 # activate channel 'effects' with specific effect
 action: divoom.effects
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 
 # activate channel 'visualization' with specific visualization
 action: divoom.visualization
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 
 # activate scoreboard with some scores
 action: divoom.scoreboard
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   player1: 2
   player2: 1
 
 # activate an image or animation, depending of the number of frames found in the file
 action: divoom.image
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   file: 'ha16.gif'
 
 # activate a scrolling text animation with the Divoom font
 action: divoom.text
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   text: 'Hi Divoom'
   font: 'divoom.ttf'
 
 # update date and time
 action: divoom.datetime
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: '2024-12-31 18:30:00'
 
 # update weather by setting 25°C and rainy weather
 action: divoom.weather
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: '25°C'
   weather: 6
 
 # activates the countdown with 1 minute and 30 seconds
 action: divoom.countdown
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
   countdown: '01:30'
 
 # activates the noise meter
 action: divoom.noise
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
 
 # activates the timer
 action: divoom.timer
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
 
 # activates the alarm in the first slot for 7:30 in the morning on monday-friday
 action: divoom.alarm
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 0
   value: '07:30'
   weekday:
@@ -122,7 +122,7 @@ data:
 # activate the sleep mode for 30 minutes
 action: divoom.sleep
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
   time: 30
   sleepmode: 4
@@ -132,7 +132,7 @@ data:
 # activates the memorial in the first slot for 0:00 new year
 action: divoom.memorial
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 0
   value: '2000-12-31 00:00:00'
   text: 'Happy New Year!'
@@ -140,17 +140,17 @@ data:
 # activates the third game, which should be the magic 8 ball
 action: divoom.game
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: 2
 
 # sends the GO control to the current game
 action: divoom.gamecontrol
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: 'go'
 
 # sends a raw command which sets brightness to 100%
 action: divoom.raw
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   raw: [0x74, 0x64]

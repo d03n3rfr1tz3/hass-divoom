@@ -24,7 +24,7 @@ from homeassistant.util.yaml import load_yaml, parse_yaml
 from pytest_homeassistant_custom_component.common import MockConfigEntry, async_mock_service
 
 from custom_components.divoom import migration as migration_module
-from custom_components.divoom.const import CONF_ENTRY_ID, DOMAIN
+from custom_components.divoom.const import CONF_DEVICE, DOMAIN
 from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.ditoo import Ditoo
 from custom_components.divoom.devices.pixoo import Pixoo
@@ -45,6 +45,7 @@ from custom_components.divoom.migration import (
     unsafe_reason,
 )
 from custom_components.divoom.repairs import LegacyNotifyRepairFlow
+from custom_components.divoom.services import device_slug
 
 from .test_notify import make_mocked_service
 
@@ -52,7 +53,7 @@ pytestmark = pytest.mark.usefixtures("enable_custom_integrations")
 
 COMPONENT_PATH = Path(__file__).parents[2] / "custom_components" / "divoom"
 
-SERVICES = {"notify.divoom_test": "ENTRY1"}
+SERVICES = {"notify.divoom_test": "divoom_test"}
 
 
 def step(message, data=None, key="action", service="notify.divoom_test"):
@@ -66,57 +67,57 @@ def step(message, data=None, key="action", service="notify.divoom_test"):
 # (name, legacy step, expected new data)
 CONVERSION_CASES = [
     ("modern notation", step("clock", {"clock": 0, "twentyfour": True}),
-     {CONF_ENTRY_ID: "ENTRY1", "clock": 0, "twentyfour": True}),
+     {CONF_DEVICE: "divoom_test", "clock": 0, "twentyfour": True}),
     ("mode inside data", step("", {"mode": "brightness", "number": 75}),
-     {CONF_ENTRY_ID: "ENTRY1", "brightness": 75}),
+     {CONF_DEVICE: "divoom_test", "brightness": 75}),
     ("mode in data wins", step("clock", {"mode": "on"}),
-     {CONF_ENTRY_ID: "ENTRY1"}),
+     {CONF_DEVICE: "divoom_test"}),
     ("service key", step("brightness", {"brightness": 30}, key="service"),
-     {CONF_ENTRY_ID: "ENTRY1", "brightness": 30}),
+     {CONF_DEVICE: "divoom_test", "brightness": 30}),
     ("brightness zero survives", step("brightness", {"value": 0}),
-     {CONF_ENTRY_ID: "ENTRY1", "brightness": 0}),
+     {CONF_DEVICE: "divoom_test", "brightness": 0}),
     ("brightness via number", step("brightness", {"number": 42}),
-     {CONF_ENTRY_ID: "ENTRY1", "brightness": 42}),
+     {CONF_DEVICE: "divoom_test", "brightness": 42}),
     ("volume via value", step("volume", {"value": 60}),
-     {CONF_ENTRY_ID: "ENTRY1", "volume": 60}),
+     {CONF_DEVICE: "divoom_test", "volume": 60}),
     ("text via value", step("text", {"value": "Hallo"}),
-     {CONF_ENTRY_ID: "ENTRY1", "text": "Hallo"}),
+     {CONF_DEVICE: "divoom_test", "text": "Hallo"}),
     ("packed colors split", step("text", {"text": "Hi", "color": [[255, 0, 0], [0, 0, 255]]}),
-     {CONF_ENTRY_ID: "ENTRY1", "text": "Hi", "foreground_color": [255, 0, 0], "background_color": [0, 0, 255]}),
+     {CONF_DEVICE: "divoom_test", "text": "Hi", "foreground_color": [255, 0, 0], "background_color": [0, 0, 255]}),
     ("separate colors win", step("text", {"text": "Hi", "color": [[1, 1, 1], [2, 2, 2]], "foreground_color": [9, 9, 9]}),
-     {CONF_ENTRY_ID: "ENTRY1", "text": "Hi", "foreground_color": [9, 9, 9], "background_color": [2, 2, 2]}),
+     {CONF_DEVICE: "divoom_test", "text": "Hi", "foreground_color": [9, 9, 9], "background_color": [2, 2, 2]}),
     ("clock keeps single color", step("clock", {"clock": 1, "color": [10, 20, 30]}),
-     {CONF_ENTRY_ID: "ENTRY1", "clock": 1, "color": [10, 20, 30]}),
+     {CONF_DEVICE: "divoom_test", "clock": 1, "color": [10, 20, 30]}),
     ("visualization colors split", step("visualization", {"number": 2, "color": [[1, 2, 3], [4, 5, 6]]}),
-     {CONF_ENTRY_ID: "ENTRY1", "number": 2, "foreground_color": [1, 2, 3], "background_color": [4, 5, 6]}),
+     {CONF_DEVICE: "divoom_test", "number": 2, "foreground_color": [1, 2, 3], "background_color": [4, 5, 6]}),
     ("keyboard previous", step("keyboard", {"value": -1}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "previous"}),
+     {CONF_DEVICE: "divoom_test", "value": "previous"}),
     ("keyboard toggle", step("keyboard", {"value": 0}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "toggle"}),
+     {CONF_DEVICE: "divoom_test", "value": "toggle"}),
     ("keyboard next", step("keyboard", {"value": 1}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "next"}),
+     {CONF_DEVICE: "divoom_test", "value": "next"}),
     ("keyboard word passes through", step("keyboard", {"value": "next"}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "next"}),
+     {CONF_DEVICE: "divoom_test", "value": "next"}),
     ("gamecontrol go", step("gamecontrol", {"value": 0}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "go"}),
+     {CONF_DEVICE: "divoom_test", "value": "go"}),
     ("gamecontrol ok", step("gamecontrol", {"value": 5}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "ok"}),
+     {CONF_DEVICE: "divoom_test", "value": "ok"}),
     ("gamecontrol down", step("gamecontrol", {"value": 4}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "down"}),
+     {CONF_DEVICE: "divoom_test", "value": "down"}),
     ("temperature celsius", step("temperature", {"value": 0}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "°C"}),
+     {CONF_DEVICE: "divoom_test", "value": "°C"}),
     ("temperature fahrenheit", step("temperature", {"value": 1}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "°F"}),
+     {CONF_DEVICE: "divoom_test", "value": "°F"}),
     ("temperature via temp", step("temperature", {"temp": "°F"}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "°F"}),
+     {CONF_DEVICE: "divoom_test", "value": "°F"}),
     ("weather stays combined", step("weather", {"value": "25°C", "weather": "rainy"}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": "25°C", "weather": "rainy"}),
+     {CONF_DEVICE: "divoom_test", "value": "25°C", "weather": "rainy"}),
     ("weather numeric condition", step("weather", {"value": 12, "weather": 6}),
-     {CONF_ENTRY_ID: "ENTRY1", "value": 12, "weather": 6}),
+     {CONF_DEVICE: "divoom_test", "value": 12, "weather": 6}),
     ("no data at all", step("on"),
-     {CONF_ENTRY_ID: "ENTRY1"}),
+     {CONF_DEVICE: "divoom_test"}),
     ("template value kept", step("text", {"text": "{{ states('sensor.t') }}"}),
-     {CONF_ENTRY_ID: "ENTRY1", "text": "{{ states('sensor.t') }}"}),
+     {CONF_DEVICE: "divoom_test", "text": "{{ states('sensor.t') }}"}),
 ]
 
 
@@ -206,7 +207,7 @@ def test_data_template_is_migrated_to_data():
 
     convert_config(config, SERVICES)
 
-    assert config["actions"][0] == {"action": "divoom.on", "data": {CONF_ENTRY_ID: "ENTRY1"}}
+    assert config["actions"][0] == {"action": "divoom.on", "data": {CONF_DEVICE: "divoom_test"}}
 
 
 # --- parity between the legacy path and the migrated call -------------------
@@ -235,7 +236,7 @@ def test_migrated_call_behaves_like_the_legacy_one(name, legacy, expected):
     """
     conversion = convert_step(dict(legacy), SERVICES)
     mode = conversion.mode
-    params = {key: value for key, value in conversion.data.items() if key != CONF_ENTRY_ID}
+    params = {key: value for key, value in conversion.data.items() if key != CONF_DEVICE}
 
     payload = legacy["data"]
     via_legacy = make_mocked_service()
@@ -348,7 +349,7 @@ def yaml_files(config_dir):
 async def test_service_map_derives_the_notify_name_from_the_entry(hass):
     entry = register_entry(hass, name="Divoom Test")
 
-    assert service_map(hass) == {"notify.divoom_test": entry.entry_id}
+    assert service_map(hass) == {"notify.divoom_test": device_slug(entry)}
 
 
 async def test_migrate_rewrites_both_files(hass, yaml_files):
@@ -366,11 +367,11 @@ async def test_migrate_rewrites_both_files(hass, yaml_files):
     migrated = load_yaml(str(automations))
     assert migrated[0]["actions"][0]["action"] == "divoom.text"
     assert migrated[0]["actions"][0]["data"] == {
-        CONF_ENTRY_ID: entry.entry_id,
+        CONF_DEVICE: device_slug(entry),
         "text": "{{ states('sensor.aussentemperatur') }} °C",
     }
     assert migrated[0]["actions"][1]["data"] == {
-        CONF_ENTRY_ID: entry.entry_id,
+        CONF_DEVICE: device_slug(entry),
         "brightness": 75,
     }
     # the untouched automation keeps working
@@ -758,3 +759,4 @@ async def test_flow_preview_shows_before_and_after(hass):
     assert "notify.divoom_test" in preview
     assert "divoom.brightness" in preview
     assert "brightness: 75" in preview
+    assert "device: divoom_test" in preview

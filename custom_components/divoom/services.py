@@ -1,13 +1,16 @@
 """Domain services for divoom, one per device mode."""
-import logging, re
+import logging, os, re
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.service import async_set_service_schema
+from homeassistant.util import slugify
+from homeassistant.util.yaml import load_yaml_dict
 
-from homeassistant.const import CONF_MAC
-from .const import CONF_ENTRY_ID, DOMAIN
+from homeassistant.const import CONF_MAC, CONF_NAME
+from .const import CONF_DEVICE, DOMAIN
 from .devices.divoom import DivoomUnsupportedError
 from .notify import (
     PARAM_ALARMMODE,
@@ -46,8 +49,10 @@ from .notify import (
 
 _LOGGER = logging.getLogger(__package__)
 
+SERVICES_YAML = os.path.join(os.path.dirname(__file__), "services.yaml")
+
 TARGET_SCHEMA = {
-    vol.Required(CONF_ENTRY_ID): cv.string,
+    vol.Required(CONF_DEVICE): cv.string,
 }
 
 RGB = vol.All(
@@ -242,14 +247,31 @@ SERVICE_SCHEMAS = {
     }),
 }
 
+def device_slug(entry) -> str:
+    """The name the device is addressed by, unchanged by renaming the entry."""
+    return slugify(entry.data.get(CONF_NAME) or entry.title)
+
+def _find_entry(hass: HomeAssistant, device: str):
+    """The entry a device value points at, by name, by slug or by raw id."""
+    entry = hass.config_entries.async_get_entry(device)
+    if entry is not None and entry.domain == DOMAIN:
+        return entry
+
+    slug = slugify(device)
+    for entry in hass.config_entries.async_entries(DOMAIN):
+        if slug in (device_slug(entry), slugify(entry.title)):
+            return entry
+
+    return None
+
 def _resolve_target(hass: HomeAssistant, data):
-    entry_id = data[CONF_ENTRY_ID]
-    entry = hass.config_entries.async_get_entry(entry_id)
-    if entry is None or entry.domain != DOMAIN:
+    device = data[CONF_DEVICE]
+    entry = _find_entry(hass, device)
+    if entry is None:
         raise ServiceValidationError(
             translation_domain=DOMAIN,
-            translation_key="entry_not_found",
-            translation_placeholders={"entry_id": entry_id},
+            translation_key="device_not_found",
+            translation_placeholders={"device": device},
         )
 
     loadedServices = hass.data.get(DOMAIN, {}).get('loaded', {})
@@ -257,7 +279,7 @@ def _resolve_target(hass: HomeAssistant, data):
     if mac not in loadedServices:
         raise ServiceValidationError(
             translation_domain=DOMAIN,
-            translation_key="entry_not_loaded",
+            translation_key="device_not_loaded",
             translation_placeholders={"title": entry.title},
         )
 
@@ -266,7 +288,7 @@ def _resolve_target(hass: HomeAssistant, data):
 def _make_handler(mode: str):
     async def _handle(call: ServiceCall) -> None:
         service = _resolve_target(call.hass, call.data)
-        params = {key: value for key, value in call.data.items() if key != CONF_ENTRY_ID}
+        params = {key: value for key, value in call.data.items() if key != CONF_DEVICE}
 
         try:
             result = await call.hass.async_add_executor_job(service.call_mode, mode, params)
@@ -292,3 +314,37 @@ def async_setup_services(hass: HomeAssistant) -> None:
         hass.services.async_register(DOMAIN, mode, _make_handler(mode), schema=schema)
 
     _LOGGER.debug("Divoom: successfully registered {} services".format(len(SERVICE_SCHEMAS)))
+
+def _device_options(hass: HomeAssistant):
+    """The configured devices, as the UI dropdown wants them."""
+    return [
+        {"value": device_slug(entry), "label": entry.title}
+        for entry in hass.config_entries.async_entries(DOMAIN)
+    ]
+
+async def async_refresh_service_descriptions(hass: HomeAssistant) -> None:
+    """Point the device field at the devices that actually exist.
+
+    services.yaml can only describe a static field, so the picker is built here
+    instead - it lists the configured devices and writes the same slug a
+    handwritten automation would use.
+    """
+    domainConfig = hass.data.setdefault(DOMAIN, {})
+    descriptions = domainConfig.get('descriptions')
+    if descriptions is None:
+        descriptions = await hass.async_add_executor_job(load_yaml_dict, SERVICES_YAML)
+        domainConfig['descriptions'] = descriptions
+
+    options = _device_options(hass)
+    selector = {"select": {
+        "options": options,
+        "mode": "dropdown",
+        "custom_value": True,
+        "sort": True,
+    }}
+
+    for mode, description in descriptions.items():
+        fields = description.get("fields", {})
+        if options:
+            fields = {**fields, CONF_DEVICE: {**fields[CONF_DEVICE], "selector": selector}}
+        async_set_service_schema(hass, DOMAIN, mode, {**description, "fields": fields})

@@ -77,10 +77,10 @@
     }
   },
   "exceptions": {
-    "entry_not_found": {
-      "message": "Nessun dispositivo Divoom trovato per la voce di configurazione {entry_id}."
+    "device_not_found": {
+      "message": "Nessun dispositivo Divoom trovato per {device}."
     },
-    "entry_not_loaded": {
+    "device_not_loaded": {
       "message": "Il dispositivo Divoom {title} non è caricato. Verifica che l'integrazione sia stata configurata correttamente."
     },
     "mode_failed": {
@@ -95,7 +95,7 @@
       "name": "Orologio",
       "description": "Mostra il canale orologio su un dispositivo Divoom. Questa modalità è molto limitata sui dispositivi più vecchi come l'Aurabox o il Timebox Mini.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -133,7 +133,7 @@
       "name": "Luce",
       "description": "Mostra il canale luce su un dispositivo Divoom. Questa modalità è molto limitata sull'Aurabox, perché supporta solo 8 colori.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -151,7 +151,7 @@
       "name": "Accendi",
       "description": "Accende il display impostando i pixel su nero, la luminosità su 100 e un apposito flag di accensione su 1. Poiché i pixel restano neri e non esiste un modo automatico per tornare alla modalità mostrata in precedenza, conviene inviare subito dopo un'altra azione come «Orologio».",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         }
@@ -161,7 +161,7 @@
       "name": "Spegni",
       "description": "Spegne il display impostando i pixel su nero, la luminosità su 0 e un apposito flag di accensione su 0.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         }
@@ -171,7 +171,7 @@
       "name": "Luminosità",
       "description": "Imposta la luminosità di un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -185,7 +185,7 @@
       "name": "Immagine",
       "description": "Mostra un'immagine statica o animata su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -203,7 +203,7 @@
       "name": "Testo",
       "description": "Mostra un testo come animazione scorrevole su un dispositivo Divoom. Un testo lungo o un carattere largo potrebbe non rientrare nel limite di circa 60 fotogrammi.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -237,7 +237,7 @@
       "name": "Design",
       "description": "Mostra il canale design su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -251,7 +251,7 @@
       "name": "Effetti",
       "description": "Mostra il canale effetti su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -265,7 +265,7 @@
       "name": "Visualizzazione",
       "description": "Mostra il canale visualizzazione su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -287,7 +287,7 @@
       "name": "Segnale",
       "description": "Mostra il canale segnale su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -301,7 +301,7 @@
       "name": "Sveglia",
       "description": "Imposta una sveglia su un dispositivo Divoom. Potresti dover sperimentare quali opzioni il tuo dispositivo Divoom supporta e cosa cambiano davvero. I valori non supportati vengono ignorati o, se possibile, azzerati direttamente per evitare comportamenti strani.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -339,7 +339,7 @@
       "name": "Conto alla rovescia",
       "description": "Mostra lo strumento conto alla rovescia su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -357,7 +357,7 @@
       "name": "Cronometro",
       "description": "Mostra lo strumento cronometro su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -371,7 +371,7 @@
       "name": "Ricorrenza",
       "description": "Imposta una ricorrenza (promemoria) su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -393,7 +393,7 @@
       "name": "Tabellone",
       "description": "Mostra il canale o lo strumento tabellone su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -411,7 +411,7 @@
       "name": "Fonometro",
       "description": "Mostra il fonometro su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -425,7 +425,7 @@
       "name": "Modalità sonno",
       "description": "Mostra la modalità sonno su un dispositivo Divoom, che riproduce suoni rilassanti, con timer e luce opzionali.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -463,7 +463,7 @@
       "name": "Data e ora",
       "description": "Imposta la data e l'ora di un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -477,7 +477,7 @@
       "name": "Equalizzatore",
       "description": "Avvia l'equalizzatore musicale su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -503,7 +503,7 @@
       "name": "Volume",
       "description": "Imposta il volume di un dispositivo Divoom. Supportato solo dai dispositivi Divoom con funzioni audio.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -517,7 +517,7 @@
       "name": "Stato di riproduzione",
       "description": "Imposta lo stato di riproduzione della musica attualmente in riproduzione su un dispositivo Divoom. Supportato solo dai dispositivi Divoom con funzioni audio.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -531,7 +531,7 @@
       "name": "Radio",
       "description": "Mostra e riproduce il canale radio su un dispositivo Divoom. Supportato solo dai dispositivi Divoom con funzione radio.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -549,7 +549,7 @@
       "name": "Testi",
       "description": "Mostra il canale dei testi su un dispositivo Divoom. Potrebbe non essere supportato da tutti i dispositivi Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         }
@@ -559,7 +559,7 @@
       "name": "Tastiera",
       "description": "Controlla i LED della tastiera, in particolare sul Ditoo.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -573,7 +573,7 @@
       "name": "Gioco",
       "description": "Mostra un gioco su un dispositivo Divoom. È teoricamente possibile aprire giochi che non compaiono nell'app del telefono, ma potrebbero non funzionare molto bene.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -587,7 +587,7 @@
       "name": "Controllo del gioco",
       "description": "Invia comandi di controllo al gioco attualmente aperto su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -601,7 +601,7 @@
       "name": "Meteo",
       "description": "Imposta il meteo.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -623,7 +623,7 @@
       "name": "Temperatura",
       "description": "Mostra il canale temperatura su un dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -641,7 +641,7 @@
       "name": "Comando grezzo",
       "description": "Invia dati grezzi al dispositivo Divoom. Può essere utile se qualcosa non funziona o non è supportato dalle altre modalità.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         },
@@ -655,7 +655,7 @@
       "name": "Connetti",
       "description": "Si connette esplicitamente al dispositivo Divoom configurato. Può essere utile se vuoi solo stabilire la connessione senza modificare nulla. Di norma la connessione viene aperta automaticamente con qualsiasi modalità.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         }
@@ -665,7 +665,7 @@
       "name": "Disconnetti",
       "description": "Si disconnette esplicitamente dal dispositivo Divoom configurato. Può essere utile se non riesci a connetterti con il telefono o altri dispositivi. Di norma questo componente lascia aperta la connessione al dispositivo Divoom.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
         }

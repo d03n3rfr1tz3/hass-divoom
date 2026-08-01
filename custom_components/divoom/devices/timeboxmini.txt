@@ -1,18 +1,18 @@
 # turn off the display
 action: divoom.off
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
 
 # change brightness of the display
 action: divoom.brightness
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   brightness: 75
 
 # activate channel 'clock' with 24h format
 action: divoom.clock
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   clock: 0
   twentyfour: true
   color: [250, 0, 0]
@@ -20,33 +20,33 @@ data:
 # activate channel 'temperature' with °C
 action: divoom.temperature
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: '°C'
   color: [250, 0, 0]
 
 # activate light mode with specific color
 action: divoom.light
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   brightness: 75
   color: [250, 0, 0]
 
 # activate channel 'effects' with specific effect
 action: divoom.effects
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 
 # activate channel 'visualization' with specific visualization
 action: divoom.visualization
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
 
 # activate channel 'visualization' with specific visualization and colors
 action: divoom.visualization
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 2
   foreground_color: [0, 0, 0]
   background_color: [250, 0, 0]
@@ -54,65 +54,65 @@ data:
 # activate scoreboard with some scores
 action: divoom.scoreboard
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   player1: 2
   player2: 1
 
 # activate an image or animation, depending of the number of frames found in the file
 action: divoom.image
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   file: 'ha16.gif'
 
 # activate a scrolling text animation with the Divoom font
 action: divoom.text
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   text: 'Hi Divoom'
   font: 'divoom.ttf'
 
 # update date and time
 action: divoom.datetime
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: '2024-12-31 18:30:00'
 
 # update weather by setting 25°C and rainy weather
 action: divoom.weather
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: '25°C'
   weather: 6
 
 # change the play/pause state
 action: divoom.playstate
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
 
 # change the volume
 action: divoom.volume
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   volume: 75
 
 # activates the radio and sets the frequency to 100.3
 action: divoom.radio
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
   frequency: 100.3
 
 # activates the timer
 action: divoom.timer
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
 
 # activates the alarm in the first slot for 7:30 in the morning on monday-friday
 action: divoom.alarm
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 0
   value: '07:30'
   weekday:
@@ -125,7 +125,7 @@ data:
 # activate the sleep mode for 30 minutes
 action: divoom.sleep
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: true
   time: 30
   sleepmode: 4
@@ -135,7 +135,7 @@ data:
 # activates the memorial in the first slot for 0:00 new year
 action: divoom.memorial
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   number: 0
   value: '2000-12-31 00:00:00'
   text: 'Happy New Year!'
@@ -143,17 +143,17 @@ data:
 # activates the third game, which should be the magic 8 ball
 action: divoom.game
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: 2
 
 # sends the GO control to the current game
 action: divoom.gamecontrol
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   value: 'go'
 
 # sends a raw command which sets brightness to 100%
 action: divoom.raw
 data:
-  entry_id: YOUR_DIVOOM_DEVICE
+  device: YOUR_DIVOOM_DEVICE
   raw: [0x74, 0x64]

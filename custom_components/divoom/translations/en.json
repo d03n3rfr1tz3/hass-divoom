@@ -77,10 +77,10 @@
     }
   },
   "exceptions": {
-    "entry_not_found": {
-      "message": "No Divoom device found for the config entry {entry_id}."
+    "device_not_found": {
+      "message": "No Divoom device found for {device}."
     },
-    "entry_not_loaded": {
+    "device_not_loaded": {
       "message": "The Divoom device {title} is not loaded. Check whether the integration was set up successfully."
     },
     "mode_failed": {
@@ -95,7 +95,7 @@
       "name": "Clock",
       "description": "Shows the clock channel on a Divoom device. This mode is very limited on older devices such as the Aurabox or the Timebox Mini.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -133,7 +133,7 @@
       "name": "Light",
       "description": "Shows the light channel on a Divoom device. This mode is very limited on the Aurabox, because it only supports 8 colors.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -151,7 +151,7 @@
       "name": "Turn on",
       "description": "Turns the display on, by setting the pixels to black, the brightness to 100 and also switching a specific power flag to 1. Because the pixels stay black and there is no automatic way back to the previously shown mode, you should send another action such as Clock afterwards.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         }
@@ -161,7 +161,7 @@
       "name": "Turn off",
       "description": "Turns the display off, by setting the pixels to black, the brightness to 0 and also switching a specific power flag to 0.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         }
@@ -171,7 +171,7 @@
       "name": "Brightness",
       "description": "Sets the brightness of a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -185,7 +185,7 @@
       "name": "Image",
       "description": "Shows a static or animated image on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -203,7 +203,7 @@
       "name": "Text",
       "description": "Shows text as a scrolling animation on a Divoom device. A longer text or a wide font might not fit into the frame limitation of ~60 frames.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -237,7 +237,7 @@
       "name": "Design",
       "description": "Shows the design channel on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -251,7 +251,7 @@
       "name": "Effects",
       "description": "Shows the effects channel on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -265,7 +265,7 @@
       "name": "Visualization",
       "description": "Shows the visualization channel on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -287,7 +287,7 @@
       "name": "Signal",
       "description": "Shows the signal channel on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -301,7 +301,7 @@
       "name": "Alarm",
       "description": "Sets an alarm on a Divoom device. You might have to experiment with the options your Divoom device supports and what it actually changes. Unsupported values will be ignored or if possible directly zeroed, to prevent strange behavior.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -339,7 +339,7 @@
       "name": "Countdown",
       "description": "Shows the countdown tool on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -357,7 +357,7 @@
       "name": "Timer",
       "description": "Shows the timer tool on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -371,7 +371,7 @@
       "name": "Memorial",
       "description": "Sets a memorial (reminder) on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -393,7 +393,7 @@
       "name": "Scoreboard",
       "description": "Shows the scoreboard channel or tool on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -411,7 +411,7 @@
       "name": "Noise meter",
       "description": "Shows the noise meter on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -425,7 +425,7 @@
       "name": "Sleep mode",
       "description": "Shows the sleep mode on a Divoom device, which plays soothing sounds, optionally with a timer and light.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -463,7 +463,7 @@
       "name": "Date and time",
       "description": "Sets the date and time of a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -477,7 +477,7 @@
       "name": "Equalizer",
       "description": "Starts the music equalizer on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -503,7 +503,7 @@
       "name": "Volume",
       "description": "Sets the volume of a Divoom device. Only supported by Divoom devices with audio features.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -517,7 +517,7 @@
       "name": "Play state",
       "description": "Sets the playstate for the currently played music on a Divoom device. Only supported by Divoom devices with audio features.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -531,7 +531,7 @@
       "name": "Radio",
       "description": "Shows and plays the radio channel on a Divoom device. Only supported by Divoom devices with the radio feature.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -549,7 +549,7 @@
       "name": "Lyrics",
       "description": "Shows the lyrics channel on a Divoom device. Might not be supported by every Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         }
@@ -559,7 +559,7 @@
       "name": "Keyboard",
       "description": "Controls the keyboard LEDs, specifically on the Ditoo.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -573,7 +573,7 @@
       "name": "Game",
       "description": "Shows a game on a Divoom device. It is theoretically possible to open games that are not shown in your phone app, but they might not work very well.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -587,7 +587,7 @@
       "name": "Game control",
       "description": "Sends controlling commands to the currently open game on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -601,7 +601,7 @@
       "name": "Weather",
       "description": "Sets the weather.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -623,7 +623,7 @@
       "name": "Temperature",
       "description": "Shows the temperature channel on a Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -641,7 +641,7 @@
       "name": "Raw command",
       "description": "Sends raw data to the Divoom device. Might be useful, if there is something wrong or not supported by the other modes.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
@@ -655,7 +655,7 @@
       "name": "Connect",
       "description": "Explicitly connects to your configured Divoom device. Might be useful, if you just want to connect without changing anything. Typically the connection is opened automatically when using any mode.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         }
@@ -665,7 +665,7 @@
       "name": "Disconnect",
       "description": "Explicitly disconnects from your configured Divoom device. Might be useful, if you cannot connect with your Phone or other devices. Typically this component leaves the connection open to your Divoom device.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         }

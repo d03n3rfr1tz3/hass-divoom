@@ -77,10 +77,10 @@
     }
   },
   "exceptions": {
-    "entry_not_found": {
-      "message": "Für den Konfigurationseintrag {entry_id} wurde kein Divoom-Gerät gefunden."
+    "device_not_found": {
+      "message": "Für {device} wurde kein Divoom-Gerät gefunden."
     },
-    "entry_not_loaded": {
+    "device_not_loaded": {
       "message": "Das Divoom-Gerät {title} ist nicht geladen. Prüfe, ob die Integration erfolgreich eingerichtet wurde."
     },
     "mode_failed": {
@@ -95,7 +95,7 @@
       "name": "Uhr",
       "description": "Zeigt den Uhr-Kanal auf einem Divoom-Gerät an. Auf älteren Geräten wie der Aurabox oder der Timebox Mini ist dieser Modus stark eingeschränkt.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -133,7 +133,7 @@
       "name": "Licht",
       "description": "Zeigt den Licht-Kanal auf einem Divoom-Gerät an. Auf der Aurabox ist dieser Modus stark eingeschränkt, weil sie nur 8 Farben unterstützt.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -151,7 +151,7 @@
       "name": "Einschalten",
       "description": "Schaltet die Anzeige ein, indem die Pixel auf Schwarz, die Helligkeit auf 100 und ein spezielles Power-Flag auf 1 gesetzt werden. Da die Pixel schwarz bleiben und es keinen automatischen Weg zurück zum zuvor angezeigten Modus gibt, sollte anschließend eine weitere Aktion wie „Uhr“ gesendet werden.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         }
@@ -161,7 +161,7 @@
       "name": "Ausschalten",
       "description": "Schaltet die Anzeige aus, indem die Pixel auf Schwarz, die Helligkeit auf 0 und ein spezielles Power-Flag auf 0 gesetzt werden.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         }
@@ -171,7 +171,7 @@
       "name": "Helligkeit",
       "description": "Stellt die Helligkeit eines Divoom-Geräts ein.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -185,7 +185,7 @@
       "name": "Bild",
       "description": "Zeigt ein statisches oder animiertes Bild auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -203,7 +203,7 @@
       "name": "Text",
       "description": "Zeigt Text als Lauftext-Animation auf einem Divoom-Gerät an. Ein längerer Text oder eine breite Schriftart passt möglicherweise nicht in die Beschränkung von ca. 60 Frames.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -237,7 +237,7 @@
       "name": "Design",
       "description": "Zeigt den Design-Kanal auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -251,7 +251,7 @@
       "name": "Effekte",
       "description": "Zeigt den Effekt-Kanal auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -265,7 +265,7 @@
       "name": "Visualisierung",
       "description": "Zeigt den Visualisierungs-Kanal auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -287,7 +287,7 @@
       "name": "Signal",
       "description": "Zeigt den Signal-Kanal auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -301,7 +301,7 @@
       "name": "Wecker",
       "description": "Stellt einen Wecker auf einem Divoom-Gerät. Möglicherweise musst du ausprobieren, welche Optionen dein Divoom-Gerät unterstützt und was sie tatsächlich bewirken. Nicht unterstützte Werte werden ignoriert oder, wenn möglich, direkt auf null gesetzt, um seltsames Verhalten zu vermeiden.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -339,7 +339,7 @@
       "name": "Countdown",
       "description": "Zeigt das Countdown-Werkzeug auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -357,7 +357,7 @@
       "name": "Stoppuhr",
       "description": "Zeigt das Stoppuhr-Werkzeug auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -371,7 +371,7 @@
       "name": "Gedenktag",
       "description": "Setzt einen Gedenktag (Erinnerung) auf einem Divoom-Gerät.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -393,7 +393,7 @@
       "name": "Anzeigetafel",
       "description": "Zeigt den Anzeigetafel-Kanal bzw. das Anzeigetafel-Werkzeug auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -411,7 +411,7 @@
       "name": "Lärmpegel",
       "description": "Zeigt den Lärmpegelmesser auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -425,7 +425,7 @@
       "name": "Schlafmodus",
       "description": "Zeigt den Schlafmodus auf einem Divoom-Gerät an, der beruhigende Klänge abspielt, optional mit Timer und Licht.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -463,7 +463,7 @@
       "name": "Datum und Uhrzeit",
       "description": "Stellt Datum und Uhrzeit eines Divoom-Geräts ein.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -477,7 +477,7 @@
       "name": "Equalizer",
       "description": "Startet den Musik-Equalizer auf einem Divoom-Gerät.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -503,7 +503,7 @@
       "name": "Lautstärke",
       "description": "Stellt die Lautstärke eines Divoom-Geräts ein. Wird nur von Divoom-Geräten mit Audiofunktionen unterstützt.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -517,7 +517,7 @@
       "name": "Wiedergabestatus",
       "description": "Setzt den Wiedergabestatus der aktuell gespielten Musik auf einem Divoom-Gerät. Wird nur von Divoom-Geräten mit Audiofunktionen unterstützt.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -531,7 +531,7 @@
       "name": "Radio",
       "description": "Zeigt und spielt den Radio-Kanal auf einem Divoom-Gerät. Wird nur von Divoom-Geräten mit Radiofunktion unterstützt.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -549,7 +549,7 @@
       "name": "Liedtexte",
       "description": "Zeigt den Liedtext-Kanal auf einem Divoom-Gerät an. Wird möglicherweise nicht von jedem Divoom-Gerät unterstützt.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         }
@@ -559,7 +559,7 @@
       "name": "Tastatur",
       "description": "Steuert die Tastaturbeleuchtung, speziell auf dem Ditoo.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -573,7 +573,7 @@
       "name": "Spiel",
       "description": "Zeigt ein Spiel auf einem Divoom-Gerät an. Theoretisch lassen sich auch Spiele öffnen, die nicht in der Handy-App angezeigt werden, sie funktionieren aber möglicherweise nicht gut.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -587,7 +587,7 @@
       "name": "Spielsteuerung",
       "description": "Sendet Steuerbefehle an das aktuell geöffnete Spiel auf einem Divoom-Gerät.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -601,7 +601,7 @@
       "name": "Wetter",
       "description": "Stellt das Wetter ein.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -623,7 +623,7 @@
       "name": "Temperatur",
       "description": "Zeigt den Temperatur-Kanal auf einem Divoom-Gerät an.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -641,7 +641,7 @@
       "name": "Rohbefehl",
       "description": "Sendet Rohdaten an das Divoom-Gerät. Das kann nützlich sein, wenn etwas nicht stimmt oder von den anderen Modi nicht unterstützt wird.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
@@ -655,7 +655,7 @@
       "name": "Verbinden",
       "description": "Stellt ausdrücklich eine Verbindung zum konfigurierten Divoom-Gerät her. Das kann nützlich sein, wenn nur die Verbindung aufgebaut werden soll, ohne etwas zu ändern. Normalerweise wird die Verbindung bei jedem Modus automatisch geöffnet.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         }
@@ -665,7 +665,7 @@
       "name": "Trennen",
       "description": "Trennt ausdrücklich die Verbindung zum konfigurierten Divoom-Gerät. Das kann nützlich sein, wenn keine Verbindung mit dem Handy oder anderen Geräten möglich ist. Normalerweise lässt diese Komponente die Verbindung zum Divoom-Gerät offen.",
       "fields": {
-        "entry_id": {
+        "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         }
