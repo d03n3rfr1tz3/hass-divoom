@@ -9,7 +9,7 @@ share the base protocol, so only the pixel-push path is overridden here.
 Protocol reverse-engineered by https://github.com/alvinunreal/divoom-minitoo-osx
 """
 
-import errno, math, socket, time
+import errno, select, socket, time
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from .divoom import Divoom
@@ -87,25 +87,57 @@ class Minitoo(Divoom):
             packets.append(self._frame(CMD_NEW_GIF, body))
         return packets
 
+    def _write(self, pkt):
+        try:
+            self.socket.sendall(pkt)
+        except socket.error as error:
+            self.socket_errno = error.errno; self.socket = None; raise
+        except IOError as error:
+            if error.errno == errno.EPIPE:
+                self.socket_errno = error.errno; self.socket = None
+            raise
+
+    def _await_request(self, timeout=2.0):
+        """Wait for the device's 'ready for animation' request (contains 04 8b 55)
+        after the start packet. Streaming chunks before the device asks for them is
+        why the first send after the device idled or changed face got dropped."""
+        deadline = time.time() + timeout
+        buf = bytearray()
+        while time.time() < deadline:
+            r, _, _ = select.select([self.socket], [], [], max(0, deadline - time.time()))
+            if not r: break
+            try:
+                data = self.socket.recv(256)
+            except socket.error:
+                break
+            if not data: break
+            buf.extend(data)
+            if b"\x04\x8b\x55" in buf:
+                return True
+        return False
+
+    def _drain(self, timeout=0.3):
+        """Consume any trailing device reply (e.g. the final ACK) so it doesn't
+        get mistaken for the next send's request."""
+        try:
+            r, _, _ = select.select([self.socket], [], [], timeout)
+            if r: self.socket.recv(512)
+        except socket.error:
+            pass
+
     def _send_packets(self, packets, delay=0.012):
-        """Stream start + chunks over RFCOMM, matching the validated app cadence."""
+        """Send the start packet, wait for the device to request the animation,
+        then stream the chunks — matching the app's real handshake."""
         self.connect()
         if self.socket == None:
             self.logger.warning("{0}: not connected, dropping media".format(self.type))
             return
-        for pkt in packets:
-            try:
-                self.socket.sendall(pkt)
-            except socket.error as error:
-                self.socket_errno = error.errno
-                self.socket = None
-                raise
-            except IOError as error:
-                if error.errno == errno.EPIPE:
-                    self.socket_errno = error.errno
-                    self.socket = None
-                raise
+        self._write(packets[0])            # start packet declares the payload length
+        self._await_request(timeout=2.0)   # device signals it is ready to receive
+        for pkt in packets[1:]:
+            self._write(pkt)
             time.sleep(delay)
+        self._drain()                      # swallow the final ACK
 
     def send_media(self, images, speed=1000):
         self._send_packets(self._build_packets(self._encode_media(images, speed)))
