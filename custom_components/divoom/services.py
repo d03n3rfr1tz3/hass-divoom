@@ -22,6 +22,7 @@ from .notify import (
     PARAM_CLOCK,
     PARAM_COLOR,
     PARAM_COUNTDOWN,
+    PARAM_EFFECT,
     PARAM_FILE,
     PARAM_FONT,
     PARAM_FOREGROUND_COLOR,
@@ -73,6 +74,8 @@ CLOCK = vol.All(vol.Coerce(int), vol.Range(min=0, max=15))
 FREQUENCY = vol.All(vol.Coerce(float), vol.Range(min=64, max=108))
 
 KEYBOARD_VALUES = ["previous", "toggle", "next"]
+PLAYSTATE_VALUES = ["previous", "pause", "play", "next"]
+RADIO_VALUES = ["bluetooth", "fm", "linein", "sdcard", "usb"]
 GAMECONTROL_VALUES = ["go", "left", "right", "up", "down", "ok"]
 TEMPERATURE_UNITS = ["°C", "°F"]
 
@@ -97,6 +100,7 @@ SERVICE_SCHEMAS = {
         **TARGET_SCHEMA,
         vol.Required(PARAM_BRIGHTNESS): PERCENT,
         vol.Optional(PARAM_COLOR): RGB,
+        vol.Optional(PARAM_EFFECT): BYTE,
     }),
     "on": vol.Schema({
         **TARGET_SCHEMA,
@@ -202,11 +206,11 @@ SERVICE_SCHEMAS = {
     }),
     "playstate": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Required(PARAM_VALUE): cv.boolean,
+        vol.Required(PARAM_VALUE): vol.Any(vol.In(PLAYSTATE_VALUES), cv.boolean),
     }),
     "radio": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Required(PARAM_VALUE): cv.boolean,
+        vol.Required(PARAM_VALUE): vol.Any(vol.In(RADIO_VALUES), cv.boolean),
         vol.Optional(PARAM_FREQUENCY): FREQUENCY,
     }),
     "lyrics": vol.Schema({

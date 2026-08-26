@@ -454,6 +454,7 @@ Shows the light channel. Be aware, that this mode is very limited on the Aurabox
 | ---          | :---:    | --- |
 | `brightness` | ✔        | The brightness value between 0 and 100. |
 | `color`      |          | The color of the light. Accepts an array of RGB color values. Leave it empty to fade through the colors. |
+| `effect`     |          | The light effect between 0 and 4. 0 shows a fixed color, while 1 to 4 are animations. |
 
 ```yaml
 action: divoom.light
@@ -524,32 +525,32 @@ data:
 ```
 
 #### MODE playstate
-Sets the playstate for the currently played music. Only supported by Divoom devices with audio features.
+Controls the music that is currently played. Only supported by Divoom devices with audio features.
 
 | Parameter | Required | Description |
 | ---       | :---:    | --- |
-| `value`   | ✔        | Controls the play/pause state. <br/> `false` = pause, `true` = play |
+| `value`   | ✔        | Plays, pauses or changes the track. <br/> `previous`, `pause`, `play`, `next` |
 
 ```yaml
 action: divoom.playstate
 data:
   device: YOUR_DIVOOM_DEVICE
-  value: true
+  value: 'next'
 ```
 
 #### MODE radio
-Shows and plays the radio channel. Only supported by Divoom devices with the radio feature.
+Shows and plays the radio channel, or switches to another audio source. Only supported by Divoom devices with audio features.
 
 | Parameter   | Required | Description |
 | ---         | :---:    | --- |
-| `value`     | ✔        | Controls the on/off state. <br/> `false` = off, `true` = on |
-| `frequency` |          | The radio frequency to set. |
+| `value`     | ✔        | The audio source to switch to. <br/> `bluetooth`, `fm`, `linein`, `sdcard`, `usb` |
+| `frequency` |          | The radio frequency to set. Only used when switching to `fm` and if it's supported. |
 
 ```yaml
 action: divoom.radio
 data:
   device: YOUR_DIVOOM_DEVICE
-  value: true
+  value: 'fm'
   frequency: 100.3
 ```
 

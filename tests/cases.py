@@ -52,6 +52,7 @@ FIXED_CASES = {
         color=[10, 20, 30], hot=True,
     ),
     "show_light": lambda d: d.show_light(color=[255, 0, 128], brightness=77, power=True),
+    "show_light_effect": lambda d: d.show_light(color=[255, 0, 128], brightness=77, power=True, effect=3),
     "show_effects": lambda d: d.show_effects(2),
     "show_visualization": lambda d: d.show_visualization(1, color1=[1, 2, 3], color2=[4, 5, 6]),
     "show_signal": lambda d: d.show_signal(1, color1=[1, 2, 3], color2=[4, 5, 6]),
@@ -76,7 +77,10 @@ FIXED_CASES = {
     "send_weather": lambda d: d.send_weather("22°C", weather=3),
     "send_datetime": lambda d: d.send_datetime("2024-01-02T03:04:05"),
     "send_playstate": lambda d: d.send_playstate(True),
+    "send_playstate_next": lambda d: d.send_playstate("next"),
+    "send_playstate_pause": lambda d: d.send_playstate("pause"),
     "show_radio": lambda d: d.show_radio(True, frequency=101.3),
+    "show_radio_sdcard": lambda d: d.show_radio("sdcard", frequency=101.3),
     "show_text": lambda d: d.show_text("HA", FONT_PATH, color1=[255, 255, 255], color2=[1, 1, 1]),
 }
 

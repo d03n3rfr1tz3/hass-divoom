@@ -58,6 +58,13 @@ light:
       example: [250, 0, 0]
       selector:
         color_rgb:
+    effect:
+      example: 1
+      selector:
+        number:
+          min: 0
+          max: 255
+          mode: box
 
 "on":
   fields:
@@ -500,9 +507,15 @@ playstate:
         text:
     value:
       required: true
-      example: true
+      example: play
       selector:
-        boolean:
+        select:
+          translation_key: playstate_value
+          options:
+            - previous
+            - pause
+            - play
+            - next
 
 radio:
   fields:
@@ -513,9 +526,16 @@ radio:
         text:
     value:
       required: true
-      example: true
+      example: fm
       selector:
-        boolean:
+        select:
+          translation_key: radio_value
+          options:
+            - bluetooth
+            - fm
+            - linein
+            - sdcard
+            - usb
     frequency:
       example: 100.3
       selector:

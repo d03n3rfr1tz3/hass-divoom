@@ -154,6 +154,10 @@
         "color": {
           "name": "Color",
           "description": "The color of the light. Leave it empty to fade through the colors."
+        },
+        "effect": {
+          "name": "Effect",
+          "description": "The light effect between 0 and 4. 0 shows a fixed color, while 1 to 4 are animations."
         }
       }
     },
@@ -525,29 +529,29 @@
     },
     "playstate": {
       "name": "Play state",
-      "description": "Sets the playstate for the currently played music on a Divoom device. Only supported by Divoom devices with audio features.",
+      "description": "Controls the music currently played on a Divoom device. Only supported by Divoom devices with audio features.",
       "fields": {
         "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
         "value": {
-          "name": "Play",
-          "description": "Controls the play/pause state."
+          "name": "Action",
+          "description": "Plays, pauses or changes the track."
         }
       }
     },
     "radio": {
       "name": "Radio",
-      "description": "Shows and plays the radio channel on a Divoom device. Only supported by Divoom devices with the radio feature.",
+      "description": "Shows the radio channel on a Divoom device or switches to another audio source. Only supported by Divoom devices with audio features.",
       "fields": {
         "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
         },
         "value": {
-          "name": "On",
-          "description": "Controls the on/off state."
+          "name": "Source",
+          "description": "The audio source to switch to."
         },
         "frequency": {
           "name": "Radio frequency",
@@ -699,6 +703,23 @@
         "previous": "Previous effect",
         "toggle": "Toggle on/off",
         "next": "Next effect"
+      }
+    },
+    "playstate_value": {
+      "options": {
+        "previous": "Previous track",
+        "pause": "Pause",
+        "play": "Play",
+        "next": "Next track"
+      }
+    },
+    "radio_value": {
+      "options": {
+        "bluetooth": "Bluetooth",
+        "fm": "FM radio",
+        "linein": "Line-in",
+        "sdcard": "SD card",
+        "usb": "USB audio"
       }
     },
     "gamecontrol_value": {

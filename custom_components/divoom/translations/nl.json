@@ -154,6 +154,10 @@
         "color": {
           "name": "Kleur",
           "description": "De kleur van het licht. Laat leeg om de kleuren te laten doorlopen."
+        },
+        "effect": {
+          "name": "Effect",
+          "description": "Het lichteffect tussen 0 en 4. 0 toont een vaste kleur, 1 tot 4 zijn animaties."
         }
       }
     },
@@ -525,29 +529,29 @@
     },
     "playstate": {
       "name": "Afspeelstatus",
-      "description": "Stelt de afspeelstatus van de momenteel afgespeelde muziek op een Divoom-apparaat in. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
+      "description": "Regelt de muziek die momenteel op een Divoom-apparaat wordt afgespeeld. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
       "fields": {
         "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
         "value": {
-          "name": "Afspelen",
-          "description": "Regelt de afspelen/pauze-status."
+          "name": "Actie",
+          "description": "Speelt af, pauzeert of wisselt van nummer."
         }
       }
     },
     "radio": {
       "name": "Radio",
-      "description": "Toont en speelt het radiokanaal op een Divoom-apparaat. Wordt alleen ondersteund door Divoom-apparaten met radiofunctie.",
+      "description": "Toont het radiokanaal op een Divoom-apparaat of schakelt naar een andere audiobron. Wordt alleen ondersteund door Divoom-apparaten met audiofuncties.",
       "fields": {
         "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
         },
         "value": {
-          "name": "Aan",
-          "description": "Regelt de aan/uit-status."
+          "name": "Bron",
+          "description": "De audiobron waarnaar geschakeld wordt."
         },
         "frequency": {
           "name": "Radiofrequentie",
@@ -699,6 +703,23 @@
         "previous": "Vorig effect",
         "toggle": "In-/uitschakelen",
         "next": "Volgend effect"
+      }
+    },
+    "playstate_value": {
+      "options": {
+        "previous": "Vorig nummer",
+        "pause": "Pauze",
+        "play": "Afspelen",
+        "next": "Volgend nummer"
+      }
+    },
+    "radio_value": {
+      "options": {
+        "bluetooth": "Bluetooth",
+        "fm": "FM-radio",
+        "linein": "Line-in",
+        "sdcard": "SD-kaart",
+        "usb": "USB-audio"
       }
     },
     "gamecontrol_value": {

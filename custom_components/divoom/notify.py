@@ -41,6 +41,7 @@ PARAM_BACKGROUND_COLOR = 'background_color'
 PARAM_FOREGROUND_COLOR = 'foreground_color'
 PARAM_COLOR = 'color'
 PARAM_COUNTDOWN = 'countdown'
+PARAM_EFFECT = 'effect'
 PARAM_FREQUENCY = 'frequency'
 PARAM_NUMBER = 'number'
 PARAM_WEEKDAY = 'weekday'
@@ -380,7 +381,8 @@ class DivoomNotificationService(BaseNotificationService):
             elif mode == "light":
                 brightness = data.get(PARAM_BRIGHTNESS)
                 color = data.get(PARAM_COLOR)
-                self._device.show_light(color=color, brightness=brightness, power=True)
+                effect = data.get(PARAM_EFFECT)
+                self._device.show_light(color=color, brightness=brightness, power=True, effect=effect)
 
             elif mode == "lyrics":
                 self._device.show_lyrics()

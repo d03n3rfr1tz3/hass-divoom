@@ -154,6 +154,10 @@
         "color": {
           "name": "Barva",
           "description": "Barva světla. Ponechte prázdné, aby barvy plynule přecházely."
+        },
+        "effect": {
+          "name": "Efekt",
+          "description": "Světelný efekt mezi 0 a 4. 0 zobrazí pevnou barvu, 1 až 4 jsou animace."
         }
       }
     },
@@ -525,29 +529,29 @@
     },
     "playstate": {
       "name": "Stav přehrávání",
-      "description": "Nastaví stav přehrávání aktuálně přehrávané hudby na zařízení Divoom. Podporují to pouze zařízení Divoom se zvukovými funkcemi.",
+      "description": "Ovládá aktuálně přehrávanou hudbu na zařízení Divoom. Podporují to pouze zařízení Divoom se zvukovými funkcemi.",
       "fields": {
         "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
         "value": {
-          "name": "Přehrávat",
-          "description": "Řídí stav přehrávání/pozastavení."
+          "name": "Akce",
+          "description": "Přehraje, pozastaví nebo změní skladbu."
         }
       }
     },
     "radio": {
       "name": "Rádio",
-      "description": "Zobrazí a přehrává kanál rádia na zařízení Divoom. Podporují to pouze zařízení Divoom s funkcí rádia.",
+      "description": "Zobrazí kanál rádia na zařízení Divoom nebo přepne na jiný zdroj zvuku. Podporují to pouze zařízení Divoom se zvukovými funkcemi.",
       "fields": {
         "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
         },
         "value": {
-          "name": "Zapnuto",
-          "description": "Řídí stav zapnuto/vypnuto."
+          "name": "Zdroj",
+          "description": "Zdroj zvuku, na který se má přepnout."
         },
         "frequency": {
           "name": "Rádiová frekvence",
@@ -699,6 +703,23 @@
         "previous": "Předchozí efekt",
         "toggle": "Zapnout/vypnout",
         "next": "Další efekt"
+      }
+    },
+    "playstate_value": {
+      "options": {
+        "previous": "Předchozí skladba",
+        "pause": "Pozastavit",
+        "play": "Přehrát",
+        "next": "Další skladba"
+      }
+    },
+    "radio_value": {
+      "options": {
+        "bluetooth": "Bluetooth",
+        "fm": "Rádio FM",
+        "linein": "Line-in",
+        "sdcard": "SD karta",
+        "usb": "USB zvuk"
       }
     },
     "gamecontrol_value": {

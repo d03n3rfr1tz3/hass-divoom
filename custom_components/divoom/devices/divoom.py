@@ -20,6 +20,7 @@ class Divoom:
         "set radio": 0x05,
         "set volume": 0x08,
         "set playstate": 0x0a,
+        "set playtrack": 0x12,
         "set game keydown": 0x17,
         "set date time": 0x18,
         "set game keyup": 0x21,
@@ -44,6 +45,14 @@ class Divoom:
         "set game keypress": 0x88,
         "set game": 0xa0,
         "set design": 0xbd,
+    }
+
+    SOURCES = {
+        "bluetooth": 0x00,
+        "fm": 0x01,
+        "linein": 0x02,
+        "sdcard": 0x03,
+        "usb": 0x07,
     }
 
     escapePayload = False
@@ -387,12 +396,12 @@ class Divoom:
                         color_index = len(colors)
                         palette_index[color_t] = color_index
                         colors.append(color)
-                    pixels[x + frameSize[1] * y] = color_index
-                
+                    pixels[x + frameSize[0] * y] = color_index
+
                 if picture_time is None: picture_time = 0
-                
+
                 colorCount = len(colors)
-                if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
+                if not needsFlags and colorCount >= 256: colorCount = 0
                 
                 frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
                 frames.append(frame)
@@ -476,10 +485,10 @@ class Divoom:
                         color_index = len(colors)
                         palette_index[color_t] = color_index
                         colors.append(color)
-                    pixels[x + frameSize[1] * y] = color_index
-                
+                    pixels[x + frameSize[0] * y] = color_index
+
                 colorCount = len(colors)
-                if colorCount >= (frameSize[0] * frameSize[1]): colorCount = 0
+                if not needsFlags and colorCount >= 256: colorCount = 0
 
                 frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
                 frames.append(frame)
@@ -655,6 +664,7 @@ class Divoom:
         args += clock.hour.to_bytes(1, byteorder='big')
         args += clock.minute.to_bytes(1, byteorder='big')
         args += clock.second.to_bytes(1, byteorder='big')
+        args += (clock.isoweekday() % 7).to_bytes(1, byteorder='big')
         return self.send_command("set date time", args)
 
     def show_design(self, number=None):
@@ -743,21 +753,23 @@ class Divoom:
     def send_keyboard(self, value=None):
         self.unimplemented()
 
-    def show_light(self, color, brightness=None, power=None):
+    def show_light(self, color, brightness=None, power=None, effect=None):
         """Show light on the Divoom device in the color"""
         if power == None: power = True
         if brightness == None: brightness = 100
         if isinstance(brightness, str): brightness = int(brightness)
+        if isinstance(effect, str): effect = int(effect)
+
+        hasColor = color is not None and len(color) >= 3
+        if effect == None: effect = 0 if hasColor else 1
 
         args = [0x01]
-        if color is None or len(color) < 3:
+        if not hasColor:
             args += [0xFF, 0xFF, 0xFF]
-            args += brightness.to_bytes(1, byteorder='big')
-            args += [0x01]
         else:
             args += self.convert_color(color)
-            args += brightness.to_bytes(1, byteorder='big')
-            args += [0x00]
+        args += brightness.to_bytes(1, byteorder='big')
+        args += effect.to_bytes(1, byteorder='big')
         args += [0x01 if power == True or power == 1 else 0x00, 0x00, 0x00, 0x00]
         return self.send_command("set view", args)
 
@@ -800,18 +812,35 @@ class Divoom:
         return self.send_command("set tool", args)
 
     def send_playstate(self, value=None):
-        """Send play/pause state to the Divoom device"""
+        """Send play/pause state or a track change to the Divoom device"""
+        if isinstance(value, str):
+            if value == "previous": return self.send_playtrack(0)
+            elif value == "next": return self.send_playtrack(1)
+            elif value == "pause": value = False
+            elif value == "play": value = True
+
         args = []
         args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
         return self.send_command("set playstate", args)
 
-    def show_radio(self, value=None, frequency=None):
-        """Show radio on the Divoom device and optionally changes to the given frequency"""
+    def send_playtrack(self, value=None):
+        """Send the previous or next track to the Divoom device"""
         args = []
         args += (0x01 if value == True or value == 1 else 0x00).to_bytes(1, byteorder='big')
+        return self.send_command("set playtrack", args)
+
+    def show_radio(self, value=None, frequency=None):
+        """Show radio on the Divoom device, or switch to another audio source, and optionally changes to the given frequency"""
+        if isinstance(value, str) and value in self.SOURCES:
+            source = self.SOURCES[value]
+        else:
+            source = 0x01 if value == True or value == 1 else 0x00
+
+        args = []
+        args += source.to_bytes(1, byteorder='big')
         result = self.send_command("set radio", args)
 
-        if (value == True or value == 1) and frequency != None:
+        if source == self.SOURCES["fm"] and frequency != None:
             if isinstance(frequency, str): frequency = float(frequency)
 
             args = []

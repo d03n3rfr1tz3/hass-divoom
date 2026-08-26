@@ -132,7 +132,7 @@ class Aurabox(Divoom):
     def send_keyboard(self, value=None):
         self.unsupported("changing the keyboard light")
 
-    def show_light(self, color, brightness=None, power=None):
+    def show_light(self, color, brightness=None, power=None, effect=None):
         """Show light on the Divoom device in the color"""
         if isinstance(brightness, str): brightness = int(brightness)
 

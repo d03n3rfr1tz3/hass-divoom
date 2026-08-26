@@ -154,6 +154,10 @@
         "color": {
           "name": "Color",
           "description": "El color de la luz. Déjalo vacío para que los colores se fundan entre sí."
+        },
+        "effect": {
+          "name": "Efecto",
+          "description": "El efecto de luz entre 0 y 4. 0 muestra un color fijo, mientras que de 1 a 4 son animaciones."
         }
       }
     },
@@ -525,29 +529,29 @@
     },
     "playstate": {
       "name": "Estado de reproducción",
-      "description": "Ajusta el estado de reproducción de la música que se está reproduciendo en un dispositivo Divoom. Solo lo admiten los dispositivos Divoom con funciones de audio.",
+      "description": "Controla la música que se está reproduciendo en un dispositivo Divoom. Solo lo admiten los dispositivos Divoom con funciones de audio.",
       "fields": {
         "device": {
           "name": "Dispositivo",
           "description": "El dispositivo Divoom al que se envía esta acción."
         },
         "value": {
-          "name": "Reproducir",
-          "description": "Controla el estado de reproducción/pausa."
+          "name": "Acción",
+          "description": "Reproduce, pausa o cambia de pista."
         }
       }
     },
     "radio": {
       "name": "Radio",
-      "description": "Muestra y reproduce el canal de radio en un dispositivo Divoom. Solo lo admiten los dispositivos Divoom con función de radio.",
+      "description": "Muestra el canal de radio en un dispositivo Divoom o cambia a otra fuente de audio. Solo lo admiten los dispositivos Divoom con funciones de audio.",
       "fields": {
         "device": {
           "name": "Dispositivo",
           "description": "El dispositivo Divoom al que se envía esta acción."
         },
         "value": {
-          "name": "Encendida",
-          "description": "Controla el estado de encendido/apagado."
+          "name": "Fuente",
+          "description": "La fuente de audio a la que cambiar."
         },
         "frequency": {
           "name": "Frecuencia de radio",
@@ -699,6 +703,23 @@
         "previous": "Efecto anterior",
         "toggle": "Activar/desactivar",
         "next": "Efecto siguiente"
+      }
+    },
+    "playstate_value": {
+      "options": {
+        "previous": "Pista anterior",
+        "pause": "Pausa",
+        "play": "Reproducir",
+        "next": "Pista siguiente"
+      }
+    },
+    "radio_value": {
+      "options": {
+        "bluetooth": "Bluetooth",
+        "fm": "Radio FM",
+        "linein": "Line-in",
+        "sdcard": "Tarjeta SD",
+        "usb": "Audio USB"
       }
     },
     "gamecontrol_value": {

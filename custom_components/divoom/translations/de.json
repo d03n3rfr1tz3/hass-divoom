@@ -154,6 +154,10 @@
         "color": {
           "name": "Farbe",
           "description": "Die Farbe des Lichts. Leer lassen, um die Farben durchlaufen zu lassen."
+        },
+        "effect": {
+          "name": "Effekt",
+          "description": "Der Lichteffekt zwischen 0 und 4. 0 zeigt eine feste Farbe, 1 bis 4 sind Animationen."
         }
       }
     },
@@ -525,29 +529,29 @@
     },
     "playstate": {
       "name": "Wiedergabestatus",
-      "description": "Setzt den Wiedergabestatus der aktuell gespielten Musik auf einem Divoom-Gerät. Wird nur von Divoom-Geräten mit Audiofunktionen unterstützt.",
+      "description": "Steuert die aktuell gespielte Musik auf einem Divoom-Gerät. Wird nur von Divoom-Geräten mit Audiofunktionen unterstützt.",
       "fields": {
         "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
         "value": {
-          "name": "Wiedergabe",
-          "description": "Steuert den Wiedergabe/Pause-Zustand."
+          "name": "Aktion",
+          "description": "Startet, pausiert oder wechselt den Titel."
         }
       }
     },
     "radio": {
       "name": "Radio",
-      "description": "Zeigt und spielt den Radio-Kanal auf einem Divoom-Gerät. Wird nur von Divoom-Geräten mit Radiofunktion unterstützt.",
+      "description": "Zeigt den Radio-Kanal auf einem Divoom-Gerät an oder wechselt zu einer anderen Audioquelle. Wird nur von Divoom-Geräten mit Audiofunktionen unterstützt.",
       "fields": {
         "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
         },
         "value": {
-          "name": "Ein",
-          "description": "Steuert den Ein/Aus-Zustand."
+          "name": "Quelle",
+          "description": "Die Audioquelle, auf die gewechselt wird."
         },
         "frequency": {
           "name": "Radiofrequenz",
@@ -699,6 +703,23 @@
         "previous": "Vorheriger Effekt",
         "toggle": "Ein-/ausschalten",
         "next": "Nächster Effekt"
+      }
+    },
+    "playstate_value": {
+      "options": {
+        "previous": "Vorheriger Titel",
+        "pause": "Pause",
+        "play": "Wiedergabe",
+        "next": "Nächster Titel"
+      }
+    },
+    "radio_value": {
+      "options": {
+        "bluetooth": "Bluetooth",
+        "fm": "FM-Radio",
+        "linein": "Line-In",
+        "sdcard": "SD-Karte",
+        "usb": "USB-Audio"
       }
     },
     "gamecontrol_value": {
