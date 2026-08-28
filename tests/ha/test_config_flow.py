@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ipaddress
+from unittest.mock import patch
 
 import pytest
 
@@ -10,6 +11,7 @@ from homeassistant.data_entry_flow import FlowResultType
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 
 from custom_components.divoom.const import CONF_DEVICE_TYPE, DOMAIN
+from custom_components.divoom.notify import DivoomNotificationService
 from homeassistant.const import CONF_HOST, CONF_MAC, CONF_PORT
 
 pytestmark = pytest.mark.usefixtures("enable_custom_integrations")
@@ -46,7 +48,8 @@ async def test_user_step_with_known_mac_creates_entry(hass):
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "confirm"
 
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+    with patch.object(DivoomNotificationService, "connect"):
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_MAC] == "11:22:33:44:55:66"
     assert result["data"][CONF_DEVICE_TYPE] == "pixoo"
@@ -79,7 +82,9 @@ async def test_zeroconf_step_with_properties_creates_entry(hass):
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_DEVICE_TYPE: "pixoo"}
     )
-    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+
+    with patch.object(DivoomNotificationService, "connect"):
+        result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
     assert result["type"] == FlowResultType.CREATE_ENTRY
     assert result["data"][CONF_MAC] == "11:22:33:44:55:66"
 
