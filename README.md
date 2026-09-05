@@ -80,6 +80,10 @@ As an alternative for directly connecting your Home Assistant via Bluetooth to y
 With this you don't have to fiddle around with Bluetooth Pairing in your Home Assistant. It's currently still quite new, so there might be some minor issues here and there.
 If you are using my Bluetooth Proxy for ESP32, you can skip the whole Bluetooth Hardware and Bluetooth Pairing parts of this documentation.
 
+The Bluetooth Proxy can either be flashed as its own firmware or be built as an [ESPHome](https://esphome.io/) component, which lets you adopt and update it from your
+ESPHome dashboard. Both variants speak the same protocols, so this integration does not care which one you use. Not to be confused with the Bluetooth Proxy that ESPHome
+brings itself, which only supports BLE.
+
 #### Bluetooth Hardware
 Of course you need Bluetooth hardware for that. It does not matter if you use the integrated Bluetooth controller of a Raspberry Pi 3/4/5 or an
 additional dongle. As long as it supports a classic Bluetooth connection via RFCOMM, you are good to go. When in doubt, just try it or have a
