@@ -17,13 +17,73 @@ dependency resolver checks first (setup.py's `_async_process_dependencies`:
 `if dep in hass.config.components: continue`) and mark the dependency as
 already set up, which skips ever running its real async_setup().
 """
+import socket
+import types
+from unittest.mock import patch
+
 import pytest
+
+from custom_components.divoom.devices import divoom as divoom_device
+from custom_components.divoom.notify import DivoomNotificationService
 
 
 @pytest.fixture(autouse=True)
 def _skip_bluetooth_dependency_setup(hass):
     hass.config.components.add("bluetooth_adapters")
     hass.config.components.add("bluetooth")
+
+
+@pytest.fixture(autouse=True)
+def _patched_device_connect():
+    """Keep every HA test from opening a real connection to a device.
+
+    Setting up a config entry loads the legacy notify platform through
+    `hass.async_create_task(async_load_platform(...))` (__init__.py) - notify
+    is the only platform divoom has, and awaiting async_load_platform inside
+    async_setup_entry would deadlock, so it has to stay fire-and-forget. That
+    means no test controls *when* async_get_service() runs, and with it
+    `hass.async_add_executor_job(notificationService.connect)`. Patching
+    connect() only around the flow call that creates the entry leaves a window:
+    if the platform task gets its turn afterwards, the real socket.connect()
+    runs, blocks an executor thread for the full TCP timeout, and the test
+    fails at teardown with a lingering 'platform loaded notify' task.
+
+    Patching it for the whole test closes that window regardless of timing.
+    Tests that create an entry still drain the task with async_block_till_done(),
+    so the platform load finishes inside the test rather than at teardown."""
+    with patch.object(DivoomNotificationService, "connect") as connect:
+        yield connect
+
+
+@pytest.fixture(autouse=True)
+def _blocked_device_sockets():
+    """Backstop for _patched_device_connect: make any real device socket a
+    loud, immediate failure instead of a 130s hang.
+
+    Only the `socket` name inside the device module is swapped, never the
+    stdlib module itself - HA, aiohttp and the event loop need real sockets.
+    The stand-in copies everything from the real module (so `socket.error` and
+    the AF_*/BTPROTO_* constants keep working, and divoom.py's `except
+    socket.error` behaves unchanged) and replaces only the socket class.
+    Divoom.connect() is the single place that constructs one; no subclass
+    overrides it, and reconnect() goes through it as well."""
+    attempts = []
+
+    class _BlockedSocket:
+        def __init__(self, *args, **kwargs):
+            attempts.append(args)
+            raise AssertionError(
+                "divoom device code opened a real socket: socket.socket{0}".format(args)
+            )
+
+    shim = types.ModuleType("socket")
+    shim.__dict__.update(socket.__dict__)
+    shim.socket = _BlockedSocket
+
+    with patch.object(divoom_device, "socket", shim):
+        yield
+
+    assert not attempts, "divoom device code opened real sockets: {0}".format(attempts)
 
 
 @pytest.fixture
