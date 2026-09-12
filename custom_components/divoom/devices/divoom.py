@@ -58,6 +58,7 @@ class Divoom:
     }
 
     escapePayload = False
+    senddelay = 0.015
     host = None
     mac = None
     port = 1
@@ -210,11 +211,11 @@ class Divoom:
         if self.socket_errno != None and self.socket_errno > 0:
             self.logger.error("{0}: giving up after {2} attempts (errno = {1}).".format(self.type, self.socket_errno, retries - 1))
 
-    def receive(self, num_bytes=1024):
+    def receive(self, num_bytes=1024, timeout=0.2):
         """Receive n bytes of data from the Divoom device and put it in the input buffer. Returns the number of bytes received."""
         if (self.socket == None): return 0
 
-        ready = select.select([self.socket], [], [], 0.2)
+        ready = select.select([self.socket], [], [], timeout)
         if ready[0]:
             try:
                 data = self.socket.recv(num_bytes)
@@ -281,6 +282,7 @@ class Divoom:
             self.logger.warning("{0}: socket not writable, dropping payload".format(self.type))
             return result
 
+        if self.senddelay: time.sleep(self.senddelay)
         if skipRead == False or (skipRead == None and self.logger.isEnabledFor(logging.DEBUG)):
             ready = select.select([self.socket], [], [], 0.2)
             if ready[0]:

@@ -3,7 +3,7 @@ byte the same Bluetooth traffic as recorded in tests/goldens/.
 
 If a test here fails after an intentional, approved code change, regenerate
 the affected golden file(s) with `python tests/record_goldens.py` and review
-the diff before trusting it - see the plan's "Byte-Identität" rule.
+the diff before trusting it.
 
 Exception: "show_text" cases are checked structurally (message count, byte
 length and envelope header per message) instead of byte-for-byte. Text

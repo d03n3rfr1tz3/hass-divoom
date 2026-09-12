@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 import socket
 import threading
+import time
 
 GOLDEN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "goldens"))
 
@@ -44,6 +45,44 @@ def minitoo_responder(data: bytes) -> bytes | None:
     return MINITOO_READY if data.startswith(MINITOO_START_PREFIX) else None
 
 
+def minitoo_resend_request(index: int) -> bytes:
+    """The device's "resend the chunk at index" message: 04 8b 55 01 <index LE16>.
+    Built through MiniToo.make_message so the envelope and checksum come from the
+    implementation, not from hand."""
+    from custom_components.divoom.devices.minitoo import MiniToo
+
+    args = [0x8B, 0x55, 0x01] + list(int(index).to_bytes(2, "little"))
+    payload = list((len(args) + 3).to_bytes(2, "little")) + [0x04] + args
+    return bytes(MiniToo(mac="00:00:00:00:00:00").make_message(payload))
+
+
+class MiniTooResendResponder:
+    """Responder that answers the start packet and then, once `after_chunks` chunk
+    packets have arrived, asks a single time for `index` to be resent.
+
+    `delay` holds that answer back by that many seconds, which is how the
+    linger-window case is reached: the stream is long over by then, so the
+    request can only be served after the last chunk."""
+
+    def __init__(self, index: int, after_chunks: int = 3, delay: float = 0.0):
+        self.index = index
+        self.after_chunks = after_chunks
+        self.delay = delay
+        self.chunks_seen = 0
+        self.requested = False
+
+    def __call__(self, data: bytes) -> bytes | None:
+        if data.startswith(MINITOO_START_PREFIX):
+            return MINITOO_READY
+        self.chunks_seen += 1
+        if self.requested or self.chunks_seen < self.after_chunks:
+            return None
+        self.requested = True
+        if self.delay:
+            time.sleep(self.delay)
+        return minitoo_resend_request(self.index)
+
+
 def _serve_forever(sock: socket.socket, responder) -> None:
     try:
         while True:
@@ -75,10 +114,16 @@ def make_connected_device(device_cls, mac="11:22:33:44:55:66", responder=None, *
     device.socket = recorder
     device.socket_errno = 0
 
-    # Chunk pacing is meant for real hardware; over a socketpair it is pure
+    # Send pacing is meant for real hardware; over a socketpair it is pure
     # sleeping - roughly 16s across the suite for the MiniToo alone.
-    if hasattr(device, "chunkdelay"):
-        device.chunkdelay = 0
+    device.senddelay = 0
+
+    # Likewise the window MiniToo keeps listening for resend requests in: 0.5s
+    # per media case would dominate the suite, 0.2s matches what the
+    # clear_input_buffer() it replaced used to cost. Tests that exercise a
+    # resend raise it themselves.
+    if hasattr(device, "resendwindow"):
+        device.resendwindow = 0.2
 
     # Keep the peer side drained so a chunked animation with many chunks
     # can never block on a full socket buffer.

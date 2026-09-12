@@ -1,7 +1,6 @@
 """Unit tests for the low-level protocol helpers in devices/divoom.py.
 These freeze the CURRENT behaviour (including the checksum branch, which is
-intentional PixooMax-compatibility code - see the plan's "checksum()" note,
-not a bug to be fixed).
+intentional PixooMax-compatibility code, not a bug to be fixed).
 """
 from __future__ import annotations
 

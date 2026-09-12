@@ -219,6 +219,40 @@ def test_reconnect_logs_error_after_exhausting_retries(monkeypatch, caplog):
     assert "giving up after 5 attempts" in caplog.text
 
 
+def test_send_payload_paces_every_write(monkeypatch):
+    """send_payload is the one write path all devices share, so the pause
+    belongs there - once per message, after the write, and only when one
+    actually happened."""
+    slept = []
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+    device, _, server_sock = make_connected_device(Pixoo)
+    device.senddelay = 0.015
+    try:
+        device.send_command("set brightness", [50])
+        device.send_command("set brightness", [60])
+        device.send_command("set brightness", [70])
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert slept == [0.015, 0.015, 0.015]
+
+
+def test_send_payload_does_not_pace_a_dropped_message(monkeypatch):
+    slept = []
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+    device, _, server_sock = make_connected_device(Pixoo)
+    device.senddelay = 0.015
+    monkeypatch.setattr(divoom_module.select, "select", lambda *a, **kw: ([], [], []))
+    try:
+        device.send_command("set brightness", [50])
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert slept == []
+
+
 def test_send_payload_warns_when_socket_not_writable(monkeypatch, caplog):
     """A full send buffer used to silently drop the message (only
     socket_errno was set, with nothing logged)."""
