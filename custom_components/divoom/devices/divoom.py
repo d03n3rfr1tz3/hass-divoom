@@ -17,6 +17,7 @@ class Divoom:
     """Class Divoom encapsulates the Divoom Bluetooth communication."""
 
     COMMANDS = {
+        "set json": 0x01,
         "set radio": 0x05,
         "set volume": 0x08,
         "set playstate": 0x0a,
@@ -43,6 +44,7 @@ class Divoom:
         "set tool": 0x72,
         "set brightness": 0x74,
         "set game keypress": 0x88,
+        "set gif": 0x8b,
         "set game": 0xa0,
         "set design": 0xbd,
     }

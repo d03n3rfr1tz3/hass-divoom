@@ -202,11 +202,11 @@ class DivoomNotificationService(BaseNotificationService):
         if device_type == 'ditoomic':
             from .devices.ditoomic import DitooMic
             self._device = DitooMic(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
-
+        
         if device_type == 'minitoo':
-            from .devices.minitoo import Minitoo
-            self._device = Minitoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
-
+            from .devices.minitoo import MiniToo
+            self._device = MiniToo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
             self._device = Pixoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
