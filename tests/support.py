@@ -14,6 +14,9 @@ import threading
 
 GOLDEN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "goldens"))
 
+MINITOO_START_PREFIX = b"\x01\x08\x00\x8b\x00"
+MINITOO_READY = bytes.fromhex("01060004 8b5500 ea0002")
+
 
 class RecordingSocket:
     """Proxy around a real socket that records each send()/sendall() call."""
@@ -34,17 +37,33 @@ class RecordingSocket:
         return getattr(self._real, name)
 
 
-def _drain_forever(sock: socket.socket) -> None:
+def minitoo_responder(data: bytes) -> bytes | None:
+    """Answer a 0x8b start packet the way a real MiniToo does: "send the
+    animation". Without it MiniToo._await_request() runs into its 2s timeout
+    on every media case and the handshake stays untested."""
+    return MINITOO_READY if data.startswith(MINITOO_START_PREFIX) else None
+
+
+def _serve_forever(sock: socket.socket, responder) -> None:
     try:
-        while sock.recv(65536):
-            pass
+        while True:
+            data = sock.recv(65536)
+            if not data:
+                break
+            reply = responder(data) if responder is not None else None
+            if reply:
+                sock.sendall(reply)
     except OSError:
         pass
 
 
-def make_connected_device(device_cls, mac="11:22:33:44:55:66", **kwargs):
+def make_connected_device(device_cls, mac="11:22:33:44:55:66", responder=None, **kwargs):
     """Instantiate a device with a live, already "connected" socket pair,
     bypassing connect() so tests need no real Bluetooth/TCP hardware.
+
+    `responder` is an optional callback receiving each chunk of bytes read
+    from the device; whatever it returns is sent back. Without one the peer
+    only drains, exactly as before.
 
     Returns (device, recorder, server_sock). Call device.disconnect() and
     server_sock.close() when done.
@@ -56,9 +75,15 @@ def make_connected_device(device_cls, mac="11:22:33:44:55:66", **kwargs):
     device.socket = recorder
     device.socket_errno = 0
 
+    # Chunk pacing is meant for real hardware; over a socketpair it is pure
+    # sleeping - roughly 16s across the suite for the MiniToo alone.
+    if hasattr(device, "chunkdelay"):
+        device.chunkdelay = 0
+
     # Keep the peer side drained so a chunked animation with many chunks
     # can never block on a full socket buffer.
-    drainer = threading.Thread(target=_drain_forever, args=(server_sock,), daemon=True)
+    drainer = threading.Thread(
+        target=_serve_forever, args=(server_sock, responder), daemon=True)
     drainer.start()
 
     return device, recorder, server_sock

@@ -27,6 +27,7 @@ class MiniToo(Divoom):
         self.type = "MiniToo"
         self.screensize = 128
         self.chunksize = 256
+        self.chunkdelay = 0.012
         self.colorpalette = None
         if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)
@@ -88,7 +89,7 @@ class MiniToo(Divoom):
         return img.crop((left, top, left + side, top + side)).resize(
             (self.screensize, self.screensize), _LANCZOS)
 
-    def _send_packets(self, packets, delay=0.012):
+    def _send_packets(self, packets):
         """Send the start packet, wait for the device to request the animation,
         then stream the chunks — matching the app's real handshake."""
         self.drop_message_buffer()
@@ -96,7 +97,7 @@ class MiniToo(Divoom):
         self._await_request()
         for packet in packets[1:]:
             result = self.send_command("set gif", packet, skipRead=True)
-            time.sleep(delay)
+            time.sleep(self.chunkdelay)
         self.clear_input_buffer() # swallow the final ACK
         return result
 

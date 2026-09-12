@@ -11,18 +11,21 @@ from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.backpack import Backpack
 from custom_components.divoom.devices.ditoo import Ditoo
 from custom_components.divoom.devices.ditoomic import DitooMic
+from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
 from custom_components.divoom.devices.timebox import Timebox
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from custom_components.divoom.devices.timoo import Timoo
 from custom_components.divoom.devices.tivoo import Tivoo
+from tests.support import minitoo_responder
 
 DEVICE_CLASSES = {
     "Aurabox": Aurabox,
     "Backpack": Backpack,
     "Ditoo": Ditoo,
     "DitooMic": DitooMic,
+    "MiniToo": MiniToo,
     "Pixoo": Pixoo,
     "PixooMax": PixooMax,
     "Timebox": Timebox,
@@ -30,6 +33,21 @@ DEVICE_CLASSES = {
     "Timoo": Timoo,
     "Tivoo": Tivoo,
 }
+
+# Devices that answer mid-send and need a talking peer, not just a drain.
+DEVICE_RESPONDERS = {
+    "MiniToo": minitoo_responder,
+}
+
+# Cases whose traffic is zstd-compressed and therefore not byte-stable across
+# libzstd versions; tests/test_minitoo_media.py verifies those structurally.
+MEDIA_DEVICES = {"MiniToo"}
+
+
+def is_media_case(device_type: str, case_name: str) -> bool:
+    return device_type in MEDIA_DEVICES and (
+        case_name.startswith("show_image") or case_name == "show_text"
+    )
 
 PIXELART_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "pixelart"))
 FONT_PATH = os.path.normpath(os.path.join(
