@@ -81,7 +81,7 @@ async def async_unload_entry(hass: HomeAssistant, config: ConfigEntry) -> bool:
 
     loadedServices = domainConfig.get('loaded')
     if mac in loadedServices:
-        loadedServices[mac].disconnect()
+        await hass.async_add_executor_job(loadedServices[mac].disconnect)
         del loadedServices[mac]
 
     hass.services.async_remove(SERVICE_NOTIFY, slugify(name))

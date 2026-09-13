@@ -36,21 +36,38 @@
         "title": "Appareil Divoom : type",
         "description": "Sélectionnez le type de votre appareil Divoom.",
         "data": {
-          "type": "Type"
+          "device_type": "Type"
         }
       },
       "confirm": {
         "title": "Confirmation",
         "description": "Votre appareil Divoom est configuré."
+      },
+      "reconfigure": {
+        "title": "Reconfigurer l'appareil Divoom",
+        "description": "Modifiez les paramètres de connexion et le type de votre appareil Divoom.",
+        "data": {
+          "host": "Nom d'hôte/IP ESP32-Divoom",
+          "port": "Canal/port Bluetooth",
+          "device_type": "Type"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom est un micrologiciel compagnon facultatif qui fait office de proxy Bluetooth Classic. Si vous l'utilisez, vous pouvez le renseigner ici au lieu de vous connecter directement à votre appareil Divoom en Bluetooth. Sinon, laissez ce champ vide et Home Assistant se connectera directement en Bluetooth."
+        }
       }
     },
     "abort": {
       "already_in_progress": "Un appareil Divoom avec cette adresse MAC est déjà en cours de configuration.",
       "already_configured": "Un appareil Divoom avec cette adresse MAC est déjà configuré.",
-      "invalid_discovery_info": "L'appareil détecté n'a pas fourni les informations nécessaires à sa configuration."
+      "invalid_discovery_info": "L'appareil détecté n'a pas fourni les informations nécessaires à sa configuration.",
+      "reconfigure_successful": "L'appareil Divoom a été reconfiguré avec succès."
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "La configuration YAML de Divoom est obsolète",
+      "description": "Vos appareils Divoom issus de `configuration.yaml` continuent de fonctionner pour l'instant, mais la configuration via YAML est obsolète. Supprimez la plateforme notify `divoom` de votre `configuration.yaml`, redémarrez Home Assistant puis ajoutez les appareils via Paramètres → Appareils et services."
+    },
     "legacy_notify_usage": {
       "title": "Actions notify Divoom obsolètes toujours utilisées",
       "fix_flow": {

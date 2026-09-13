@@ -36,21 +36,38 @@
         "title": "Dispositivo Divoom: tipo",
         "description": "Selecciona el tipo de tu dispositivo Divoom.",
         "data": {
-          "type": "Tipo"
+          "device_type": "Tipo"
         }
       },
       "confirm": {
         "title": "Confirmación",
         "description": "Tu dispositivo Divoom está configurado."
+      },
+      "reconfigure": {
+        "title": "Reconfigurar dispositivo Divoom",
+        "description": "Cambia la configuración de conexión y el tipo de tu dispositivo Divoom.",
+        "data": {
+          "host": "Nombre de host/IP de ESP32-Divoom",
+          "port": "Canal/puerto Bluetooth",
+          "device_type": "Tipo"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom es un firmware complementario opcional que actúa como proxy Bluetooth Classic. Si lo utilizas, puedes indicarlo aquí en lugar de conectarte directamente a tu dispositivo Divoom por Bluetooth. Si no, deja este campo vacío y Home Assistant se conectará directamente por Bluetooth."
+        }
       }
     },
     "abort": {
       "already_in_progress": "Ya se está configurando un dispositivo Divoom con esa dirección MAC.",
       "already_configured": "Ya hay un dispositivo Divoom configurado con esa dirección MAC.",
-      "invalid_discovery_info": "El dispositivo detectado no proporcionó la información necesaria para configurarlo."
+      "invalid_discovery_info": "El dispositivo detectado no proporcionó la información necesaria para configurarlo.",
+      "reconfigure_successful": "El dispositivo Divoom se ha reconfigurado correctamente."
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "La configuración YAML de Divoom está obsoleta",
+      "description": "Tus dispositivos Divoom de `configuration.yaml` siguen funcionando por ahora, pero la configuración mediante YAML está obsoleta. Elimina la plataforma notify `divoom` de tu `configuration.yaml`, reinicia Home Assistant y después añade los dispositivos en Ajustes → Dispositivos y servicios."
+    },
     "legacy_notify_usage": {
       "title": "Acciones notify de Divoom obsoletas todavía en uso",
       "fix_flow": {

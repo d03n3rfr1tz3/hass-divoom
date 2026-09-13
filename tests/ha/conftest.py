@@ -38,19 +38,15 @@ def _patched_device_connect():
     """Keep every HA test from opening a real connection to a device.
 
     Setting up a config entry loads the legacy notify platform through
-    `hass.async_create_task(async_load_platform(...))` (__init__.py) - notify
-    is the only platform divoom has, and awaiting async_load_platform inside
-    async_setup_entry would deadlock, so it has to stay fire-and-forget. That
-    means no test controls *when* async_get_service() runs, and with it
-    `hass.async_add_executor_job(notificationService.connect)`. Patching
-    connect() only around the flow call that creates the entry leaves a window:
-    if the platform task gets its turn afterwards, the real socket.connect()
-    runs, blocks an executor thread for the full TCP timeout, and the test
-    fails at teardown with a lingering 'platform loaded notify' task.
+    `hass.async_create_task(async_load_platform(...))` (__init__.py), and
+    async_get_service() then starts connect() as a background task. So no test
+    controls *when* connect() runs. Patching it only around the flow call that
+    creates the entry leaves a window for the real socket.connect() to run
+    afterwards and block an executor thread past the end of the test.
 
     Patching it for the whole test closes that window regardless of timing.
-    Tests that create an entry still drain the task with async_block_till_done(),
-    so the platform load finishes inside the test rather than at teardown."""
+    Tests that need connect() to have happened wait for it with
+    async_block_till_done(wait_background_tasks=True)."""
     with patch.object(DivoomNotificationService, "connect") as connect:
         yield connect
 

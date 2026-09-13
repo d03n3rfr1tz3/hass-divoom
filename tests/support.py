@@ -131,7 +131,27 @@ def make_connected_device(device_cls, mac="11:22:33:44:55:66", responder=None, *
         target=_serve_forever, args=(server_sock, responder), daemon=True)
     drainer.start()
 
-    return device, recorder, server_sock
+    return device, recorder, PeerSocket(server_sock, drainer)
+
+
+class PeerSocket:
+    """Peer end of the pair; close() also waits for its drain thread."""
+
+    def __init__(self, real_socket, thread):
+        self._real = real_socket
+        self._thread = thread
+
+    def close(self):
+        # close() alone does not wake a blocked recv() on Linux
+        try:
+            self._real.shutdown(socket.SHUT_RDWR)
+        except OSError:
+            pass
+        self._thread.join(timeout=5)
+        self._real.close()
+
+    def __getattr__(self, name):
+        return getattr(self._real, name)
 
 
 def hexdump(data: bytes) -> str:

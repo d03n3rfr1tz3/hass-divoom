@@ -1,9 +1,9 @@
 """Legacy notify service for divoom devices."""
-import logging, os, socket, threading
+import logging, os, threading
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers import config_validation as cv, issue_registry as ir
 from homeassistant.helpers.typing import ConfigType, DiscoveryInfoType
 from homeassistant.loader import DATA_CUSTOM_COMPONENTS
 
@@ -142,7 +142,17 @@ async def async_get_service(
         if CONF_DEVICE_TYPE in discovery_info: device_type = discovery_info[CONF_DEVICE_TYPE]
         if CONF_MEDIA_DIR in discovery_info: media_directory = hass.config.path(discovery_info[CONF_MEDIA_DIR])
         if CONF_ESCAPE_PAYLOAD in discovery_info: escape_payload = discovery_info[CONF_ESCAPE_PAYLOAD]
-    
+    else:
+        ir.async_create_issue(
+            hass,
+            DOMAIN,
+            "deprecated_yaml",
+            is_fixable=False,
+            severity=ir.IssueSeverity.WARNING,
+            translation_key="deprecated_yaml",
+            learn_more_url="https://github.com/d03n3rfr1tz3/hass-divoom#easy-configuration",
+        )
+
     if config is not None:
         if CONF_HOST in config: host = config[CONF_HOST]
         if CONF_MAC in config: mac = config[CONF_MAC]
@@ -150,7 +160,7 @@ async def async_get_service(
         if CONF_DEVICE_TYPE in config: device_type = config[CONF_DEVICE_TYPE]
         if CONF_MEDIA_DIR in config: media_directory = hass.config.path(config[CONF_MEDIA_DIR])
         if CONF_ESCAPE_PAYLOAD in config: escape_payload = config[CONF_ESCAPE_PAYLOAD]
-    
+
     font_directory = hass.config.path(f"{DATA_CUSTOM_COMPONENTS}/{DOMAIN}/fonts/")
     notificationService = DivoomNotificationService(host, mac, port, device_type, media_directory, font_directory, escape_payload)
 
@@ -161,19 +171,17 @@ async def async_get_service(
     loadedServices = domainConfig.get('loaded')
     loadedServices[mac] = notificationService
     
-    try:
+    async def _connect() -> None:
         await hass.async_add_executor_job(notificationService.connect)
-    except BrokenPipeError as error:
-        _LOGGER.error("Error while initially connecting to the Divoom device. %s", error, exc_info=True, stack_info=True)
-        pass
-    except socket.error as error:
-        _LOGGER.error("Error while initially connecting to the Divoom device. %s", error, exc_info=True, stack_info=True)
-        pass
+
+    hass.async_create_background_task(_connect(), f"divoom connect {mac}")
 
     return notificationService
 
 class DivoomNotificationService(BaseNotificationService):
     """Implement the notification service for Divoom."""
+
+    _deprecation_logged = False
 
     def __init__(self, host, mac, port, device_type, media_directory, font_directory, escape_payload):
         assert mac is not None
@@ -275,6 +283,10 @@ class DivoomNotificationService(BaseNotificationService):
         return joined
 
     def send_message(self, message="", **kwargs):
+        if not self._deprecation_logged:
+            self._deprecation_logged = True
+            _LOGGER.warning("notify.divoom_* is deprecated, use the divoom.* actions instead")
+
         if message == "" and kwargs.get(ATTR_DATA) is None:
             _LOGGER.error("Service call needs more information")
             return False

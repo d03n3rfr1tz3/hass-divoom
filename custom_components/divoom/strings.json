@@ -36,21 +36,38 @@
         "title": "Divoom device: type",
         "description": "Select the type of your Divoom device.",
         "data": {
-          "type": "Type"
+          "device_type": "Type"
         }
       },
       "confirm": {
         "title": "Confirmation",
         "description": "Your Divoom device is configured."
+      },
+      "reconfigure": {
+        "title": "Reconfigure Divoom device",
+        "description": "Change the connection settings and the type of your Divoom device.",
+        "data": {
+          "host": "ESP32-Divoom hostname/IP",
+          "port": "Bluetooth channel/port",
+          "device_type": "Type"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom is an optional companion firmware that acts as a Bluetooth Classic proxy. If you have it, you can use it instead of connecting to your Divoom device directly via Bluetooth. If not, just leave this empty and Home Assistant will connect directly via Bluetooth."
+        }
       }
     },
     "abort": {
       "already_in_progress": "A Divoom device with that MAC address is already being set up.",
       "already_configured": "A Divoom device with that MAC address is already configured.",
-      "invalid_discovery_info": "The discovered device did not provide the information needed to configure it."
+      "invalid_discovery_info": "The discovered device did not provide the information needed to configure it.",
+      "reconfigure_successful": "The Divoom device was reconfigured successfully."
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "Divoom YAML configuration is deprecated",
+      "description": "Your Divoom devices from `configuration.yaml` keep working for now, but configuring them via YAML is deprecated. Remove the `divoom` notify platform from your `configuration.yaml`, restart Home Assistant and then add the devices via Settings → Devices & services."
+    },
     "legacy_notify_usage": {
       "title": "Legacy Divoom notify actions still in use",
       "fix_flow": {

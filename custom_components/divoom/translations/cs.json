@@ -36,21 +36,38 @@
         "title": "Zařízení Divoom: typ",
         "description": "Vyberte typ svého zařízení Divoom.",
         "data": {
-          "type": "Typ"
+          "device_type": "Typ"
         }
       },
       "confirm": {
         "title": "Potvrzení",
         "description": "Vaše zařízení Divoom je nakonfigurováno."
+      },
+      "reconfigure": {
+        "title": "Překonfigurovat zařízení Divoom",
+        "description": "Změňte nastavení připojení a typ svého zařízení Divoom.",
+        "data": {
+          "host": "Název hostitele/IP ESP32-Divoom",
+          "port": "Kanál/port Bluetooth",
+          "device_type": "Typ"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom je volitelný doprovodný firmware, který funguje jako proxy Bluetooth Classic. Pokud jej používáte, můžete jej zadat zde místo přímého připojení k zařízení Divoom přes Bluetooth. Pokud ne, ponechte pole prázdné a Home Assistant se připojí přímo přes Bluetooth."
+        }
       }
     },
     "abort": {
       "already_in_progress": "Zařízení Divoom s touto MAC adresou se již nastavuje.",
       "already_configured": "Zařízení Divoom s touto MAC adresou je již nakonfigurováno.",
-      "invalid_discovery_info": "Nalezené zařízení neposkytlo informace potřebné k jeho konfiguraci."
+      "invalid_discovery_info": "Nalezené zařízení neposkytlo informace potřebné k jeho konfiguraci.",
+      "reconfigure_successful": "Zařízení Divoom bylo úspěšně překonfigurováno."
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "Konfigurace Divoom přes YAML je zastaralá",
+      "description": "Vaše zařízení Divoom z `configuration.yaml` zatím fungují dál, ale konfigurace přes YAML je zastaralá. Odstraňte platformu notify `divoom` ze souboru `configuration.yaml`, restartujte Home Assistant a poté přidejte zařízení v Nastavení → Zařízení a služby."
+    },
     "legacy_notify_usage": {
       "title": "Zastaralé akce notify pro Divoom se stále používají",
       "fix_flow": {

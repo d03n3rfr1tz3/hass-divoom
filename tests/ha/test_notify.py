@@ -11,7 +11,7 @@ import logging
 import os
 import threading
 import time
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
@@ -47,42 +47,42 @@ def make_mocked_service(media_directory="pixelart", font_directory="fonts"):
     return service
 
 
-async def test_async_get_service_registers_and_picks_device_class(hass):
-    """Service setup wires up the right device class for device_type and
-    registers the service under its MAC in hass.data. connect() is patched
-    out: it would open a real Bluetooth RFCOMM socket, which is out of
-    scope here (and pytest-socket blocks connect() to any non-localhost
-    host anyway, regardless of platform) - async_get_service's own wiring
-    is what's under test, not the socket connection itself."""
-    with patch.object(DivoomNotificationService, "connect"):
-        service = await async_get_service(
-            hass,
-            {
-                CONF_MAC: "11:22:33:44:55:66",
-                CONF_PORT: 1,
-                CONF_DEVICE_TYPE: "pixoo",
-                CONF_MEDIA_DIR: "pixelart",
-            },
-        )
+async def test_async_get_service_registers_and_picks_device_class(
+    hass, _patched_device_connect
+):
+    """Service setup wires up the right device class for device_type,
+    registers the service under its MAC in hass.data and connects in the
+    background. connect() itself is patched out by the conftest fixture."""
+    service = await async_get_service(
+        hass,
+        {
+            CONF_MAC: "11:22:33:44:55:66",
+            CONF_PORT: 1,
+            CONF_DEVICE_TYPE: "pixoo",
+            CONF_MEDIA_DIR: "pixelart",
+        },
+    )
+    await hass.async_block_till_done(wait_background_tasks=True)
 
     assert type(service._device).__name__ == "Pixoo"
     assert hass.data[DOMAIN]["loaded"]["11:22:33:44:55:66"] is service
+    _patched_device_connect.assert_called_once_with()
 
 
 async def test_async_get_service_invalid_device_type_logs_device_type(hass, caplog):
     """The error message used to format media_directory into the
     "device_type {0} does not exist" string instead of device_type itself."""
     caplog.set_level(logging.ERROR)
-    with patch.object(DivoomNotificationService, "connect"):
-        service = await async_get_service(
-            hass,
-            {
-                CONF_MAC: "11:22:33:44:55:66",
-                CONF_PORT: 1,
-                CONF_DEVICE_TYPE: "not-a-real-device-type",
-                CONF_MEDIA_DIR: "pixelart",
-            },
-        )
+    service = await async_get_service(
+        hass,
+        {
+            CONF_MAC: "11:22:33:44:55:66",
+            CONF_PORT: 1,
+            CONF_DEVICE_TYPE: "not-a-real-device-type",
+            CONF_MEDIA_DIR: "pixelart",
+        },
+    )
+    await hass.async_block_till_done(wait_background_tasks=True)
 
     assert service._device is None
     assert "not-a-real-device-type" in caplog.text
@@ -303,9 +303,6 @@ def test_send_message_serializes_concurrent_calls_to_same_device():
     thread1 = threading.Thread(
         target=lambda: service.send_message(data={PARAM_MODE: "on"})
     )
-    thread1.start()
-    assert first_call_entered.wait(timeout=2)
-
     second_call_done = threading.Event()
     thread2 = threading.Thread(
         target=lambda: (
@@ -313,14 +310,19 @@ def test_send_message_serializes_concurrent_calls_to_same_device():
             second_call_done.set(),
         )
     )
-    thread2.start()
 
-    time.sleep(0.1)
-    assert not second_call_done.is_set()
+    thread1.start()
+    try:
+        assert first_call_entered.wait(timeout=2)
+        thread2.start()
 
-    release_first_call.set()
-    thread1.join(timeout=2)
-    thread2.join(timeout=2)
+        time.sleep(0.1)
+        assert not second_call_done.is_set()
+    finally:
+        release_first_call.set()
+        thread1.join(timeout=2)
+        if thread2.is_alive():
+            thread2.join(timeout=2)
 
     assert max_active == 1
     assert service._device.send_on.call_count == 2
@@ -345,13 +347,14 @@ def test_send_message_different_devices_do_not_block_each_other():
         target=lambda: service_a.send_message(data={PARAM_MODE: "on"})
     )
     thread_a.start()
-    assert a_entered.wait(timeout=2)
+    try:
+        assert a_entered.wait(timeout=2)
 
-    # service_b's send_message must complete promptly even though service_a
-    # is still blocked inside its own reconnect().
-    result_b = service_b.send_message(data={PARAM_MODE: "on"})
-    assert result_b is True
-    service_b._device.send_on.assert_called_once_with()
-
-    release_a.set()
-    thread_a.join(timeout=2)
+        # service_b's send_message must complete promptly even though service_a
+        # is still blocked inside its own reconnect().
+        result_b = service_b.send_message(data={PARAM_MODE: "on"})
+        assert result_b is True
+        service_b._device.send_on.assert_called_once_with()
+    finally:
+        release_a.set()
+        thread_a.join(timeout=2)

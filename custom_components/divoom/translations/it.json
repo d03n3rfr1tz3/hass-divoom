@@ -36,21 +36,38 @@
         "title": "Dispositivo Divoom: tipo",
         "description": "Seleziona il tipo del tuo dispositivo Divoom.",
         "data": {
-          "type": "Tipo"
+          "device_type": "Tipo"
         }
       },
       "confirm": {
         "title": "Conferma",
         "description": "Il tuo dispositivo Divoom è configurato."
+      },
+      "reconfigure": {
+        "title": "Riconfigura dispositivo Divoom",
+        "description": "Modifica le impostazioni di connessione e il tipo del tuo dispositivo Divoom.",
+        "data": {
+          "host": "Nome host/IP di ESP32-Divoom",
+          "port": "Canale/porta Bluetooth",
+          "device_type": "Tipo"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom è un firmware complementare opzionale che funge da proxy Bluetooth Classic. Se lo utilizzi, puoi indicarlo qui invece di collegarti direttamente al tuo dispositivo Divoom via Bluetooth. In caso contrario, lascia il campo vuoto e Home Assistant si collegherà direttamente via Bluetooth."
+        }
       }
     },
     "abort": {
       "already_in_progress": "È già in corso la configurazione di un dispositivo Divoom con questo indirizzo MAC.",
       "already_configured": "Esiste già un dispositivo Divoom configurato con questo indirizzo MAC.",
-      "invalid_discovery_info": "Il dispositivo rilevato non ha fornito le informazioni necessarie per configurarlo."
+      "invalid_discovery_info": "Il dispositivo rilevato non ha fornito le informazioni necessarie per configurarlo.",
+      "reconfigure_successful": "Il dispositivo Divoom è stato riconfigurato correttamente."
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "La configurazione YAML di Divoom è obsoleta",
+      "description": "I tuoi dispositivi Divoom da `configuration.yaml` continuano a funzionare per ora, ma la configurazione tramite YAML è obsoleta. Rimuovi la piattaforma notify `divoom` dal tuo `configuration.yaml`, riavvia Home Assistant e poi aggiungi i dispositivi in Impostazioni → Dispositivi e servizi."
+    },
     "legacy_notify_usage": {
       "title": "Azioni notify Divoom obsolete ancora in uso",
       "fix_flow": {

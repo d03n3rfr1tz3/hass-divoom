@@ -36,21 +36,38 @@
         "title": "Dispositivo Divoom: tipo",
         "description": "Selecione o tipo do seu dispositivo Divoom.",
         "data": {
-          "type": "Tipo"
+          "device_type": "Tipo"
         }
       },
       "confirm": {
         "title": "Confirmação",
         "description": "O seu dispositivo Divoom está configurado."
+      },
+      "reconfigure": {
+        "title": "Reconfigurar dispositivo Divoom",
+        "description": "Altere as definições de ligação e o tipo do seu dispositivo Divoom.",
+        "data": {
+          "host": "Nome de anfitrião/IP ESP32-Divoom",
+          "port": "Canal/Porta Bluetooth",
+          "device_type": "Tipo"
+        },
+        "data_description": {
+          "host": "O ESP32-Divoom é um firmware complementar opcional que atua como proxy Bluetooth Classic. Se o tiver, pode usá-lo em vez de se ligar diretamente ao seu dispositivo Divoom via Bluetooth. Se não, basta deixá-lo vazio e o Home Assistant ligar-se-á diretamente via Bluetooth."
+        }
       }
     },
     "abort": {
       "already_in_progress": "Já existe um dispositivo Divoom com esse endereço MAC em progresso.",
       "already_configured": "Já existe um dispositivo Divoom com esse endereço MAC configurado.",
-      "invalid_discovery_info": "O dispositivo detetado não forneceu as informações necessárias para o configurar."
+      "invalid_discovery_info": "O dispositivo detetado não forneceu as informações necessárias para o configurar.",
+      "reconfigure_successful": "O dispositivo Divoom foi reconfigurado com sucesso."
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "A configuração YAML do Divoom está obsoleta",
+      "description": "Os seus dispositivos Divoom do `configuration.yaml` continuam a funcionar por agora, mas a configuração via YAML está obsoleta. Remova a plataforma notify `divoom` do seu `configuration.yaml`, reinicie o Home Assistant e depois adicione os dispositivos em Definições → Dispositivos e serviços."
+    },
     "legacy_notify_usage": {
       "title": "Ações notify do Divoom obsoletas ainda em uso",
       "fix_flow": {
