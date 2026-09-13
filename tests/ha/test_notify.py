@@ -11,7 +11,7 @@ import logging
 import os
 import threading
 import time
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
 
 import pytest
 
@@ -47,42 +47,42 @@ def make_mocked_service(media_directory="pixelart", font_directory="fonts"):
     return service
 
 
-async def test_async_get_service_registers_and_picks_device_class(hass):
-    """Service setup wires up the right device class for device_type and
-    registers the service under its MAC in hass.data. connect() is patched
-    out: it would open a real Bluetooth RFCOMM socket, which is out of
-    scope here (and pytest-socket blocks connect() to any non-localhost
-    host anyway, regardless of platform) - async_get_service's own wiring
-    is what's under test, not the socket connection itself."""
-    with patch.object(DivoomNotificationService, "connect"):
-        service = await async_get_service(
-            hass,
-            {
-                CONF_MAC: "11:22:33:44:55:66",
-                CONF_PORT: 1,
-                CONF_DEVICE_TYPE: "pixoo",
-                CONF_MEDIA_DIR: "pixelart",
-            },
-        )
+async def test_async_get_service_registers_and_picks_device_class(
+    hass, _patched_device_connect
+):
+    """Service setup wires up the right device class for device_type,
+    registers the service under its MAC in hass.data and connects in the
+    background. connect() itself is patched out by the conftest fixture."""
+    service = await async_get_service(
+        hass,
+        {
+            CONF_MAC: "11:22:33:44:55:66",
+            CONF_PORT: 1,
+            CONF_DEVICE_TYPE: "pixoo",
+            CONF_MEDIA_DIR: "pixelart",
+        },
+    )
+    await hass.async_block_till_done(wait_background_tasks=True)
 
     assert type(service._device).__name__ == "Pixoo"
     assert hass.data[DOMAIN]["loaded"]["11:22:33:44:55:66"] is service
+    _patched_device_connect.assert_called_once_with()
 
 
 async def test_async_get_service_invalid_device_type_logs_device_type(hass, caplog):
     """The error message used to format media_directory into the
     "device_type {0} does not exist" string instead of device_type itself."""
     caplog.set_level(logging.ERROR)
-    with patch.object(DivoomNotificationService, "connect"):
-        service = await async_get_service(
-            hass,
-            {
-                CONF_MAC: "11:22:33:44:55:66",
-                CONF_PORT: 1,
-                CONF_DEVICE_TYPE: "not-a-real-device-type",
-                CONF_MEDIA_DIR: "pixelart",
-            },
-        )
+    service = await async_get_service(
+        hass,
+        {
+            CONF_MAC: "11:22:33:44:55:66",
+            CONF_PORT: 1,
+            CONF_DEVICE_TYPE: "not-a-real-device-type",
+            CONF_MEDIA_DIR: "pixelart",
+        },
+    )
+    await hass.async_block_till_done(wait_background_tasks=True)
 
     assert service._device is None
     assert "not-a-real-device-type" in caplog.text

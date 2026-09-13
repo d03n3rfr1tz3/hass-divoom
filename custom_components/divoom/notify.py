@@ -1,5 +1,5 @@
 """Legacy notify service for divoom devices."""
-import logging, os, socket, threading
+import logging, os, threading
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant
@@ -161,14 +161,10 @@ async def async_get_service(
     loadedServices = domainConfig.get('loaded')
     loadedServices[mac] = notificationService
     
-    try:
+    async def _connect() -> None:
         await hass.async_add_executor_job(notificationService.connect)
-    except BrokenPipeError as error:
-        _LOGGER.error("Error while initially connecting to the Divoom device. %s", error, exc_info=True, stack_info=True)
-        pass
-    except socket.error as error:
-        _LOGGER.error("Error while initially connecting to the Divoom device. %s", error, exc_info=True, stack_info=True)
-        pass
+
+    hass.async_create_background_task(_connect(), f"divoom connect {mac}")
 
     return notificationService
 
