@@ -1,5 +1,5 @@
 {
     "name": "Divoom Bluetooth",
-    "homeassistant": "2021.1.0",
+    "homeassistant": "2025.2.0",
     "render_readme": true
 }

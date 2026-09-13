@@ -36,18 +36,31 @@
         "title": "Divoom-Gerät: Typ",
         "description": "Wähle den Typ deines Divoom-Geräts aus.",
         "data": {
-          "type": "Typ"
+          "device_type": "Typ"
         }
       },
       "confirm": {
         "title": "Bestätigung",
         "description": "Dein Divoom-Gerät ist nun konfiguriert."
+      },
+      "reconfigure": {
+        "title": "Divoom-Gerät neu konfigurieren",
+        "description": "Ändere die Verbindungseinstellungen und den Typ deines Divoom-Geräts.",
+        "data": {
+          "host": "ESP32-Divoom Host/IP",
+          "port": "Bluetooth-Kanal/-Port",
+          "device_type": "Typ"
+        },
+        "data_description": {
+          "host": "ESP32-Divoom ist eine optionale Begleit-Firmware, die als Bluetooth-Classic-Proxy fungiert. Falls du sie einsetzt, kannst du sie anstelle einer direkten Bluetooth-Verbindung zu deinem Divoom-Gerät nutzen. Falls nicht, lass das Feld einfach leer und Home Assistant verbindet sich direkt per Bluetooth."
+        }
       }
     },
     "abort": {
       "already_in_progress": "Ein Divoom-Gerät mit dieser MAC-Adresse wird bereits eingerichtet.",
       "already_configured": "Es ist bereits ein Divoom-Gerät mit dieser MAC-Adresse konfiguriert.",
-      "invalid_discovery_info": "Das gefundene Gerät hat nicht die Informationen geliefert, die zur Einrichtung nötig sind."
+      "invalid_discovery_info": "Das gefundene Gerät hat nicht die Informationen geliefert, die zur Einrichtung nötig sind.",
+      "reconfigure_successful": "Das Divoom-Gerät wurde erfolgreich neu konfiguriert."
     }
   },
   "issues": {

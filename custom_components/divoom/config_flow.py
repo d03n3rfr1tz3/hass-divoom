@@ -5,7 +5,8 @@ import voluptuous as vol
 from typing import Any
 from homeassistant import config_entries
 from homeassistant.helpers import config_validation as cv
-from homeassistant.data_entry_flow import AbortFlow, FlowResult
+from homeassistant.config_entries import ConfigFlowResult
+from homeassistant.data_entry_flow import AbortFlow
 
 from homeassistant.components.bluetooth import (
     BluetoothServiceInfo,
@@ -29,7 +30,30 @@ from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CON
 
 _LOGGER = logging.getLogger(__package__)
 
-@config_entries.HANDLERS.register(DOMAIN)
+DEVICE_TYPES = [
+    SelectOptionDict(value="aurabox", label="Aurabox"),
+    SelectOptionDict(value="backpack", label="Backpack"),
+    SelectOptionDict(value="ditoo", label="Ditoo"),
+    SelectOptionDict(value="ditoomic", label="Ditoo Mic"),
+    SelectOptionDict(value="pixoo", label="Pixoo"),
+    SelectOptionDict(value="pixoomax", label="Pixoo Max"),
+    SelectOptionDict(value="timebox", label="Timebox"),
+    SelectOptionDict(value="timeboxmini", label="Timebox Mini"),
+    SelectOptionDict(value="timoo", label="Timoo"),
+    SelectOptionDict(value="tivoo", label="Tivoo"),
+]
+
+def _device_type_selector() -> SelectSelector:
+    return SelectSelector(
+        SelectSelectorConfig(
+            mode=SelectSelectorMode.LIST,
+            options=DEVICE_TYPES,
+            custom_value=False,
+            multiple=False,
+            sort=True,
+        ),
+    )
+
 class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Divoom Bluetooth config flow."""
     VERSION = 1
@@ -45,7 +69,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
 
         if user_input is None or CONF_MAC not in user_input:
@@ -90,7 +114,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 self._device_name = self._discovered_devices[user_input[CONF_MAC]].name
             else:
                 self._device_name = "Device"
-            self._device_mac = user_input[CONF_MAC]
+            self._device_mac = user_input[CONF_MAC].lower()
 
         if CONF_PORT in user_input:
             self._device_port = user_input[CONF_PORT]
@@ -107,7 +131,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_bluetooth(
         self, discovery_info: BluetoothServiceInfoBleak
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle a flow initialized by bluetooth discovery."""
 
         self._device_name = discovery_info.name
@@ -125,7 +149,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_zeroconf(
         self, discovery_info: ZeroconfServiceInfo
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle a flow initialized by zeroconf discovery."""
 
         device_mac = discovery_info.properties.get("device_mac")
@@ -148,7 +172,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
     async def async_step_device_port(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the flow step to choose the Port for the Divoom device."""
 
         if user_input is not None:
@@ -181,7 +205,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     
     async def async_step_device_type(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the flow step to choose the Port for the Divoom device."""
 
         if user_input is not None:
@@ -214,38 +238,18 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             device_type = "tivoo"
         self._device_type = device_type
 
-        device_types = [
-            SelectOptionDict(value="aurabox", label="Aurabox"),
-            SelectOptionDict(value="backpack", label="Backpack"),
-            SelectOptionDict(value="ditoo", label="Ditoo"),
-            SelectOptionDict(value="ditoomic", label="Ditoo Mic"),
-            SelectOptionDict(value="pixoo", label="Pixoo"),
-            SelectOptionDict(value="pixoomax", label="Pixoo Max"),
-            SelectOptionDict(value="timebox", label="Timebox"),
-            SelectOptionDict(value="timeboxmini", label="Timebox Mini"),
-            SelectOptionDict(value="timoo", label="Timoo"),
-            SelectOptionDict(value="tivoo", label="Tivoo"),
-        ]
         return self.async_show_form(
             step_id="device_type",
             data_schema=vol.Schema(
                 {
-                    vol.Required(CONF_DEVICE_TYPE, default=device_type): SelectSelector(
-                        SelectSelectorConfig(
-                            mode=SelectSelectorMode.LIST,
-                            options=device_types,
-                            custom_value=False,
-                            multiple=False,
-                            sort=True,
-                        ),
-                    ),
+                    vol.Required(CONF_DEVICE_TYPE, default=device_type): _device_type_selector(),
                 }
             ),
         )
     
     async def async_step_confirm(
         self, user_input: dict[str, Any] | None = None
-    ) -> FlowResult:
+    ) -> ConfigFlowResult:
         """Handle the flow step to confirm the Divoom device."""
 
         if user_input is not None:
@@ -265,7 +269,39 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return self.async_show_form(
             step_id="confirm",
         )
-    
+
+    async def async_step_reconfigure(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle the flow to change host, port and type of the Divoom device."""
+
+        entry = self._get_reconfigure_entry()
+
+        if user_input is not None:
+            return self.async_update_reload_and_abort(
+                entry,
+                data_updates={
+                    CONF_HOST: user_input.get(CONF_HOST) or None,
+                    CONF_PORT: user_input[CONF_PORT],
+                    CONF_DEVICE_TYPE: user_input[CONF_DEVICE_TYPE],
+                },
+            )
+
+        # suggested values instead of defaults, so the host can be cleared
+        return self.async_show_form(
+            step_id="reconfigure",
+            data_schema=self.add_suggested_values_to_schema(
+                vol.Schema(
+                    {
+                        vol.Optional(CONF_HOST): cv.string,
+                        vol.Required(CONF_PORT): cv.port,
+                        vol.Required(CONF_DEVICE_TYPE): _device_type_selector(),
+                    }
+                ),
+                entry.data,
+            ),
+        )
+
     async def async_check_uniqueness(self) -> bool:
         self._abort_if_unique_id_configured()
         self._async_abort_entries_match({ CONF_MAC: self._device_mac, CONF_HOST: self._device_host })
