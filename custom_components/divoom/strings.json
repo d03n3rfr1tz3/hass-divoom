@@ -64,6 +64,10 @@
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "Divoom YAML configuration is deprecated",
+      "description": "Your Divoom devices from `configuration.yaml` keep working for now, but configuring them via YAML is deprecated. Remove the `divoom` notify platform from your `configuration.yaml`, restart Home Assistant and then add the devices via Settings → Devices & services."
+    },
     "legacy_notify_usage": {
       "title": "Legacy Divoom notify actions still in use",
       "fix_flow": {

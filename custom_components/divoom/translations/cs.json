@@ -64,6 +64,10 @@
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "Konfigurace Divoom přes YAML je zastaralá",
+      "description": "Vaše zařízení Divoom z `configuration.yaml` zatím fungují dál, ale konfigurace přes YAML je zastaralá. Odstraňte platformu notify `divoom` ze souboru `configuration.yaml`, restartujte Home Assistant a poté přidejte zařízení v Nastavení → Zařízení a služby."
+    },
     "legacy_notify_usage": {
       "title": "Zastaralé akce notify pro Divoom se stále používají",
       "fix_flow": {

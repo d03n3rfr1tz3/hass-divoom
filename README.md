@@ -148,7 +148,7 @@ Currently it is supported through auto-discovery via ZeroConf, as well as throug
 add to the list of discovered Bluetooth devices, which means you have to manually type the MAC address in that case.
 
 ### Manual Configuration
-This is the legacy way and only recommended, if the Easy Configuration does not work for you.
+This is the legacy and deprecated way and only recommended, if the Easy Configuration does not work for you.
 A device configured like this has no config entry and therefore cannot be picked in the
 `divoom.*` actions. It is controlled through its `notify.NOTIFIER_NAME` service instead,
 which is described in [Legacy: Notify Service](#legacy-notify-service).
@@ -732,8 +732,9 @@ data:
 ### Legacy: Notify Service
 
 Before the actions existed, everything went through a notify service named after your device.
-That way still works and is not going away, so existing automations and scripts keep running
-unchanged. It is also the only way to control a device from the [Manual Configuration](#manual-configuration),
+That way still works as long as Home Assistant supports legacy notify services, so existing automations
+and scripts keep running unchanged. It is only marked deprecated as a precaution, because Home Assistant is
+phasing legacy notify services out. Should Home Assistant ever remove them, this integration will follow. It is also the only way to control a device from the [Manual Configuration](#manual-configuration),
 because such a device has no config entry to pick.
 
 The parameters are the same ones documented for each mode above, only the wrapping differs: the

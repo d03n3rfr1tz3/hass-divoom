@@ -64,6 +64,10 @@
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "Konfiguracja YAML Divoom jest przestarzała",
+      "description": "Twoje urządzenia Divoom z `configuration.yaml` na razie nadal działają, ale konfiguracja przez YAML jest przestarzała. Usuń platformę notify `divoom` z pliku `configuration.yaml`, uruchom ponownie Home Assistant, a następnie dodaj urządzenia w Ustawienia → Urządzenia oraz usługi."
+    },
     "legacy_notify_usage": {
       "title": "Przestarzałe akcje notify dla Divoom nadal w użyciu",
       "fix_flow": {

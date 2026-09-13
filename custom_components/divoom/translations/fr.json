@@ -64,6 +64,10 @@
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "La configuration YAML de Divoom est obsolète",
+      "description": "Vos appareils Divoom issus de `configuration.yaml` continuent de fonctionner pour l'instant, mais la configuration via YAML est obsolète. Supprimez la plateforme notify `divoom` de votre `configuration.yaml`, redémarrez Home Assistant puis ajoutez les appareils via Paramètres → Appareils et services."
+    },
     "legacy_notify_usage": {
       "title": "Actions notify Divoom obsolètes toujours utilisées",
       "fix_flow": {

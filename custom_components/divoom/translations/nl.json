@@ -64,6 +64,10 @@
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "Divoom YAML-configuratie is verouderd",
+      "description": "Je Divoom-apparaten uit `configuration.yaml` blijven voorlopig werken, maar configuratie via YAML is verouderd. Verwijder het `divoom`-notify-platform uit je `configuration.yaml`, herstart Home Assistant en voeg de apparaten daarna toe via Instellingen → Apparaten & diensten."
+    },
     "legacy_notify_usage": {
       "title": "Verouderde Divoom-notify-acties nog in gebruik",
       "fix_flow": {

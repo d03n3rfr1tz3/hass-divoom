@@ -64,6 +64,10 @@
     }
   },
   "issues": {
+    "deprecated_yaml": {
+      "title": "Divoom-YAML-Konfiguration ist veraltet",
+      "description": "Deine Divoom-Geräte aus der `configuration.yaml` funktionieren vorerst weiter, die Konfiguration per YAML ist aber veraltet. Entferne die `divoom`-notify-Plattform aus deiner `configuration.yaml`, starte Home Assistant neu und füge die Geräte danach unter Einstellungen → Geräte & Dienste hinzu."
+    },
     "legacy_notify_usage": {
       "title": "Veraltete Divoom-notify-Aktionen weiterhin in Benutzung",
       "fix_flow": {
