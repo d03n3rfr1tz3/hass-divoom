@@ -130,6 +130,10 @@
           "name": "Klokstijl",
           "description": "De klokstijl die getoond wordt, als getal vanaf 0 tot wat het Divoom-apparaat ondersteunt. Bekijk de officiële Divoom-app voor de beschikbare stijlen."
         },
+        "clock_id": {
+          "name": "Klok-ID",
+          "description": "Selecteert een specifieke klok via het ID, zoals de Divoom-app dat doet. Alleen de MiniToo begrijpt dit, andere apparaten negeren het. De ID's zijn nergens gedocumenteerd; de app haalt ze uit de Divoom-cloud."
+        },
         "twentyfour": {
           "name": "24-uursnotatie",
           "description": "Toont de tijd in 24-uursnotatie in plaats van 12-uursnotatie."

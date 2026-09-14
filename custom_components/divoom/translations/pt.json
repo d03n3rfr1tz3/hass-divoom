@@ -130,6 +130,10 @@
           "name": "Estilo do relógio",
           "description": "O estilo de relógio a mostrar, como um número a partir de 0 até ao máximo que o dispositivo Divoom suporta. Consulta a aplicação oficial da Divoom para ver os estilos disponíveis."
         },
+        "clock_id": {
+          "name": "ID do relógio",
+          "description": "Seleciona um relógio específico pelo seu ID, tal como faz a aplicação Divoom. Apenas o MiniToo o compreende, os outros dispositivos ignoram-no. Os ID não estão documentados em lado nenhum; a aplicação obtém-nos da nuvem da Divoom."
+        },
         "twentyfour": {
           "name": "Formato de 24 horas",
           "description": "Mostra a hora no formato de 24 horas em vez do formato de 12 horas."

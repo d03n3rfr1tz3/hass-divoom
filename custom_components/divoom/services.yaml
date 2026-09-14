@@ -6,12 +6,19 @@ clock:
       selector:
         text:
     clock:
-      required: true
+      required: false
       example: 1
       selector:
         number:
           min: 0
           max: 15
+          mode: box
+    clock_id:
+      required: false
+      example: 848
+      selector:
+        number:
+          min: 0
           mode: box
     twentyfour:
       example: true

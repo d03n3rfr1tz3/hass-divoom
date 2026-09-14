@@ -41,6 +41,7 @@ from .notify import (
 from .services import (
     GAMECONTROL_VALUES,
     KEYBOARD_VALUES,
+    SERVICE_RULES,
     SERVICE_SCHEMAS,
     TEMPERATURE_UNITS,
 )
@@ -265,6 +266,12 @@ def _check(mode, params) -> str | None:
 
     if required - set(params):
         return REASON_MISSING_FIELD
+
+    if mode in SERVICE_RULES:
+        try:
+            SERVICE_RULES[mode](params)
+        except vol.Invalid:
+            return REASON_MISSING_FIELD
 
     for key, value in params.items():
         if has_template(value):

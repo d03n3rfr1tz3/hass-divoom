@@ -53,7 +53,7 @@ class TimeboxMini(Divoom):
 
         return self.send_command("set alarm", args)
 
-    def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
+    def show_clock(self, clock=None, clock_id=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""
         if twentyfour == None: twentyfour = True
 

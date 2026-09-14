@@ -201,8 +201,8 @@ async def test_clock_service_calls_show_clock_off_the_event_loop(hass):
     )
 
     service._device.show_clock.assert_called_once_with(
-        clock=1, twentyfour=None, weather=None, temp=None, calendar=True,
-        color=[250, 0, 0], hot=None,
+        clock=1, clock_id=None, twentyfour=None, weather=None, temp=None,
+        calendar=True, color=[250, 0, 0], hot=None,
     )
     assert calling_threads != [loop_thread]
 
@@ -220,8 +220,8 @@ async def test_clock_service_omits_unset_fields(hass):
     )
 
     service._device.show_clock.assert_called_once_with(
-        clock=1, twentyfour=None, weather=None, temp=None, calendar=None,
-        color=None, hot=None,
+        clock=1, clock_id=None, twentyfour=None, weather=None, temp=None,
+        calendar=None, color=None, hot=None,
     )
 
 
@@ -261,6 +261,7 @@ async def test_notify_and_service_clock_paths_produce_identical_show_clock_call(
 
     params = {
         "clock": 1,
+        "clock_id": 848,
         "twentyfour": True,
         "weather": False,
         "temp": False,
@@ -501,6 +502,22 @@ async def test_service_requires_mandatory_field(hass, mode, params):
         )
 
     assert service._device.mock_calls == []
+
+
+async def test_clock_service_accepts_clock_id_without_clock(hass):
+    """Picking a clock by its id is a complete instruction on its own, so the
+    caller must not be forced to name a style the MiniToo ignores anyway."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, service = register_device(hass)
+
+    await hass.services.async_call(
+        DOMAIN, "clock", {CONF_DEVICE: device_slug(entry), "clock_id": 848}, blocking=True
+    )
+
+    service._device.show_clock.assert_called_once_with(
+        clock=None, clock_id=848, twentyfour=None, weather=None, temp=None,
+        calendar=None, color=None, hot=None,
+    )
 
 
 @pytest.mark.parametrize("mode", ["on", "off"])

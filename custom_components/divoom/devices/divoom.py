@@ -607,7 +607,7 @@ class Divoom:
         args += value.to_bytes(1, byteorder='big')
         return self.send_command("set brightness", args, skipRead=True)
 
-    def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
+    def show_clock(self, clock=None, clock_id=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""
         if clock == None: clock = 0
         if weather == None: weather = False

@@ -130,6 +130,10 @@
           "name": "Style d'horloge",
           "description": "Le style d'horloge à afficher, sous forme d'un nombre à partir de 0 jusqu'à la valeur maximale prise en charge par l'appareil Divoom. Consultez l'application Divoom officielle pour voir les styles disponibles."
         },
+        "clock_id": {
+          "name": "ID d'horloge",
+          "description": "Sélectionne une horloge précise par son ID, comme le fait l'application Divoom. Seul le MiniToo le comprend, les autres appareils l'ignorent. Les ID ne sont documentés nulle part ; l'application les récupère depuis le cloud Divoom."
+        },
         "twentyfour": {
           "name": "Format 24 heures",
           "description": "Affiche l'heure au format 24 heures au lieu du format 12 heures."

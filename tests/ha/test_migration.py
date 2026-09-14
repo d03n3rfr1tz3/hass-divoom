@@ -143,6 +143,8 @@ MANUAL_CASES = [
     # notify.py resolves volume through an `or` chain, so 0 falls through to
     # None, which the required volume field cannot express
     ("volume zero is ambiguous", step("volume", {"volume": 0}), REASON_MISSING_FIELD),
+    # the action needs clock or clock_id, the legacy device default does not carry over
+    ("clock without style", step("clock", {"twentyfour": True}), REASON_MISSING_FIELD),
     # the signal action takes no colors, so there is nothing to migrate them to
     ("signal with colors", step("signal", {"number": 1, "color": [[1, 2, 3]]}), REASON_UNKNOWN_FIELD),
     ("out of range", step("brightness", {"brightness": 500}), "schema"),

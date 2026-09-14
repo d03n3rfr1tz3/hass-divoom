@@ -9,7 +9,7 @@ protocol, so only the pixel-push path is overridden here.
 Protocol reverse-engineered by https://github.com/alvinunreal/divoom-minitoo-osx
 """
 
-import time
+import datetime, json, time
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
 from .divoom import Divoom
@@ -166,6 +166,10 @@ class MiniToo(Divoom):
         self.message_buf = list(buf[at + 6:])
         return flag, int.from_bytes(buf[at + 4:at + 6], "little")
 
+    def send_json(self, payload):
+        """Send a JSON request over SPP, the way the app mirrors its cloud calls"""
+        return self.send_command("set json", list(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")))
+
     def send_media(self, images, speed=1000):
         """Send frames to the Divoom device as one zstd compressed animation"""
         return self._send_packets(self._build_packets(self._encode_media(images, speed)))
@@ -179,6 +183,25 @@ class MiniToo(Divoom):
         csum = []
         csum += (sum(payload) & 0xffff).to_bytes(2, byteorder='little')
         return csum
+
+    def send_brightness(self, value=None):
+        """Send brightness, as opcode and as the app's Channel/SetBrightness request"""
+        result = super().send_brightness(value)
+        if value != None: self.send_json({"Command": "Channel/SetBrightness", "Brightness": int(value)})
+        return result
+
+    def send_datetime(self, value=None):
+        """Send date and time, as opcode and as the app's Device/SetUTC request"""
+        result = super().send_datetime(value)
+        clock = datetime.datetime.now() if value == None else datetime.datetime.fromisoformat(value)
+        self.send_json({"Command": "Device/SetUTC", "Utc": int(clock.timestamp()), "Time": clock.strftime("%Y-%m-%d %H:%M:%S")})
+        return result
+
+    def show_clock(self, clock=None, clock_id=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
+        """Show clock, as opcode and as the app's Channel/SetClockSelectId request"""
+        result = super().show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
+        if clock_id != None: self.send_json({"Command": "Channel/SetClockSelectId", "ClockId": int(clock_id)})
+        return result
 
     def show_image(self, file, time=None):
         """Show a still image or animated GIF on the MiniToo."""

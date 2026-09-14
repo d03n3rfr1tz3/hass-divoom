@@ -20,6 +20,7 @@ from .notify import (
     PARAM_BRIGHTNESS,
     PARAM_CALENDAR,
     PARAM_CLOCK,
+    PARAM_CLOCK_ID,
     PARAM_COLOR,
     PARAM_COUNTDOWN,
     PARAM_EFFECT,
@@ -70,6 +71,9 @@ WORD = vol.All(vol.Coerce(int), vol.Range(min=0, max=65535))
 # beyond 15 show_clock deactivates the clock instead of picking a style
 CLOCK = vol.All(vol.Coerce(int), vol.Range(min=0, max=15))
 
+# the clock id the MiniToo picks from, unrelated to the style above
+CLOCK_ID = vol.All(vol.Coerce(int), vol.Range(min=0))
+
 # the FM broadcast bands in use worldwide, from OIRT up to ITU
 FREQUENCY = vol.All(vol.Coerce(float), vol.Range(min=64, max=108))
 
@@ -88,7 +92,8 @@ TEMPERATURE = vol.Any(
 SERVICE_SCHEMAS = {
     "clock": vol.Schema({
         **TARGET_SCHEMA,
-        vol.Required(PARAM_CLOCK): CLOCK,
+        vol.Optional(PARAM_CLOCK): CLOCK,
+        vol.Optional(PARAM_CLOCK_ID): CLOCK_ID,
         vol.Optional(PARAM_TWENTYFOUR): cv.boolean,
         vol.Optional(PARAM_WEATHER): cv.boolean,
         vol.Optional(PARAM_TEMP): cv.boolean,
@@ -251,6 +256,10 @@ SERVICE_SCHEMAS = {
     }),
 }
 
+SERVICE_RULES = {
+    "clock": cv.has_at_least_one_key(PARAM_CLOCK, PARAM_CLOCK_ID),
+}
+
 def device_slug(entry) -> str:
     """The name the device is addressed by, unchanged by renaming the entry."""
     return slugify(entry.data.get(CONF_NAME) or entry.title)
@@ -315,6 +324,7 @@ def _make_handler(mode: str):
 @callback
 def async_setup_services(hass: HomeAssistant) -> None:
     for mode, schema in SERVICE_SCHEMAS.items():
+        if mode in SERVICE_RULES: schema = vol.All(schema, SERVICE_RULES[mode])
         hass.services.async_register(DOMAIN, mode, _make_handler(mode), schema=schema)
 
     _LOGGER.debug("Divoom: successfully registered {} services".format(len(SERVICE_SCHEMAS)))

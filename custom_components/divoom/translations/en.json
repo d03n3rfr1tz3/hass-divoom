@@ -130,6 +130,10 @@
           "name": "Clock style",
           "description": "The clock style to show, as a number starting from 0 up to what the Divoom device supports. Check the official Divoom app to see the available styles."
         },
+        "clock_id": {
+          "name": "Clock ID",
+          "description": "Selects a specific clock by its ID, the way the Divoom app does. Only the MiniToo understands this, other devices ignore it. The IDs are not documented anywhere; the app gets them from the Divoom cloud."
+        },
         "twentyfour": {
           "name": "24-hour format",
           "description": "Shows the time in 24-hour format instead of 12-hour format."

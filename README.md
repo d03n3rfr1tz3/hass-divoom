@@ -281,13 +281,16 @@ Shows the clock channel. Be aware, that this mode is very limited on older devic
 
 | Parameter    | Required | Description |
 | ---          | :---:    | --- |
-| `clock`      | ✔        | The style of the clock. Accepts a number starting from 0 up to what the Divoom device supports.<br/> Examples from Pixoo: `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen |
+| `clock`      | ✔*       | The style of the clock. Accepts a number starting from 0 up to what the Divoom device supports.<br/> Examples from Pixoo: `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen |
+| `clock_id`   | ✔*       | Selects a specific clock by its id, the way the Divoom app does. Only the MiniToo understands it, other devices ignore it. The ids are not documented anywhere, the app gets them from the Divoom cloud. Example: `848`. |
 | `twentyfour` |          | Changes between 12h or 24h format. <br/> `false` = 12h, `true` = 24h. |
 | `weather`    |          | Actives or deactivates showing the weather with `true` or `false`. |
 | `temp`       |          | Actives or deactivates showing the temperature with `true` or `false`. |
 | `calendar`   |          | Actives or deactivates showing the calendar date with `true` or `false`. |
 | `color`      |          | The color of the clock. Accepts an array of RGB color values. |
 | `hot`        |          | Actives or deactivates showing the slideshow of the best images with `true` or `false`, which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol |
+
+*) At least one of `clock` and `clock_id` has to be given.
 
 ```yaml
 action: divoom.clock

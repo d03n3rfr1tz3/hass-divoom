@@ -130,6 +130,10 @@
           "name": "Styl zegara",
           "description": "Styl zegara do wyświetlenia, jako liczba od 0 w górę, aż do wartości obsługiwanej przez urządzenie Divoom. Dostępne style można obejrzeć w oficjalnej aplikacji Divoom."
         },
+        "clock_id": {
+          "name": "ID zegara",
+          "description": "Wybiera konkretny zegar na podstawie jego ID, tak jak robi to aplikacja Divoom. Rozumie to tylko MiniToo, pozostałe urządzenia to ignorują. ID nie są nigdzie udokumentowane; aplikacja pobiera je z chmury Divoom."
+        },
         "twentyfour": {
           "name": "Format 24-godzinny",
           "description": "Wyświetla godzinę w formacie 24-godzinnym zamiast 12-godzinnego."
