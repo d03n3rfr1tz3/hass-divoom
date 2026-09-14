@@ -209,11 +209,11 @@ def test_minitoo_media(case_name):
 RESEND_IMAGE = os.path.join(PIXELART_DIR, "smiley16.gif")  # 38 chunks
 
 
-def _run_show_image(responder, resendwindow=0.5, path=RESEND_IMAGE):
+def _run_show_image(responder, resendwindow=0.5, path=RESEND_IMAGE, time=None):
     device, recorder, server_sock = make_connected_device(MiniToo, responder=responder)
     device.resendwindow = resendwindow
     try:
-        device.show_image(path)
+        device.show_image(path, time=time)
     finally:
         device.disconnect()
         server_sock.close()
@@ -292,3 +292,45 @@ def test_frames_are_quantized():
             raw[i * BYTES_PER_FRAME:(i + 1) * BYTES_PER_FRAME])
         colors = frame.getcolors(maxcolors=1 << 16)
         assert colors is not None and len(colors) <= 255
+
+
+# --- time and text layout -------------------------------------------
+
+LONG_TEXT = " ".join(["Divoom"] * 40)
+
+
+def _run_show_text(text, time=None):
+    device, recorder, server_sock = make_connected_device(MiniToo, responder=minitoo_responder)
+    try:
+        device.show_text(text, None, time=time)
+    finally:
+        device.disconnect()
+        server_sock.close()
+    return recorder.sent_messages
+
+
+def test_image_time_sets_speed():
+    path = os.path.join(PIXELART_DIR, "ha16.gif")
+    frames, speed, _, raw = _decoded_frames(_run_show_image(minitoo_responder, path=path))
+    timed_frames, timed_speed, _, timed_raw = _decoded_frames(
+        _run_show_image(minitoo_responder, path=path, time=40))
+
+    assert frames > 1 and speed != 40
+    assert timed_speed == 40
+    assert (timed_frames, timed_raw) == (frames, raw)
+
+
+def test_long_text_scrolls_vertically():
+    frames, speed, _, raw = _decoded_frames(_run_show_text(LONG_TEXT))
+
+    assert 1 < frames <= 255
+    assert speed == 100
+    assert len(raw) == frames * BYTES_PER_FRAME
+    assert set(raw[:BYTES_PER_FRAME]) == {0}, "the text starts below the screen"
+    middle = frames // 2 * BYTES_PER_FRAME
+    assert set(raw[middle:middle + BYTES_PER_FRAME]) != {0}
+
+
+def test_long_text_time_sets_speed():
+    _, speed, _, _ = _decoded_frames(_run_show_text(LONG_TEXT, time=40))
+    assert speed == 40

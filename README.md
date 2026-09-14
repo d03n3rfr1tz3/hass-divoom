@@ -176,7 +176,7 @@ notify:
 * `mac` (Required): The Bluetooth MAC address for the Divoom device.
 * `port` (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
 * `device_type`: The concrete type of your Divoom device. \
-  Currently `aurabox`, `backpack`, `ditoo`, `ditoomic`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `timoo` and `tivoo` are supported.
+  Currently `aurabox`, `backpack`, `ditoo`, `ditoomic`, `minitoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `timoo` and `tivoo` are supported.
   If you have a different device, you might try one that's most similar to yours.
 * `media_directory` (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
@@ -648,7 +648,7 @@ data:
 ```
 
 #### MODE text
-Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the frame limitation of ~60 frames.
+Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the frame limitation of ~60 frames. The MiniToo shows text as a still image instead, and scrolls it vertically if it does not fit the screen.
 
 | Parameter          | Required | Description |
 | ---                | :---:    | --- |
@@ -805,6 +805,7 @@ Examples for Aurabox: [devices/aurabox.txt](https://github.com/d03n3rfr1tz3/hass
 Examples for Backpack: [devices/backpack.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/backpack.txt) \
 Examples for Ditoo: [devices/ditoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/ditoo.txt) \
 Examples for Ditoo Mic: [devices/ditoomic.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/ditoomic.txt) \
+Examples for MiniToo: [devices/minitoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/minitoo.txt) \
 Examples for Pixoo: [devices/pixoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoo.txt) \
 Examples for Pixoo Max: [devices/pixoomax.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoomax.txt) \
 Examples for Timebox: [devices/timebox.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timebox.txt) \

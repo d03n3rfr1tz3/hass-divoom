@@ -213,13 +213,14 @@ class MiniToo(Divoom):
                     img.seek(i)
                     frames.append(self._fit(img.convert("RGB")))
                     durations.append(img.info.get("duration", 100))
-                speed = max(1, int(sum(durations) / len(durations)))
+                speed = max(1, int(sum(durations) / len(durations) if time is None else time))
             else:
                 frames, speed = [self._fit(img)], 1000
         return self.send_media(frames, speed=speed)
 
     def show_text(self, text, font, size=None, time=None, color1=None, color2=None):
-        """Render wrapped, centered text into a 128x128 frame and show it."""
+        """Render wrapped, centered text into a 128x128 frame and show it. Text
+        taller than the screen scrolls up from the bottom instead."""
         if color1 is None or len(color1) < 3: color1 = [0xff, 0xff, 0xff]
         if color2 is None or len(color2) < 3: color2 = [0x00, 0x00, 0x00]
         S = self.screensize
@@ -250,9 +251,16 @@ class MiniToo(Divoom):
         line_h = ascent + descent
         total_h = line_h * len(lines)
         y = max(0, (S - total_h) // 2)
+        if total_h > S:
+            img = Image.new("RGB", (S, S + total_h + S), tuple(color2))
+            drw = ImageDraw.Draw(img)
+            y = S
         for line in lines:
             lw = drw.textlength(line, font=fnt)
             drw.text(((S - lw) // 2, y), line, font=fnt, fill=tuple(color1))
             y += line_h
 
-        return self.send_media([img], speed=1000)
+        if total_h <= S: return self.send_media([img], speed=1000)
+        step = max(S // 16, -(-(total_h + S) // (MEDIA_MAX_FRAMES - 1)))
+        frames = [img.crop((0, top, S, top + S)) for top in range(0, total_h + S + 1, step)]
+        return self.send_media(frames, speed=100 if time is None else max(1, int(time)))

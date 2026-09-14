@@ -830,7 +830,7 @@ def test_device_examples_match_the_service_schemas():
             SERVICE_SCHEMAS[mode](example["data"])
             checked += 1
 
-    assert checked == 241 # every block, not just the ones that happened to parse
+    assert checked == 267 # every block, not just the ones that happened to parse
 
 
 def _number_selector(field_definition):
