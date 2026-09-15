@@ -9,26 +9,6 @@ data:
   device: YOUR_DIVOOM_DEVICE
   brightness: 75
 
-# activate channel 'clock' in rainbow style with specific components
-action: divoom.clock
-data:
-  device: YOUR_DIVOOM_DEVICE
-  clock: 1
-  weather: false
-  temp: false
-  calendar: true
-  color: [250, 0, 0]
-
-# activate channel 'clock' in analog style with specific components
-action: divoom.clock
-data:
-  device: YOUR_DIVOOM_DEVICE
-  clock: 5
-  weather: true
-  temp: true
-  calendar: true
-  color: [0, 250, 0]
-
 # activate channel 'clock' and select a specific clock by its id
 action: divoom.clock
 data:

@@ -1,16 +1,19 @@
 """Domain services for divoom, one per device mode."""
 import logging, os, re
+from collections import Counter
+import aiohttp
 import voluptuous as vol
 
 from homeassistant.core import HomeAssistant, ServiceCall, callback
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers import config_validation as cv
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.service import async_set_service_schema
 from homeassistant.util import slugify
 from homeassistant.util.yaml import load_yaml_dict
 
 from homeassistant.const import CONF_MAC, CONF_NAME
-from .const import CONF_DEVICE, DOMAIN
+from .const import CONF_DEVICE, CONF_DEVICE_TYPE, DOMAIN
 from .devices.divoom import DivoomUnsupportedError
 from .notify import (
     PARAM_ALARMMODE,
@@ -73,6 +76,12 @@ CLOCK = vol.All(vol.Coerce(int), vol.Range(min=0, max=15))
 
 # the clock id the MiniToo picks from, unrelated to the style above
 CLOCK_ID = vol.All(vol.Coerce(int), vol.Range(min=0))
+
+# device types that pick clocks by id instead of style
+CLOCK_ID_TYPES = {"minitoo"}
+CLOCK_CATALOG_URL = "https://app.divoom-gz.com/Channel/{}"
+CLOCK_CATEGORIES = ("Normal", "Nature&Weather", "Retro", "Ambient", "Plan", "Music Reactive", "Pixel Art", "HOLIDAYS")
+CLOCK_PAGE_SIZE = 30
 
 # the FM broadcast bands in use worldwide, from OIRT up to ITU
 FREQUENCY = vol.All(vol.Coerce(float), vol.Range(min=64, max=108))
@@ -336,12 +345,75 @@ def _device_options(hass: HomeAssistant):
         for entry in hass.config_entries.async_entries(DOMAIN)
     ]
 
+def _dropdown(options):
+    return {"select": {
+        "options": options,
+        "mode": "dropdown",
+        "custom_value": True,
+        "sort": True,
+    }}
+
+async def _fetch_clock_options(hass: HomeAssistant):
+    """The clocks of the public Divoom catalog, as the UI dropdown wants them."""
+    session = async_get_clientsession(hass)
+
+    async def post(command, body=None):
+        async with session.post(CLOCK_CATALOG_URL.format(command), json=body, timeout=aiohttp.ClientTimeout(total=10)) as response:
+            response.raise_for_status()
+            return await response.json(content_type=None)
+
+    labels = {}
+    for dial_type in (await post("GetDialType")).get("DialTypeList", []):
+        category = dial_type.split("（")[0].strip()
+        if category not in CLOCK_CATEGORIES: continue
+
+        for page in range(1, 51):
+            dials = (await post("GetDialList", {"DialType": dial_type, "Page": page})).get("DialList", [])
+            for dial in dials:
+                name = dial["Name"].replace("\\'", "'").strip()
+                labels.setdefault(dial["ClockId"], "{} · {}".format(category, name))
+            if len(dials) < CLOCK_PAGE_SIZE: break
+
+    counts = Counter(labels.values())
+    return [
+        {"value": str(clock_id), "label": label if counts[label] == 1 else "{} ({})".format(label, clock_id)}
+        for clock_id, label in labels.items()
+    ]
+
+async def _load_clock_options(hass: HomeAssistant) -> None:
+    domainConfig = hass.data[DOMAIN]
+    try:
+        clocks = await _fetch_clock_options(hass)
+    except Exception as err: # only UI sugar, the number field works without it
+        _LOGGER.warning("Divoom: clock catalog unavailable: {}".format(err))
+        return
+    finally:
+        domainConfig.pop('clocks_task', None)
+
+    if clocks:
+        domainConfig['clocks'] = clocks
+        await async_refresh_service_descriptions(hass)
+
+def _clock_fields(fields, types, clocks):
+    """Keep the sections the configured device types understand."""
+    fields = dict(fields)
+    if not types & CLOCK_ID_TYPES:
+        fields.pop("catalog")
+    elif clocks:
+        catalog = fields["catalog"]
+        clock_id = {**catalog["fields"][PARAM_CLOCK_ID], "selector": _dropdown(clocks)}
+        fields["catalog"] = {**catalog, "fields": {**catalog["fields"], PARAM_CLOCK_ID: clock_id}}
+    if types <= CLOCK_ID_TYPES:
+        fields.pop("classic")
+    return fields
+
 async def async_refresh_service_descriptions(hass: HomeAssistant) -> None:
     """Point the device field at the devices that actually exist.
 
     services.yaml can only describe a static field, so the picker is built here
     instead - it lists the configured devices and writes the same slug a
-    handwritten automation would use.
+    handwritten automation would use. The clock sections follow the configured
+    device types, and clock_id offers the Divoom catalog once it has loaded.
     """
     domainConfig = hass.data.setdefault(DOMAIN, {})
     descriptions = domainConfig.get('descriptions')
@@ -349,16 +421,17 @@ async def async_refresh_service_descriptions(hass: HomeAssistant) -> None:
         descriptions = await hass.async_add_executor_job(load_yaml_dict, SERVICES_YAML)
         domainConfig['descriptions'] = descriptions
 
-    options = _device_options(hass)
-    selector = {"select": {
-        "options": options,
-        "mode": "dropdown",
-        "custom_value": True,
-        "sort": True,
-    }}
+    entries = hass.config_entries.async_entries(DOMAIN)
+    types = {entry.data.get(CONF_DEVICE_TYPE) for entry in entries}
+    clocks = domainConfig.get('clocks')
+    if types & CLOCK_ID_TYPES and clocks is None and 'clocks_task' not in domainConfig:
+        domainConfig['clocks_task'] = hass.async_create_background_task(_load_clock_options(hass), "divoom clock catalog", eager_start=False)
+
+    selector = _dropdown(_device_options(hass))
 
     for mode, description in descriptions.items():
         fields = description.get("fields", {})
-        if options:
+        if entries:
             fields = {**fields, CONF_DEVICE: {**fields[CONF_DEVICE], "selector": selector}}
+            if mode == "clock": fields = _clock_fields(fields, types, clocks)
         async_set_service_schema(hass, DOMAIN, mode, {**description, "fields": fields})

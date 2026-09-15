@@ -5,45 +5,51 @@ clock:
       example: divoom_ditoo
       selector:
         text:
-    clock:
-      required: false
-      example: 1
-      selector:
-        number:
-          min: 0
-          max: 15
-          mode: box
-    clock_id:
-      required: false
-      example: 848
-      selector:
-        number:
-          min: 0
-          mode: box
-    twentyfour:
-      example: true
-      selector:
-        boolean:
-    weather:
-      example: false
-      selector:
-        boolean:
-    temp:
-      example: false
-      selector:
-        boolean:
-    calendar:
-      example: true
-      selector:
-        boolean:
-    color:
-      example: [250, 0, 0]
-      selector:
-        color_rgb:
-    hot:
-      example: false
-      selector:
-        boolean:
+    classic:
+      collapsed: false
+      fields:
+        clock:
+          required: false
+          example: 1
+          selector:
+            number:
+              min: 0
+              max: 15
+              mode: box
+        twentyfour:
+          example: true
+          selector:
+            boolean:
+        weather:
+          example: false
+          selector:
+            boolean:
+        temp:
+          example: false
+          selector:
+            boolean:
+        calendar:
+          example: true
+          selector:
+            boolean:
+        color:
+          example: [250, 0, 0]
+          selector:
+            color_rgb:
+        hot:
+          example: false
+          selector:
+            boolean:
+    catalog:
+      collapsed: false
+      fields:
+        clock_id:
+          required: false
+          example: 848
+          selector:
+            number:
+              min: 0
+              mode: box
 
 light:
   fields:

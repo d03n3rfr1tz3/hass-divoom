@@ -132,7 +132,7 @@
         },
         "clock_id": {
           "name": "ID hodin",
-          "description": "Vybere konkrétní hodiny podle jejich ID, stejně jako to dělá aplikace Divoom. Rozumí tomu pouze MiniToo, ostatní zařízení to ignorují. ID nejsou nikde zdokumentována; aplikace je získává z cloudu Divoom."
+          "description": "Vybere konkrétní hodiny podle jejich ID, stejně jako to dělá aplikace Divoom. Rozumí tomu pouze MiniToo, ostatní zařízení to ignorují. Vyberte hodiny ze seznamu nebo zadejte libovolné ID."
         },
         "twentyfour": {
           "name": "24hodinový formát",
@@ -157,6 +157,16 @@
         "hot": {
           "name": "Zobrazit oblíbené obrázky",
           "description": "Postupně prochází oblíbené obrázky komunity Divoom."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Styl hodin",
+          "description": "Pro všechna zařízení kromě MiniToo."
+        },
+        "catalog": {
+          "name": "Katalog hodin",
+          "description": "Vybere hodiny podle jejich ID. Pouze pro MiniToo."
         }
       }
     },

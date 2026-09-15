@@ -132,7 +132,7 @@
         },
         "clock_id": {
           "name": "Uhren-ID",
-          "description": "Wählt eine bestimmte Uhr über ihre ID, so wie es die Divoom-App tut. Nur der MiniToo versteht das, andere Geräte ignorieren es. Die IDs sind nirgends dokumentiert; die App bezieht sie aus der Divoom-Cloud."
+          "description": "Wählt eine bestimmte Uhr über ihre ID, so wie es die Divoom-App tut. Nur der MiniToo versteht das, andere Geräte ignorieren es. Wähle eine Uhr aus der Liste oder gib eine beliebige ID ein."
         },
         "twentyfour": {
           "name": "24-Stunden-Format",
@@ -157,6 +157,16 @@
         "hot": {
           "name": "Beliebte Bilder anzeigen",
           "description": "Zeigt nacheinander die beliebten Bilder der Divoom-Community an."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Uhrstil",
+          "description": "Für alle Geräte außer dem MiniToo."
+        },
+        "catalog": {
+          "name": "Uhren-Katalog",
+          "description": "Wählt eine Uhr über ihre ID. Nur für den MiniToo."
         }
       }
     },

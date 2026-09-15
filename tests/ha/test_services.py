@@ -14,6 +14,7 @@ import threading
 from pathlib import Path
 from unittest.mock import Mock
 
+import aiohttp
 import pytest
 import voluptuous as vol
 
@@ -24,9 +25,10 @@ from homeassistant.helpers.service import async_get_all_descriptions
 from homeassistant.setup import async_setup_component
 from homeassistant.util.yaml import load_yaml, parse_yaml
 from pytest_homeassistant_custom_component.common import MockConfigEntry
+from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMockResponse
 
 from custom_components.divoom import notify as notify_module
-from custom_components.divoom.const import CONF_DEVICE, DOMAIN
+from custom_components.divoom.const import CONF_DEVICE, CONF_DEVICE_TYPE, DOMAIN
 from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.backpack import Backpack
 from custom_components.divoom.devices.ditoo import Ditoo
@@ -48,10 +50,13 @@ pytestmark = pytest.mark.usefixtures("enable_custom_integrations")
 COMPONENT_PATH = Path(__file__).parents[2] / "custom_components" / "divoom"
 
 
-def register_device(hass, mac="11:22:33:44:55:66", loaded=True):
+def register_device(hass, mac="11:22:33:44:55:66", loaded=True, device_type=None):
     """Put a mocked device behind a config entry, the way async_setup_entry
     plus the notify platform would."""
-    entry = MockConfigEntry(domain=DOMAIN, data={CONF_MAC: mac}, title="Divoom Test")
+    data = {CONF_MAC: mac}
+    if device_type is not None:
+        data[CONF_DEVICE_TYPE] = device_type
+    entry = MockConfigEntry(domain=DOMAIN, data=data, title="Divoom Test")
     entry.add_to_hass(hass)
 
     service = make_mocked_service()
@@ -520,6 +525,99 @@ async def test_clock_service_accepts_clock_id_without_clock(hass):
     )
 
 
+CATALOG_URL = "https://app.divoom-gz.com/Channel/{}"
+
+
+async def _clock_fields(hass):
+    descriptions = await async_get_all_descriptions(hass)
+    return descriptions[DOMAIN]["clock"]["fields"]
+
+
+@pytest.mark.parametrize(
+    ("device_types", "sections"),
+    [
+        (["minitoo"], {"catalog"}),
+        (["ditoo"], {"classic"}),
+        (["minitoo", "ditoo"], {"classic", "catalog"}),
+        ([], {"classic", "catalog"}),
+    ],
+)
+async def test_clock_sections_follow_the_configured_device_types(hass, aioclient_mock, device_types, sections):
+    """HA can't hide a field depending on the picked device, so the clock
+    action offers only what the configured devices understand."""
+    aioclient_mock.post(CATALOG_URL.format("GetDialType"), json={"DialTypeList": []})
+    assert await async_setup_component(hass, DOMAIN, {})
+    for index, device_type in enumerate(device_types):
+        register_device(hass, mac="11:22:33:44:55:6{}".format(index), device_type=device_type)
+
+    await async_refresh_service_descriptions(hass)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    fields = await _clock_fields(hass)
+    assert {key for key, value in fields.items() if "fields" in value} == sections
+    assert CONF_DEVICE in fields
+
+
+async def test_clock_id_field_offers_the_cloud_catalog(hass, aioclient_mock):
+    """The ids are only known to the Divoom cloud, so the picker is filled from
+    its public catalog - and repeated names stay apart by their id."""
+    dials = {
+        "Normal": [
+            {"ClockId": 1, "Name": "Twin"},
+            {"ClockId": 2, "Name": "Twin "},
+            {"ClockId": 3, "Name": "Bun\\'s clock"},
+        ],
+        "Nature&Weather": [{"ClockId": 4, "Name": "Rain"}],
+        "Nature&Weather（Weather syncs via app）": [{"ClockId": 5, "Name": "Rain"}, {"ClockId": 6, "Name": "Sun"}],
+    }
+    requested = []
+
+    async def dial_list(method, url, data):
+        requested.append(data["DialType"])
+        return AiohttpClientMockResponse(method, url, json={"DialList": dials.get(data["DialType"], [])})
+
+    aioclient_mock.post(CATALOG_URL.format("GetDialType"), json={"DialTypeList": ["Normal", "Social", *list(dials)[1:]]})
+    aioclient_mock.post(CATALOG_URL.format("GetDialList"), side_effect=dial_list)
+    assert await async_setup_component(hass, DOMAIN, {})
+    register_device(hass, device_type="minitoo")
+
+    await async_refresh_service_descriptions(hass)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    assert "Social" not in requested
+    field = (await _clock_fields(hass))["catalog"]["fields"]["clock_id"]
+    assert field["selector"]["select"]["custom_value"] is True
+    assert field["selector"]["select"]["options"] == [
+        {"value": "1", "label": "Normal · Twin (1)"},
+        {"value": "2", "label": "Normal · Twin (2)"},
+        {"value": "3", "label": "Normal · Bun's clock"},
+        {"value": "4", "label": "Nature&Weather · Rain (4)"},
+        {"value": "5", "label": "Nature&Weather · Rain (5)"},
+        {"value": "6", "label": "Nature&Weather · Sun"},
+    ]
+    selector(field["selector"])
+
+
+async def test_clock_id_field_stays_a_number_without_the_cloud(hass, aioclient_mock):
+    """The catalog is only a convenience - without it the id is typed in, and
+    the next refresh tries again."""
+    aioclient_mock.post(CATALOG_URL.format("GetDialType"), exc=aiohttp.ClientError())
+    assert await async_setup_component(hass, DOMAIN, {})
+    register_device(hass, device_type="minitoo")
+
+    await async_refresh_service_descriptions(hass)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    field = (await _clock_fields(hass))["catalog"]["fields"]["clock_id"]
+    assert field == SERVICES_YAML["clock"]["fields"]["catalog"]["fields"]["clock_id"]
+    assert aioclient_mock.call_count == 1
+
+    await async_refresh_service_descriptions(hass)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    assert aioclient_mock.call_count == 2
+
+
 @pytest.mark.parametrize("mode", ["on", "off"])
 async def test_on_off_services_take_no_parameters(hass, mode):
     assert await async_setup_component(hass, DOMAIN, {})
@@ -830,7 +928,7 @@ def test_device_examples_match_the_service_schemas():
             SERVICE_SCHEMAS[mode](example["data"])
             checked += 1
 
-    assert checked == 267 # every block, not just the ones that happened to parse
+    assert checked == 265 # every block, not just the ones that happened to parse
 
 
 def _number_selector(field_definition):
@@ -845,6 +943,17 @@ def _range_of(validator):
     return None
 
 
+def _fields(definition):
+    """The fields of a service description, with sections unpacked."""
+    fields = {}
+    for key, value in definition["fields"].items():
+        if "fields" in value:
+            fields.update(value["fields"])
+        else:
+            fields[key] = value
+    return fields
+
+
 SERVICES_YAML = load_yaml(str(COMPONENT_PATH / "services.yaml"))
 
 # a payload per mode that satisfies every vol.Required, so a schema rejection
@@ -856,7 +965,7 @@ for _case in DISPATCH_CASES:
 NUMBER_FIELDS = [
     (mode, field)
     for mode, definition in SERVICES_YAML.items()
-    for field, field_definition in definition["fields"].items()
+    for field, field_definition in _fields(definition).items()
     if _number_selector(field_definition) is not None
 ]
 NUMBER_IDS = ["{}.{}".format(mode, field) for mode, field in NUMBER_FIELDS]
@@ -866,7 +975,7 @@ NUMBER_IDS = ["{}.{}".format(mode, field) for mode, field in NUMBER_FIELDS]
 def test_services_yaml_number_bounds_match_the_schema(mode, field):
     """A bound the UI enforces but the schema doesn't (or the other way
     round) lets the frontend offer values the call then rejects."""
-    selector = _number_selector(SERVICES_YAML[mode]["fields"][field])
+    selector = _number_selector(_fields(SERVICES_YAML[mode])[field])
     bounds = _range_of(SERVICE_SCHEMAS[mode].schema[field])
 
     # weather.value is bounded on the celsius-converted value, so neither side
@@ -882,7 +991,7 @@ def test_services_yaml_number_bounds_match_the_schema(mode, field):
 
 BOUNDED_NUMBER_FIELDS = [
     (mode, field) for mode, field in NUMBER_FIELDS
-    if _number_selector(SERVICES_YAML[mode]["fields"][field]).get("max") is not None
+    if _number_selector(_fields(SERVICES_YAML[mode])[field]).get("max") is not None
 ]
 BOUNDED_NUMBER_IDS = [
     "{}.{}".format(mode, field) for mode, field in BOUNDED_NUMBER_FIELDS
@@ -894,7 +1003,7 @@ def test_number_fields_stop_at_the_protocol_limit(mode, field):
     """Above the width the protocol packs the value into, to_bytes would
     raise OverflowError deep in the executor thread - the schema has to
     catch it first, while the limit itself still has to be reachable."""
-    limit = _number_selector(SERVICES_YAML[mode]["fields"][field])["max"]
+    limit = _number_selector(_fields(SERVICES_YAML[mode])[field])["max"]
     schema = SERVICE_SCHEMAS[mode]
     payload = {CONF_DEVICE: "divoom_test", **VALID_PARAMS.get(mode, {})}
 
@@ -911,7 +1020,7 @@ def test_selector_options_are_translated():
 
     found = 0
     for mode, definition in SERVICES_YAML.items():
-        for field, field_definition in definition["fields"].items():
+        for field, field_definition in _fields(definition).items():
             selector = field_definition.get("selector", {}).get("select")
             if selector is None:
                 continue
@@ -975,7 +1084,7 @@ def test_services_yaml_strings_and_translations_stay_in_sync():
     for mode, definition in services_yaml.items():
         assert mode in VALID_MODES, mode
 
-        yaml_fields = definition["fields"]
+        yaml_fields = _fields(definition)
         schema_fields = {str(marker): marker for marker in SERVICE_SCHEMAS[mode].schema}
         assert set(yaml_fields) == set(schema_fields), mode
 
@@ -988,6 +1097,11 @@ def test_services_yaml_strings_and_translations_stay_in_sync():
         assert set(described["fields"]) == set(yaml_fields), mode
         for field, texts in described["fields"].items():
             assert texts["name"] and texts["description"], (mode, field)
+
+        yaml_sections = {key for key, value in definition["fields"].items() if "fields" in value}
+        assert set(described.get("sections", {})) == yaml_sections, mode
+        for section, texts in described.get("sections", {}).items():
+            assert texts["name"] and texts["description"], (mode, section)
 
     # every translation_key raised by services.py must be translatable
     assert set(strings["exceptions"]) == {

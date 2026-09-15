@@ -132,7 +132,7 @@
         },
         "clock_id": {
           "name": "ID zegara",
-          "description": "Wybiera konkretny zegar na podstawie jego ID, tak jak robi to aplikacja Divoom. Rozumie to tylko MiniToo, pozostałe urządzenia to ignorują. ID nie są nigdzie udokumentowane; aplikacja pobiera je z chmury Divoom."
+          "description": "Wybiera konkretny zegar na podstawie jego ID, tak jak robi to aplikacja Divoom. Rozumie to tylko MiniToo, pozostałe urządzenia to ignorują. Wybierz zegar z listy lub wpisz dowolne ID."
         },
         "twentyfour": {
           "name": "Format 24-godzinny",
@@ -157,6 +157,16 @@
         "hot": {
           "name": "Pokaż popularne obrazy",
           "description": "Przewija popularne obrazy społeczności Divoom."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Styl zegara",
+          "description": "Dla wszystkich urządzeń oprócz MiniToo."
+        },
+        "catalog": {
+          "name": "Katalog zegarów",
+          "description": "Wybiera zegar na podstawie jego ID. Tylko dla MiniToo."
         }
       }
     },

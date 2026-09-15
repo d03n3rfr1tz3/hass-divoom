@@ -198,10 +198,12 @@ class MiniToo(Divoom):
         return result
 
     def show_clock(self, clock=None, clock_id=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
-        """Show clock, as opcode and as the app's Channel/SetClockSelectId request"""
-        result = super().show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
-        if clock_id != None: self.send_json({"Command": "Channel/SetClockSelectId", "ClockId": int(clock_id)})
-        return result
+        """Show clock by id, the app's Channel/SetClockSelectId request. The MiniToo
+        has no styles, so the remaining parameters are ignored."""
+        if clock_id == None:
+            self.logger.warning("{0}: clock needs clock_id".format(self.type))
+            return None
+        return self.send_json({"Command": "Channel/SetClockSelectId", "ClockId": int(clock_id)})
 
     def show_image(self, file, time=None):
         """Show a still image or animated GIF on the MiniToo."""

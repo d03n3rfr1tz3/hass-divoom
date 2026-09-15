@@ -132,7 +132,7 @@
         },
         "clock_id": {
           "name": "Klok-ID",
-          "description": "Selecteert een specifieke klok via het ID, zoals de Divoom-app dat doet. Alleen de MiniToo begrijpt dit, andere apparaten negeren het. De ID's zijn nergens gedocumenteerd; de app haalt ze uit de Divoom-cloud."
+          "description": "Selecteert een specifieke klok via het ID, zoals de Divoom-app dat doet. Alleen de MiniToo begrijpt dit, andere apparaten negeren het. Kies een klok uit de lijst of voer een willekeurig ID in."
         },
         "twentyfour": {
           "name": "24-uursnotatie",
@@ -157,6 +157,16 @@
         "hot": {
           "name": "Populaire afbeeldingen tonen",
           "description": "Doorloopt de populaire afbeeldingen van de Divoom-community."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Klokstijl",
+          "description": "Voor alle apparaten behalve de MiniToo."
+        },
+        "catalog": {
+          "name": "Klokcatalogus",
+          "description": "Kiest een klok via het ID. Alleen voor de MiniToo."
         }
       }
     },
