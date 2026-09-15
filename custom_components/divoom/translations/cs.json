@@ -130,6 +130,10 @@
           "name": "Styl hodin",
           "description": "Styl hodin, který se má zobrazit, jako číslo od 0 výše až po hodnotu, kterou zařízení Divoom podporuje. Dostupné styly najdete v oficiální aplikaci Divoom."
         },
+        "clock_id": {
+          "name": "ID hodin",
+          "description": "Vybere konkrétní hodiny podle jejich ID, stejně jako to dělá aplikace Divoom. Rozumí tomu pouze MiniToo, ostatní zařízení to ignorují. Vyberte hodiny ze seznamu nebo zadejte libovolné ID."
+        },
         "twentyfour": {
           "name": "24hodinový formát",
           "description": "Zobrazí čas ve 24hodinovém formátu místo 12hodinového."
@@ -153,6 +157,16 @@
         "hot": {
           "name": "Zobrazit oblíbené obrázky",
           "description": "Postupně prochází oblíbené obrázky komunity Divoom."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Styl hodin",
+          "description": "Pro všechna zařízení kromě MiniToo."
+        },
+        "catalog": {
+          "name": "Katalog hodin",
+          "description": "Vybere hodiny podle jejich ID. Pouze pro MiniToo."
         }
       }
     },

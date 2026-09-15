@@ -24,6 +24,7 @@ PARAM_TEXT = 'text'
 PARAM_VALUE = 'value'
 
 PARAM_CLOCK = 'clock'
+PARAM_CLOCK_ID = 'clock_id'
 PARAM_TWENTYFOUR = 'twentyfour'
 PARAM_WEATHER = 'weather'
 PARAM_TEMP = 'temp'
@@ -211,6 +212,10 @@ class DivoomNotificationService(BaseNotificationService):
             from .devices.ditoomic import DitooMic
             self._device = DitooMic(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
+        if device_type == 'minitoo':
+            from .devices.minitoo import MiniToo
+            self._device = MiniToo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
             self._device = Pixoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
@@ -334,13 +339,14 @@ class DivoomNotificationService(BaseNotificationService):
 
             elif mode == "clock":
                 clock = data.get(PARAM_CLOCK)
+                clock_id = data.get(PARAM_CLOCK_ID)
                 twentyfour = data.get(PARAM_TWENTYFOUR)
                 weather = data.get(PARAM_WEATHER)
                 temp = data.get(PARAM_TEMP)
                 calendar = data.get(PARAM_CALENDAR)
                 color = data.get(PARAM_COLOR)
                 hot = data.get(PARAM_HOT)
-                self._device.show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
+                self._device.show_clock(clock=clock, clock_id=clock_id, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
 
             elif mode == "countdown":
                 value = data.get(PARAM_VALUE)

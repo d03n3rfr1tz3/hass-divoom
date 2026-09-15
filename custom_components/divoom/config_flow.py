@@ -35,6 +35,7 @@ DEVICE_TYPES = [
     SelectOptionDict(value="backpack", label="Backpack"),
     SelectOptionDict(value="ditoo", label="Ditoo"),
     SelectOptionDict(value="ditoomic", label="Ditoo Mic"),
+    SelectOptionDict(value="minitoo", label="MiniToo"),
     SelectOptionDict(value="pixoo", label="Pixoo"),
     SelectOptionDict(value="pixoomax", label="Pixoo Max"),
     SelectOptionDict(value="timebox", label="Timebox"),
@@ -80,7 +81,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     continue
 
                 device_name = discovery_info.name.lower()
-                if "aurabox" in device_name or "timebox" in device_name or "ditoo" in device_name or "pixoo" in device_name or "timoo" in device_name or "tivoo" in device_name or "divoom" in device_name:
+                if "aurabox" in device_name or "timebox" in device_name or "ditoo" in device_name or "minitoo" in device_name or "pixoo" in device_name or "timoo" in device_name or "tivoo" in device_name or "divoom" in device_name:
                     self._discovered_devices[discovery_address] = discovery_info
 
             discovered_titles = [
@@ -222,6 +223,8 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
             device_type = "backpack"
         elif device_name.startswith("ditoomic") or device_name.startswith("ditoo-mic") or device_name.startswith("ditoo mic"):
             device_type = "ditoomic"
+        elif device_name.startswith("minitoo") or device_name.startswith("divoom-minitoo") or device_name.startswith("divoom minitoo"):
+            device_type = "minitoo"
         elif device_name.startswith("ditoo") or device_name.startswith("divoom-ditoo") or device_name.startswith("divoom ditoo"):
             device_type = "ditoo"
         elif device_name.startswith("pixoomax") or device_name.startswith("pixoo-max") or device_name.startswith("pixoo max"):

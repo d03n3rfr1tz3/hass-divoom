@@ -1,13 +1,13 @@
 """Unit tests for the low-level protocol helpers in devices/divoom.py.
 These freeze the CURRENT behaviour (including the checksum branch, which is
-intentional PixooMax-compatibility code - see the plan's "checksum()" note,
-not a bug to be fixed).
+intentional PixooMax-compatibility code, not a bug to be fixed).
 """
 from __future__ import annotations
 
 import os
 
 from custom_components.divoom.devices.aurabox import Aurabox
+from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
 from tests.support import make_connected_device
@@ -163,6 +163,21 @@ def test_show_clock_string_clock_matches_int_clock():
         server_int.close()
 
     assert recorder_str.sent_messages == recorder_int.sent_messages
+
+
+def test_send_json_sorts_keys_and_drops_whitespace():
+    """The app serializes with fastjson's SortField, so the device only ever
+    sees alphabetically sorted, compact JSON."""
+    device, recorder, server_sock = make_connected_device(MiniToo)
+    try:
+        device.send_json({"B": "x", "A": 1})
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    body = b'{"A":1,"B":"x"}'
+    payload = list((len(body) + 3).to_bytes(2, "little")) + [0x01] + list(body)
+    assert recorder.sent_messages == [bytes(device.make_message(payload))]
 
 
 def test_send_gamecontrol_invalid_string_logs_and_sends_nothing():

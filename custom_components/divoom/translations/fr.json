@@ -130,6 +130,10 @@
           "name": "Style d'horloge",
           "description": "Le style d'horloge à afficher, sous forme d'un nombre à partir de 0 jusqu'à la valeur maximale prise en charge par l'appareil Divoom. Consultez l'application Divoom officielle pour voir les styles disponibles."
         },
+        "clock_id": {
+          "name": "ID d'horloge",
+          "description": "Sélectionne une horloge précise par son ID, comme le fait l'application Divoom. Seul le MiniToo le comprend, les autres appareils l'ignorent. Choisissez une horloge dans la liste ou saisissez un ID."
+        },
         "twentyfour": {
           "name": "Format 24 heures",
           "description": "Affiche l'heure au format 24 heures au lieu du format 12 heures."
@@ -153,6 +157,16 @@
         "hot": {
           "name": "Afficher les images populaires",
           "description": "Fait défiler les images populaires de la communauté Divoom."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Style d'horloge",
+          "description": "Pour tous les appareils sauf le MiniToo."
+        },
+        "catalog": {
+          "name": "Catalogue d'horloges",
+          "description": "Choisit une horloge par son ID. Uniquement pour le MiniToo."
         }
       }
     },

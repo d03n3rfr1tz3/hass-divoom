@@ -130,6 +130,10 @@
           "name": "Styl zegara",
           "description": "Styl zegara do wyświetlenia, jako liczba od 0 w górę, aż do wartości obsługiwanej przez urządzenie Divoom. Dostępne style można obejrzeć w oficjalnej aplikacji Divoom."
         },
+        "clock_id": {
+          "name": "ID zegara",
+          "description": "Wybiera konkretny zegar na podstawie jego ID, tak jak robi to aplikacja Divoom. Rozumie to tylko MiniToo, pozostałe urządzenia to ignorują. Wybierz zegar z listy lub wpisz dowolne ID."
+        },
         "twentyfour": {
           "name": "Format 24-godzinny",
           "description": "Wyświetla godzinę w formacie 24-godzinnym zamiast 12-godzinnego."
@@ -153,6 +157,16 @@
         "hot": {
           "name": "Pokaż popularne obrazy",
           "description": "Przewija popularne obrazy społeczności Divoom."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Styl zegara",
+          "description": "Dla wszystkich urządzeń oprócz MiniToo."
+        },
+        "catalog": {
+          "name": "Katalog zegarów",
+          "description": "Wybiera zegar na podstawie jego ID. Tylko dla MiniToo."
         }
       }
     },
