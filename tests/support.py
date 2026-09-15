@@ -84,14 +84,24 @@ class MiniTooResendResponder:
 
 
 def _serve_forever(sock: socket.socket, responder) -> None:
+    buf = b""
     try:
         while True:
             data = sock.recv(65536)
             if not data:
                 break
-            reply = responder(data) if responder is not None else None
-            if reply:
-                sock.sendall(reply)
+            if responder is None:
+                continue
+            buf += data
+
+            while len(buf) >= 3:
+                size = int.from_bytes(buf[1:3], "little") + 4 if buf[0] == 0x01 else len(buf)
+                if len(buf) < size:
+                    break
+                message, buf = buf[:size], buf[size:]
+                reply = responder(message)
+                if reply:
+                    sock.sendall(reply)
     except OSError:
         pass
 
@@ -100,8 +110,8 @@ def make_connected_device(device_cls, mac="11:22:33:44:55:66", responder=None, *
     """Instantiate a device with a live, already "connected" socket pair,
     bypassing connect() so tests need no real Bluetooth/TCP hardware.
 
-    `responder` is an optional callback receiving each chunk of bytes read
-    from the device; whatever it returns is sent back. Without one the peer
+    `responder` is an optional callback receiving each message read from the
+    device; whatever it returns is sent back. Without one the peer
     only drains, exactly as before.
 
     Returns (device, recorder, server_sock). Call device.disconnect() and
