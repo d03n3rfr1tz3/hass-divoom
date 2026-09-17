@@ -21,6 +21,7 @@ class Divoom128(Divoom):
     """Class Divoom128 encapsulates the 128x128 LCD Bluetooth communication."""
 
     maxframes = 92 # frame limit of the app editor
+    MEDIA_WINDOW_LOG = 17
     REQUEST_MARK = b"\x04\x8b\x55"
 
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
@@ -59,7 +60,7 @@ class Divoom128(Divoom):
         Layout:
           25 <frame_count_u8> <speed_ms_be16> <row_blocks_u8> <col_blocks_u8>
           <zstd_len_be32> <zstd_frame>
-        Pixels are concatenated RGB888 frames, zstd level 20, window_log 17.
+        Pixels are the concatenated frames as _pixels encodes them, zstd level 20.
         """
         import zstandard as zstd  # only these devices need it; keep it out of base import
 
@@ -68,7 +69,7 @@ class Divoom128(Divoom):
 
         compressor = zstd.ZstdCompressor(
             compression_params=zstd.ZstdCompressionParameters.from_level(
-                20, window_log=17, write_content_size=True))
+                20, window_log=self.MEDIA_WINDOW_LOG, write_content_size=True))
 
         # Thin the animation out evenly until it fits, stretching speed by the
         # same factor to keep the cycle length. A single frame always fits.
@@ -77,7 +78,7 @@ class Divoom128(Divoom):
         while True:
             frames = [images[i] for i in self.pick_frames(count, keep)]
             zbytes = compressor.compress(
-                b"".join(self._quantize(img).tobytes("raw", "RGB") for img in frames))
+                b"".join(self._pixels(self._quantize(img)) for img in frames))
             if len(zbytes) <= MEDIA_MAX_BYTES or keep == 1: break
             keep = max(1, min(keep - 1, keep * MEDIA_MAX_BYTES // len(zbytes)))
         if keep < count:
@@ -99,6 +100,10 @@ class Divoom128(Divoom):
         resample = Image.Resampling.NEAREST if self.screensize % side == 0 else Image.Resampling.LANCZOS
         return img.crop((left, top, left + side, top + side)).resize(
             (self.screensize, self.screensize), resample)
+
+    def _pixels(self, img):
+        """Wire bytes of one quantized frame."""
+        return img.tobytes("raw", "RGB")
 
     def _quantize(self, img):
         """Reduce to at most 255 colors before compressing. Dithering is off on

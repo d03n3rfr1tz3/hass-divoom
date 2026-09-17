@@ -132,7 +132,7 @@
         },
         "clock_id": {
           "name": "ID zegara",
-          "description": "Wybiera konkretny zegar na podstawie jego ID, tak jak robi to aplikacja Divoom. Rozumie to tylko MiniToo, pozostałe urządzenia to ignorują. Wybierz zegar z listy lub wpisz dowolne ID."
+          "description": "Wybiera konkretny zegar na podstawie jego ID, tak jak robi to aplikacja Divoom. Rozumieją to tylko MiniToo, Tiivoo 2 i FlowToo, pozostałe urządzenia to ignorują. Wybierz zegar z listy lub wpisz dowolne ID."
         },
         "twentyfour": {
           "name": "Format 24-godzinny",
@@ -162,11 +162,11 @@
       "sections": {
         "classic": {
           "name": "Styl zegara",
-          "description": "Dla wszystkich urządzeń oprócz MiniToo."
+          "description": "Dla wszystkich urządzeń oprócz MiniToo, Tiivoo 2 i FlowToo."
         },
         "catalog": {
           "name": "Katalog zegarów",
-          "description": "Wybiera zegar na podstawie jego ID. Tylko dla MiniToo."
+          "description": "Wybiera zegar na podstawie jego ID. Tylko dla MiniToo, Tiivoo 2 i FlowToo."
         }
       }
     },
@@ -538,7 +538,7 @@
       "sections": {
         "whitenoise": {
           "name": "Biały szum",
-          "description": "Jedna głośność na każdy dźwięk. Tylko dla MiniToo."
+          "description": "Jedna głośność na każdy dźwięk. Tylko dla MiniToo i Tiivoo 2."
         }
       }
     },
@@ -648,7 +648,7 @@
       "sections": {
         "style": {
           "name": "Styl tekstu piosenki",
-          "description": "Efekt tekstu i tło. Tylko dla MiniToo."
+          "description": "Efekt tekstu i tło. Tylko dla MiniToo i Tiivoo 2."
         }
       }
     },

@@ -12,10 +12,16 @@
       "local_name": "Divoom*"
     },
     {
+      "local_name": "FlowToo*"
+    },
+    {
       "local_name": "MiniToo*"
     },
     {
       "local_name": "Pixoo*"
+    },
+    {
+      "local_name": "Tiivoo*"
     },
     {
       "local_name": "Timebox*"
@@ -58,6 +64,12 @@
     {
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
+        "device_name": "flowtoo*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
         "device_name": "minitoo*"
       }
     },
@@ -65,6 +77,12 @@
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
         "device_name": "pixoo*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "device_name": "tiivoo*"
       }
     },
     {

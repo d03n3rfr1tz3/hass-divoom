@@ -132,7 +132,7 @@
         },
         "clock_id": {
           "name": "ID hodin",
-          "description": "Vybere konkrétní hodiny podle jejich ID, stejně jako to dělá aplikace Divoom. Rozumí tomu pouze MiniToo, ostatní zařízení to ignorují. Vyberte hodiny ze seznamu nebo zadejte libovolné ID."
+          "description": "Vybere konkrétní hodiny podle jejich ID, stejně jako to dělá aplikace Divoom. Rozumí tomu pouze MiniToo, Tiivoo 2 a FlowToo, ostatní zařízení to ignorují. Vyberte hodiny ze seznamu nebo zadejte libovolné ID."
         },
         "twentyfour": {
           "name": "24hodinový formát",
@@ -162,11 +162,11 @@
       "sections": {
         "classic": {
           "name": "Styl hodin",
-          "description": "Pro všechna zařízení kromě MiniToo."
+          "description": "Pro všechna zařízení kromě MiniToo, Tiivoo 2 a FlowToo."
         },
         "catalog": {
           "name": "Katalog hodin",
-          "description": "Vybere hodiny podle jejich ID. Pouze pro MiniToo."
+          "description": "Vybere hodiny podle jejich ID. Pouze pro MiniToo, Tiivoo 2 a FlowToo."
         }
       }
     },
@@ -538,7 +538,7 @@
       "sections": {
         "whitenoise": {
           "name": "Bílý šum",
-          "description": "Jedna hlasitost pro každý zvuk. Pouze pro MiniToo."
+          "description": "Jedna hlasitost pro každý zvuk. Pouze pro MiniToo a Tiivoo 2."
         }
       }
     },
@@ -648,7 +648,7 @@
       "sections": {
         "style": {
           "name": "Styl textu písně",
-          "description": "Efekt textu a pozadí. Pouze pro MiniToo."
+          "description": "Efekt textu a pozadí. Pouze pro MiniToo a Tiivoo 2."
         }
       }
     },

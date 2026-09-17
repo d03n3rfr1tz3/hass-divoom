@@ -132,7 +132,7 @@
         },
         "clock_id": {
           "name": "Klok-ID",
-          "description": "Selecteert een specifieke klok via het ID, zoals de Divoom-app dat doet. Alleen de MiniToo begrijpt dit, andere apparaten negeren het. Kies een klok uit de lijst of voer een willekeurig ID in."
+          "description": "Selecteert een specifieke klok via het ID, zoals de Divoom-app dat doet. Alleen de MiniToo, de Tiivoo 2 en de FlowToo begrijpen dit, andere apparaten negeren het. Kies een klok uit de lijst of voer een willekeurig ID in."
         },
         "twentyfour": {
           "name": "24-uursnotatie",
@@ -162,11 +162,11 @@
       "sections": {
         "classic": {
           "name": "Klokstijl",
-          "description": "Voor alle apparaten behalve de MiniToo."
+          "description": "Voor alle apparaten behalve de MiniToo, de Tiivoo 2 en de FlowToo."
         },
         "catalog": {
           "name": "Klokcatalogus",
-          "description": "Kiest een klok via het ID. Alleen voor de MiniToo."
+          "description": "Kiest een klok via het ID. Alleen voor de MiniToo, de Tiivoo 2 en de FlowToo."
         }
       }
     },
@@ -538,7 +538,7 @@
       "sections": {
         "whitenoise": {
           "name": "Witte ruis",
-          "description": "Eén volume per geluid. Alleen voor de MiniToo."
+          "description": "Eén volume per geluid. Alleen voor de MiniToo en de Tiivoo 2."
         }
       }
     },
@@ -648,7 +648,7 @@
       "sections": {
         "style": {
           "name": "Songtekststijl",
-          "description": "Teksteffect en achtergrond. Alleen voor de MiniToo."
+          "description": "Teksteffect en achtergrond. Alleen voor de MiniToo en de Tiivoo 2."
         }
       }
     },

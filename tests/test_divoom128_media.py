@@ -25,8 +25,11 @@ import pytest
 import zstandard as zstd
 from PIL import Image
 
+from custom_components.divoom.devices.flowtoo import FlowToo
 from custom_components.divoom.devices.minitoo import MiniToo
 from tests.cases import (
+    DEVICE_CLASSES,
+    MEDIA_DEVICES,
     PIXELART_DIR,
     all_cases,
     image_case_name,
@@ -46,11 +49,16 @@ MEDIA_CASES = [name for name, _ in all_cases() if is_media_case("MiniToo", name)
 OPCODE = 0x8B
 SCREEN = 128
 BLOCKS = SCREEN // 16
-BYTES_PER_FRAME = SCREEN * SCREEN * 3
+PIXELS = SCREEN * SCREEN
+BYTES_PER_FRAME = PIXELS * 3 # RGB888, as everything but the FlowToo sends it
 CHUNK_SIZE = 256
 ZSTD_MAGIC = b"\x28\xb5\x2f\xfd"
 
 MEDIA_MAX_BYTES = 307200
+
+# bytes per pixel and zstd window_log per device. Every media device needs an
+# entry here, or the parametrized case below fails on the lookup.
+MEDIA_DEVICE_SPECS = {"FlowToo": (2, 16), "MiniToo": (3, 17), "Tiivoo2": (3, 17)}
 
 # sha256 of pixelart/smiley16.gif run through Divoom128._fit() and _quantize().
 # This pins the crop/resample/quantize pipeline itself - the reference buffer
@@ -82,15 +90,15 @@ def _expected_frames(device, path):
             img.seek(i)
             frames.append(device._quantize(device._fit(img)))
             durations.append(img.info.get("duration", 100))
-        keep = min(n, MiniToo.maxframes)
+        keep = min(n, device.maxframes)
         speed = max(1, int(sum(durations) / len(durations)))
         if keep < n: speed = round(speed * n / keep)
         return [frames[i] for i in device.pick_frames(n, keep)], speed
 
 
-def _run_case(case_name, responder=media_responder, **kwargs):
+def _run_case(case_name, device_cls=MiniToo, responder=media_responder, **kwargs):
     device, recorder, server_sock = make_connected_device(
-        MiniToo, responder=responder, **kwargs)
+        device_cls, responder=responder, **kwargs)
     try:
         dict(all_cases())[case_name](device)
     finally:
@@ -143,9 +151,11 @@ def test_await_request_times_out_without_a_reply():
         server_sock.close()
 
 
+@pytest.mark.parametrize("device_type", sorted(MEDIA_DEVICES))
 @pytest.mark.parametrize("case_name", MEDIA_CASES)
-def test_divoom128_media(case_name):
-    device, messages = _run_case(case_name)
+def test_divoom128_media(case_name, device_type):
+    bytes_per_pixel, window_log = MEDIA_DEVICE_SPECS[device_type]
+    device, messages = _run_case(case_name, device_cls=DEVICE_CLASSES[device_type])
     assert len(messages) >= 2, "expected a start packet plus at least one chunk"
 
     # 1. envelope, opcode and checksum of every single message
@@ -188,8 +198,10 @@ def test_divoom128_media(case_name):
     assert stream[:4] == ZSTD_MAGIC
 
     # 5. the pixels themselves
+    # a wider window than the device announces would not decompress there
+    assert zstd.get_frame_parameters(stream).window_size <= 1 << window_log
     raw = zstd.ZstdDecompressor().decompress(stream)
-    assert len(raw) == frames * BYTES_PER_FRAME
+    assert len(raw) == frames * PIXELS * bytes_per_pixel
 
     path = _source_file(case_name)
     if path is None:
@@ -203,9 +215,9 @@ def test_divoom128_media(case_name):
     expected_frames, expected_speed = _expected_frames(device, path)
     assert frames == len(expected_frames)
     assert speed == expected_speed
-    assert raw == b"".join(f.tobytes("raw", "RGB") for f in expected_frames)
+    assert raw == b"".join(device._pixels(f) for f in expected_frames)
 
-    if os.path.basename(path) == "smiley16.gif":
+    if os.path.basename(path) == "smiley16.gif" and bytes_per_pixel == 3:
         assert hashlib.sha256(raw).hexdigest() == SMILEY16_RAW_SHA256
 
 
@@ -214,8 +226,8 @@ def test_divoom128_media(case_name):
 RESEND_IMAGE = os.path.join(PIXELART_DIR, "ha32.gif")  # 9 chunks
 
 
-def _run_show_image(responder, resendwindow=0.5, path=RESEND_IMAGE, time=None):
-    device, recorder, server_sock = make_connected_device(MiniToo, responder=responder)
+def _run_show_image(responder, resendwindow=0.5, path=RESEND_IMAGE, time=None, device_cls=MiniToo):
+    device, recorder, server_sock = make_connected_device(device_cls, responder=responder)
     device.resendwindow = resendwindow
     try:
         device.show_image(path, time=time)
@@ -322,6 +334,24 @@ def test_send_media_without_connection_encodes_nothing(monkeypatch):
 
     monkeypatch.setattr(device, "_encode_media", encode)
     assert device.send_media([Image.new("RGB", (SCREEN, SCREEN))]) is None
+
+
+def test_flowtoo_pixels_are_rgb565_big_endian(tmp_path):
+    """The FlowToo packs each pixel into two bytes, high byte first. The four
+    quadrants are pinned by hand so _pixels is checked against the format, not
+    against itself."""
+    path = str(tmp_path / "quadrants.png")
+    img = Image.new("RGB", (2, 2))
+    img.putdata([(255, 255, 255), (255, 0, 0), (0, 255, 0), (0, 0, 255)])
+    img.save(path)
+    frames, _, _, raw = _decoded_frames(
+        _run_show_image(media_responder, path=path, device_cls=FlowToo))
+
+    assert frames == 1
+    half = SCREEN // 2
+    corners = [raw[(y * SCREEN + x) * 2:(y * SCREEN + x) * 2 + 2].hex()
+        for x, y in [(0, 0), (half, 0), (0, half), (half, half)]]
+    assert corners == ["ffff", "f800", "07e0", "001f"]
 
 
 def test_frames_are_quantized():

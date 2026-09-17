@@ -176,7 +176,7 @@ notify:
 * `mac` (Required): The Bluetooth MAC address for the Divoom device.
 * `port` (Optional): The Bluetooth channel for the Divoom device. Typically 1, but might be 2 for some devices with audio features.
 * `device_type`: The concrete type of your Divoom device. \
-  Currently `aurabox`, `backpack`, `ditoo`, `ditoomic`, `minitoo`, `pixoo`, `pixoomax`, `timebox`, `timeboxmini`, `timoo` and `tivoo` are supported.
+  Currently `aurabox`, `backpack`, `ditoo`, `ditoomic`, `flowtoo`, `minitoo`, `pixoo`, `pixoomax`, `tiivoo2`, `timebox`, `timeboxmini`, `timoo` and `tivoo` are supported.
   If you have a different device, you might try one that's most similar to yours.
 * `media_directory` (Required): A directory, relative to the configuration dir, containing image
   files in GIF format. The component will use these to display static or animated images on the device.
@@ -281,8 +281,8 @@ Shows the clock channel. Be aware, that this mode is very limited on older devic
 
 | Parameter    | Required | Description |
 | ---          | :---:    | --- |
-| `clock`      | ✔*       | The style of the clock. Accepts a number starting from 0 up to what the Divoom device supports.<br/> Examples from Pixoo: `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen <br/> The MiniToo ignores it. |
-| `clock_id`   | ✔*       | Selects a specific clock by its id, the way the Divoom app does. Only the MiniToo understands it, other devices ignore it. With a MiniToo set up, the UI offers the clocks of the public Divoom catalog, which Home Assistant fetches from `app.divoom-gz.com` once per start. Any other id can still be typed in. Example: `848`. |
+| `clock`      | ✔*       | The style of the clock. Accepts a number starting from 0 up to what the Divoom device supports.<br/> Examples from Pixoo: `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen <br/> The MiniToo, Tiivoo 2 and FlowToo ignore it. |
+| `clock_id`   | ✔*       | Selects a specific clock by its id, the way the Divoom app does. Only the MiniToo, Tiivoo 2 and FlowToo understand it, other devices ignore it. With one of them set up, the UI offers the clocks of the public Divoom catalog, which Home Assistant fetches from `app.divoom-gz.com` once per start. Any other id can still be typed in. Example: `848`. |
 | `twentyfour` |          | Changes between 12h or 24h format. <br/> `false` = 12h, `true` = 24h. |
 | `weather`    |          | Actives or deactivates showing the weather with `true` or `false`. |
 | `temp`       |          | Actives or deactivates showing the temperature with `true` or `false`. |
@@ -292,7 +292,7 @@ Shows the clock channel. Be aware, that this mode is very limited on older devic
 
 *) At least one of `clock` and `clock_id` has to be given.
 
-The UI only shows the parameters that fit the configured devices: `clock_id` with a MiniToo, the others with any other device.
+The UI only shows the parameters that fit the configured devices: `clock_id` with a MiniToo, Tiivoo 2 or FlowToo, the others with any other device.
 
 ```yaml
 action: divoom.clock
@@ -479,8 +479,8 @@ Shows the lyrics channel. Might not be supported by every Divoom device.
 
 | Parameter    | Required | Description |
 | ---          | :---:    | --- |
-| `effect`     |          | The text effect of the lyrics, from `0` to `5`. Only the MiniToo understands it. |
-| `background` |          | The background of the lyrics, from `0` to `20`. Only the MiniToo understands it. |
+| `effect`     |          | The text effect of the lyrics, from `0` to `5`. Only the MiniToo and Tiivoo 2 understand it. |
+| `background` |          | The background of the lyrics, from `0` to `20`. Only the MiniToo and Tiivoo 2 understand it. |
 
 ```yaml
 action: divoom.lyrics
@@ -626,7 +626,7 @@ Shows the sleep mode, which plays soothing sounds, optionally with a timer and l
 | `volume`     |          | The volume value between 0 and 100. |
 | `color`      |          | The color of the display. Accepts an array of RGB color values. |
 | `brightness` |          | The brightness value between 0 and 100. |
-| `volume1` … `volume8` | | The volume of each of the eight white noise sounds between 0 and 100. Only the MiniToo understands them, other devices ignore them. A sound without its own volume stays off, except the one `sleepmode` picks, which gets `volume`. |
+| `volume1` … `volume8` | | The volume of each of the eight white noise sounds between 0 and 100. Only the MiniToo and Tiivoo 2 understand them, other devices ignore them. A sound without its own volume stays off, except the one `sleepmode` picks, which gets `volume`. |
 
 ```yaml
 action: divoom.sleep
@@ -657,7 +657,7 @@ data:
 ```
 
 #### MODE text
-Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the devices frame limit and then scrolls in bigger steps. The MiniToo shows text as a still image instead, and scrolls it vertically if it does not fit the screen.
+Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the devices frame limit and then scrolls in bigger steps. The MiniToo, Tiivoo 2 and FlowToo show text as a still image instead, and scroll it vertically if it does not fit the screen.
 
 | Parameter          | Required | Description |
 | ---                | :---:    | --- |
@@ -814,9 +814,11 @@ Examples for Aurabox: [devices/aurabox.txt](https://github.com/d03n3rfr1tz3/hass
 Examples for Backpack: [devices/backpack.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/backpack.txt) \
 Examples for Ditoo: [devices/ditoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/ditoo.txt) \
 Examples for Ditoo Mic: [devices/ditoomic.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/ditoomic.txt) \
+Examples for FlowToo: [devices/flowtoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/flowtoo.txt) \
 Examples for MiniToo: [devices/minitoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/minitoo.txt) \
 Examples for Pixoo: [devices/pixoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoo.txt) \
 Examples for Pixoo Max: [devices/pixoomax.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/pixoomax.txt) \
+Examples for Tiivoo 2: [devices/tiivoo2.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/tiivoo2.txt) \
 Examples for Timebox: [devices/timebox.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timebox.txt) \
 Examples for Timebox Mini: [devices/timeboxmini.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timeboxmini.txt) \
 Examples for Timoo: [devices/timoo.txt](https://github.com/d03n3rfr1tz3/hass-divoom/blob/main/custom_components/divoom/devices/timoo.txt) \

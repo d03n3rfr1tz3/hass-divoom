@@ -83,20 +83,20 @@ WORD = vol.All(vol.Coerce(int), vol.Range(min=0, max=65535))
 # beyond 15 show_clock deactivates the clock instead of picking a style
 CLOCK = vol.All(vol.Coerce(int), vol.Range(min=0, max=15))
 
-# the clock id the MiniToo picks from, unrelated to the style above
+# the clock id the 128x128 devices pick from, unrelated to the style above
 CLOCK_ID = vol.All(vol.Coerce(int), vol.Range(min=0))
 
 # device types that pick clocks by id instead of style
-CLOCK_ID_TYPES = {"minitoo"}
+CLOCK_ID_TYPES = {"flowtoo", "minitoo", "tiivoo2"}
 CLOCK_CATALOG_URL = "https://app.divoom-gz.com/Channel/{}"
 CLOCK_CATEGORIES = ("Normal", "Nature&Weather", "Retro", "Ambient", "Plan", "Music Reactive", "Pixel Art", "HOLIDAYS")
 CLOCK_PAGE_SIZE = 30
 
 # device types that take one volume per white noise sound in sleep mode
-WHITENOISE_TYPES = {"minitoo"}
+WHITENOISE_TYPES = {"minitoo", "tiivoo2"}
 
 # device types that take a text effect and background for lyrics
-LYRIC_CONFIG_TYPES = {"minitoo"}
+LYRIC_CONFIG_TYPES = {"minitoo", "tiivoo2"}
 LYRIC_EFFECT = vol.All(vol.Coerce(int), vol.Range(min=0, max=5))
 LYRIC_BACKGROUND = vol.All(vol.Coerce(int), vol.Range(min=0, max=20))
 

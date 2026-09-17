@@ -132,7 +132,7 @@
         },
         "clock_id": {
           "name": "ID del reloj",
-          "description": "Selecciona un reloj concreto por su ID, igual que hace la aplicación Divoom. Solo el MiniToo lo entiende, los demás dispositivos lo ignoran. Elige un reloj de la lista o escribe cualquier ID."
+          "description": "Selecciona un reloj concreto por su ID, igual que hace la aplicación Divoom. Solo el MiniToo, el Tiivoo 2 y el FlowToo lo entienden, los demás dispositivos lo ignoran. Elige un reloj de la lista o escribe cualquier ID."
         },
         "twentyfour": {
           "name": "Formato de 24 horas",
@@ -162,11 +162,11 @@
       "sections": {
         "classic": {
           "name": "Estilo de reloj",
-          "description": "Para todos los dispositivos excepto el MiniToo."
+          "description": "Para todos los dispositivos excepto el MiniToo, el Tiivoo 2 y el FlowToo."
         },
         "catalog": {
           "name": "Catálogo de relojes",
-          "description": "Elige un reloj por su ID. Solo para el MiniToo."
+          "description": "Elige un reloj por su ID. Solo para el MiniToo, el Tiivoo 2 y el FlowToo."
         }
       }
     },
@@ -538,7 +538,7 @@
       "sections": {
         "whitenoise": {
           "name": "Ruido blanco",
-          "description": "Un volumen por sonido. Solo para el MiniToo."
+          "description": "Un volumen por sonido. Solo para el MiniToo y el Tiivoo 2."
         }
       }
     },
@@ -648,7 +648,7 @@
       "sections": {
         "style": {
           "name": "Estilo de letra",
-          "description": "Efecto de texto y fondo. Solo para el MiniToo."
+          "description": "Efecto de texto y fondo. Solo para el MiniToo y el Tiivoo 2."
         }
       }
     },

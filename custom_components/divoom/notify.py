@@ -221,6 +221,10 @@ class DivoomNotificationService(BaseNotificationService):
             from .devices.ditoomic import DitooMic
             self._device = DitooMic(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
+        if device_type == 'flowtoo':
+            from .devices.flowtoo import FlowToo
+            self._device = FlowToo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
         if device_type == 'minitoo':
             from .devices.minitoo import MiniToo
             self._device = MiniToo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
@@ -232,6 +236,10 @@ class DivoomNotificationService(BaseNotificationService):
         if device_type == 'pixoomax':
             from .devices.pixoomax import PixooMax
             self._device = PixooMax(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
+        if device_type == 'tiivoo2':
+            from .devices.tiivoo2 import Tiivoo2
+            self._device = Tiivoo2(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'timebox':
             from .devices.timebox import Timebox

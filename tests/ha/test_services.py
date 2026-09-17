@@ -522,7 +522,7 @@ async def test_service_requires_mandatory_field(hass, mode, params):
 
 async def test_clock_service_accepts_clock_id_without_clock(hass):
     """Picking a clock by its id is a complete instruction on its own, so the
-    caller must not be forced to name a style the MiniToo ignores anyway."""
+    caller must not be forced to name a style those devices ignore anyway."""
     assert await async_setup_component(hass, DOMAIN, {})
     entry, service = register_device(hass)
 
@@ -548,6 +548,8 @@ async def _clock_fields(hass):
     ("device_types", "sections"),
     [
         (["minitoo"], {"catalog"}),
+        (["tiivoo2"], {"catalog"}),
+        (["flowtoo"], {"catalog"}),
         (["ditoo"], {"classic"}),
         (["minitoo", "ditoo"], {"classic", "catalog"}),
         ([], {"classic", "catalog"}),
@@ -573,15 +575,17 @@ async def test_clock_sections_follow_the_configured_device_types(hass, aioclient
     ("device_types", "present"),
     [
         (["minitoo"], True),
+        (["tiivoo2"], True),
+        (["flowtoo"], False),
         (["ditoo"], False),
         (["minitoo", "ditoo"], True),
         ([], True),
     ],
 )
 @pytest.mark.parametrize(("mode", "section"), [("sleep", "whitenoise"), ("lyrics", "style")])
-async def test_minitoo_sections_follow_the_configured_device_types(hass, aioclient_mock, device_types, present, mode, section):
-    """The white noise volumes and the lyrics style only reach the MiniToo, so
-    the UI offers them only with one set up."""
+async def test_whitenoise_and_lyrics_sections_follow_the_configured_device_types(hass, aioclient_mock, device_types, present, mode, section):
+    """The white noise volumes and the lyrics style only reach the MiniToo and
+    the Tiivoo 2, so the UI offers them only with one of those set up."""
     aioclient_mock.post(CATALOG_URL.format("GetDialType"), json={"DialTypeList": []})
     assert await async_setup_component(hass, DOMAIN, {})
     for index, device_type in enumerate(device_types):
@@ -965,7 +969,7 @@ def test_device_examples_match_the_service_schemas():
             SERVICE_SCHEMAS[mode](example["data"])
             checked += 1
 
-    assert checked == 266 # every block, not just the ones that happened to parse
+    assert checked == 314 # every block, not just the ones that happened to parse
 
 
 def _number_selector(field_definition):

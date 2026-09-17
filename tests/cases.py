@@ -11,9 +11,11 @@ from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.backpack import Backpack
 from custom_components.divoom.devices.ditoo import Ditoo
 from custom_components.divoom.devices.ditoomic import DitooMic
+from custom_components.divoom.devices.flowtoo import FlowToo
 from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
+from custom_components.divoom.devices.tiivoo2 import Tiivoo2
 from custom_components.divoom.devices.timebox import Timebox
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from custom_components.divoom.devices.timoo import Timoo
@@ -25,9 +27,11 @@ DEVICE_CLASSES = {
     "Backpack": Backpack,
     "Ditoo": Ditoo,
     "DitooMic": DitooMic,
+    "FlowToo": FlowToo,
     "MiniToo": MiniToo,
     "Pixoo": Pixoo,
     "PixooMax": PixooMax,
+    "Tiivoo2": Tiivoo2,
     "Timebox": Timebox,
     "TimeboxMini": TimeboxMini,
     "Timoo": Timoo,
@@ -36,12 +40,14 @@ DEVICE_CLASSES = {
 
 # Devices that answer mid-send and need a talking peer, not just a drain.
 DEVICE_RESPONDERS = {
+    "FlowToo": media_responder,
     "MiniToo": media_responder,
+    "Tiivoo2": media_responder,
 }
 
 # Cases whose traffic is zstd-compressed and therefore not byte-stable across
 # libzstd versions; tests/test_divoom128_media.py verifies those structurally.
-MEDIA_DEVICES = {"MiniToo"}
+MEDIA_DEVICES = {"FlowToo", "MiniToo", "Tiivoo2"}
 
 
 def is_media_case(device_type: str, case_name: str) -> bool:
