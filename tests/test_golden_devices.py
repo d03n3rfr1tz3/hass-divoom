@@ -31,7 +31,7 @@ bytes are not guaranteed identical across zstandard/libzstd versions, so a
 recorded golden would be flaky - and at roughly 1.5 MB of hex it would be
 unreadable besides. Its show_image_*/show_text cases are therefore left out
 here entirely (see cases.is_media_case) and verified in
-tests/test_minitoo_media.py instead, which checks the framing, the chunk
+tests/test_divoom128_media.py instead, which checks the framing, the chunk
 indices, the checksums, the header and the *decompressed* pixel buffer. That
 is a stronger check than a golden, not a weaker one. Everything else the
 MiniToo sends goes through the base class and is compared byte-for-byte below

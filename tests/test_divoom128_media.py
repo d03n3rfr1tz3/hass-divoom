@@ -1,4 +1,4 @@
-"""Structural verification of the MiniToo's media path (opcode 0x8b).
+"""Structural verification of the 128x128 media path (opcode 0x8b).
 
 These cases are deliberately absent from tests/goldens/: the payload is one
 Zstandard stream, whose bytes are not guaranteed identical across
@@ -12,7 +12,7 @@ against an independently rebuilt reference.
 
 The comparison is against the *decompressed* bytes, so it stays valid no
 matter how the compressor version changes. One frozen hash pins
-MiniToo._fit()/_quantize() themselves; without it the content check would
+Divoom128._fit()/_quantize() themselves; without it the content check would
 only compare show_image against itself.
 """
 from __future__ import annotations
@@ -34,9 +34,9 @@ from tests.cases import (
     pixelart_files,
 )
 from tests.support import (
-    MiniTooResendResponder,
+    MediaResendResponder,
     make_connected_device,
-    minitoo_responder,
+    media_responder,
     solid_color,
     solid_gif,
 )
@@ -52,7 +52,7 @@ ZSTD_MAGIC = b"\x28\xb5\x2f\xfd"
 
 MEDIA_MAX_BYTES = 307200
 
-# sha256 of pixelart/smiley16.gif run through MiniToo._fit() and _quantize().
+# sha256 of pixelart/smiley16.gif run through Divoom128._fit() and _quantize().
 # This pins the crop/resample/quantize pipeline itself - the reference buffer
 # below is rebuilt with those two, so without this the content check would
 # compare show_image against itself. Regenerate only after an intentional
@@ -88,7 +88,7 @@ def _expected_frames(device, path):
         return [frames[i] for i in device.pick_frames(n, keep)], speed
 
 
-def _run_case(case_name, responder=minitoo_responder, **kwargs):
+def _run_case(case_name, responder=media_responder, **kwargs):
     device, recorder, server_sock = make_connected_device(
         MiniToo, responder=responder, **kwargs)
     try:
@@ -124,7 +124,7 @@ def test_await_request_sees_the_device_reply():
     """The handshake itself: without this a broken _await_request() would only
     make the cases below slow (2s timeout each), never red."""
     device, _, server_sock = make_connected_device(
-        MiniToo, responder=minitoo_responder)
+        MiniToo, responder=media_responder)
     try:
         device.send_command("set gif", [0x00, 0x00, 0x00, 0x00, 0x00], skipRead=True)
         assert device._await_request() is True
@@ -144,7 +144,7 @@ def test_await_request_times_out_without_a_reply():
 
 
 @pytest.mark.parametrize("case_name", MEDIA_CASES)
-def test_minitoo_media(case_name):
+def test_divoom128_media(case_name):
     device, messages = _run_case(case_name)
     assert len(messages) >= 2, "expected a start packet plus at least one chunk"
 
@@ -227,8 +227,8 @@ def _run_show_image(responder, resendwindow=0.5, path=RESEND_IMAGE, time=None):
 
 def test_resend_request_mid_stream():
     """A chunk the device asks for again has to go out again, byte for byte."""
-    baseline = _run_show_image(minitoo_responder)
-    messages = _run_show_image(MiniTooResendResponder(1, after_chunks=3))
+    baseline = _run_show_image(media_responder)
+    messages = _run_show_image(MediaResendResponder(1, after_chunks=3))
 
     assert len(messages) == len(baseline) + 1
     positions = [i for i, m in enumerate(messages) if _chunk_index(m) == 1]
@@ -243,7 +243,7 @@ def test_resend_request_mid_stream():
 def test_resend_request_in_the_linger_window():
     """The device may only ask once the last chunk is out - _send_packets keeps
     listening for resendwindow seconds instead of draining blindly."""
-    responder = MiniTooResendResponder(2, after_chunks=1, delay=0.15)
+    responder = MediaResendResponder(2, after_chunks=1, delay=0.15)
     messages = _run_show_image(responder)
 
     assert responder.requested, "the responder never got to ask"
@@ -252,8 +252,8 @@ def test_resend_request_in_the_linger_window():
 
 
 def test_resend_request_with_unknown_index_is_ignored():
-    baseline = _run_show_image(minitoo_responder)
-    messages = _run_show_image(MiniTooResendResponder(9999, after_chunks=2))
+    baseline = _run_show_image(media_responder)
+    messages = _run_show_image(MediaResendResponder(9999, after_chunks=2))
     assert messages == baseline
 
 
@@ -276,7 +276,7 @@ def _noise_gif(path, frames=20, seed=20240912):
 
 def test_oversized_animation_is_thinned(tmp_path):
     path = _noise_gif(str(tmp_path / "noise.gif"))
-    messages = _run_show_image(minitoo_responder, path=path)
+    messages = _run_show_image(media_responder, path=path)
     frames, speed, stream, raw = _decoded_frames(messages)
 
     assert len(stream) <= MEDIA_MAX_BYTES
@@ -290,7 +290,7 @@ def test_long_animation_is_thinned_evenly(tmp_path):
     instead of cutting it off."""
     count = 300
     path = solid_gif(str(tmp_path / "long.gif"), count)
-    frames, speed, _, raw = _decoded_frames(_run_show_image(minitoo_responder, path=path))
+    frames, speed, _, raw = _decoded_frames(_run_show_image(media_responder, path=path))
 
     assert frames == MiniToo.maxframes
     assert speed == round(100 * count / frames)
@@ -304,7 +304,7 @@ def test_transparency_turns_black(tmp_path):
     img = Image.new("RGBA", (16, 16), (255, 255, 255, 0))
     img.paste((255, 0, 0, 255), (8, 0, 16, 16))
     img.save(path)
-    frames, _, _, raw = _decoded_frames(_run_show_image(minitoo_responder, path=path))
+    frames, _, _, raw = _decoded_frames(_run_show_image(media_responder, path=path))
 
     assert frames == 1
     half = SCREEN * SCREEN // 2
@@ -344,7 +344,7 @@ LONG_TEXT = " ".join(["Divoom"] * 40)
 
 
 def _run_show_text(text, time=None):
-    device, recorder, server_sock = make_connected_device(MiniToo, responder=minitoo_responder)
+    device, recorder, server_sock = make_connected_device(MiniToo, responder=media_responder)
     try:
         device.show_text(text, None, time=time)
     finally:
@@ -355,9 +355,9 @@ def _run_show_text(text, time=None):
 
 def test_image_time_sets_speed():
     path = os.path.join(PIXELART_DIR, "ha16.gif")
-    frames, speed, _, raw = _decoded_frames(_run_show_image(minitoo_responder, path=path))
+    frames, speed, _, raw = _decoded_frames(_run_show_image(media_responder, path=path))
     timed_frames, timed_speed, _, timed_raw = _decoded_frames(
-        _run_show_image(minitoo_responder, path=path, time=40))
+        _run_show_image(media_responder, path=path, time=40))
 
     assert frames > 1 and speed != 40
     assert timed_speed == 40

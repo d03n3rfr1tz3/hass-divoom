@@ -18,7 +18,7 @@ from custom_components.divoom.devices.timebox import Timebox
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from custom_components.divoom.devices.timoo import Timoo
 from custom_components.divoom.devices.tivoo import Tivoo
-from tests.support import minitoo_responder
+from tests.support import media_responder
 
 DEVICE_CLASSES = {
     "Aurabox": Aurabox,
@@ -36,11 +36,11 @@ DEVICE_CLASSES = {
 
 # Devices that answer mid-send and need a talking peer, not just a drain.
 DEVICE_RESPONDERS = {
-    "MiniToo": minitoo_responder,
+    "MiniToo": media_responder,
 }
 
 # Cases whose traffic is zstd-compressed and therefore not byte-stable across
-# libzstd versions; tests/test_minitoo_media.py verifies those structurally.
+# libzstd versions; tests/test_divoom128_media.py verifies those structurally.
 MEDIA_DEVICES = {"MiniToo"}
 
 

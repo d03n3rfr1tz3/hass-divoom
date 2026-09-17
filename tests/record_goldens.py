@@ -28,7 +28,7 @@ def record_all() -> None:
         os.makedirs(out_dir, exist_ok=True)
         for case_name, case_fn in all_cases():
             if is_media_case(device_type, case_name):
-                continue # zstd traffic is not byte-stable; see test_minitoo_media.py
+                continue # zstd traffic is not byte-stable; see test_divoom128_media.py
             device, recorder, server_sock = make_connected_device(
                 device_cls, responder=DEVICE_RESPONDERS.get(device_type))
             try:

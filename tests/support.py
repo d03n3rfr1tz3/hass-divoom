@@ -15,8 +15,8 @@ import time
 
 GOLDEN_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "goldens"))
 
-MINITOO_START_PREFIX = b"\x01\x08\x00\x8b\x00"
-MINITOO_READY = bytes.fromhex("01060004 8b5500 ea0002")
+MEDIA_START_PREFIX = b"\x01\x08\x00\x8b\x00"
+MEDIA_READY = bytes.fromhex("01060004 8b5500 ea0002")
 
 
 class RecordingSocket:
@@ -38,17 +38,17 @@ class RecordingSocket:
         return getattr(self._real, name)
 
 
-def minitoo_responder(data: bytes) -> bytes | None:
-    """Answer a 0x8b start packet the way a real MiniToo does: "send the
-    animation". Without it MiniToo._await_request() runs into its 2s timeout
+def media_responder(data: bytes) -> bytes | None:
+    """Answer a 0x8b start packet the way a real 128x128 device does: "send the
+    animation". Without it Divoom128._await_request() runs into its 2s timeout
     on every media case and the handshake stays untested."""
-    return MINITOO_READY if data.startswith(MINITOO_START_PREFIX) else None
+    return MEDIA_READY if data.startswith(MEDIA_START_PREFIX) else None
 
 
-def minitoo_resend_request(index: int) -> bytes:
+def media_resend_request(index: int) -> bytes:
     """The device's "resend the chunk at index" message: 04 8b 55 01 <index LE16>.
-    Built through MiniToo.make_message so the envelope and checksum come from the
-    implementation, not from hand."""
+    Built through a 128x128 device's make_message so the envelope and checksum
+    come from the implementation, not from hand."""
     from custom_components.divoom.devices.minitoo import MiniToo
 
     args = [0x8B, 0x55, 0x01] + list(int(index).to_bytes(2, "little"))
@@ -56,7 +56,7 @@ def minitoo_resend_request(index: int) -> bytes:
     return bytes(MiniToo(mac="00:00:00:00:00:00").make_message(payload))
 
 
-class MiniTooResendResponder:
+class MediaResendResponder:
     """Responder that answers the start packet and then, once `after_chunks` chunk
     packets have arrived, asks a single time for `index` to be resent.
 
@@ -72,15 +72,15 @@ class MiniTooResendResponder:
         self.requested = False
 
     def __call__(self, data: bytes) -> bytes | None:
-        if data.startswith(MINITOO_START_PREFIX):
-            return MINITOO_READY
+        if data.startswith(MEDIA_START_PREFIX):
+            return MEDIA_READY
         self.chunks_seen += 1
         if self.requested or self.chunks_seen < self.after_chunks:
             return None
         self.requested = True
         if self.delay:
             time.sleep(self.delay)
-        return minitoo_resend_request(self.index)
+        return media_resend_request(self.index)
 
 
 def _serve_forever(sock: socket.socket, responder) -> None:
