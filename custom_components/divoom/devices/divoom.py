@@ -59,6 +59,7 @@ class Divoom:
 
     escapePayload = False
     senddelay = 0.015
+    maxframes = 60
     host = None
     mac = None
     port = 1
@@ -296,6 +297,12 @@ class Divoom:
         """Drop all dat currently in the message buffer,"""
         self.message_buf = []
     
+    def animation_fits(self, frames):
+        """Whether the frames fit the size and chunk index fields of make_framepart."""
+        size = sum(pair[1] for pair in frames)
+        wide = self.screensize == 32 # Pixoo-Max expects more
+        return size < (1 << (32 if wide else 16)) and -(-size // self.chunksize) <= (1 << (16 if wide else 8))
+
     def checksum(self, payload):
         """Compute the payload checksum. Returned as list with LSM, MSB"""
         length = sum(payload)
@@ -314,6 +321,30 @@ class Divoom:
         result += color[1].to_bytes(1, byteorder='big')
         result += color[2].to_bytes(1, byteorder='big')
         return result
+
+    def encode_frames(self, decoded, needsFlags):
+        """Encode (pixels, colors, colorCount, time) frames, thinned out evenly beyond maxframes
+        or animation_fits. Kept frames last as long as the frames they replace."""
+        count = len(decoded)
+        result = []
+        if needsFlags: # Pixoo-Max expects two empty frames with flags 0x05 and 0x06 at the start
+            result.append(self.make_frame([0x00, 0x00, 0x05, 0x00, 0x00]))
+            result.append(self.make_frame([0x00, 0x00, 0x06, 0x00, 0x00, 0x00]))
+
+        frames = [self.make_frame(self.process_frame(pixels, colors, colorCount, count, time, needsFlags))
+            for pixels, colors, colorCount, time in decoded]
+        keep = min(count, self.maxframes)
+        while keep > 1 and not self.animation_fits(result + [frames[i] for i in self.pick_frames(count, keep)]):
+            keep -= 1 # frame sizes do not depend on the time, so the encoded frames tell
+        if keep == count: return [result + frames, count]
+
+        self.logger.warning("{0}: animation has {1} frames, keeping {2}".format(self.type, count, keep))
+        picks = self.pick_frames(count, keep) + [count]
+        for start, end in zip(picks, picks[1:]):
+            pixels, colors, colorCount, _ = decoded[start]
+            time = min(0xffff, sum(frame[3] for frame in decoded[start:end]))
+            result.append(self.make_frame(self.process_frame(pixels, colors, colorCount, keep, time, needsFlags)))
+        return [result, keep]
 
     def escape_payload(self, payload):
         """Escaping is not needed anymore as some smarter guys found out"""
@@ -351,8 +382,12 @@ class Divoom:
             header += [0x00, 0x0A, 0x0A, 0x04] # Fixed header on single frames
         return header + framePart
 
+    def pick_frames(self, count, keep):
+        """Indices of keep frames spread evenly over count frames."""
+        return [i * count // keep for i in range(keep)]
+
     def process_image(self, image, time=None):
-        frames = []
+        decoded = []
         with Image.open(image) as img:
             
             picture_frames = []
@@ -380,7 +415,6 @@ class Divoom:
             except EOFError:
                 pass
             
-            framesCount = len(picture_frames)
             for pair in picture_frames:
                 picture_frame = pair[0]
                 picture_time = pair[1]
@@ -407,25 +441,15 @@ class Divoom:
                 colorCount = len(colors)
                 if not needsFlags and colorCount >= 256: colorCount = 0
                 
-                frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
-                frames.append(frame)
+                decoded.append((pixels, colors, colorCount, picture_time if time is None else time))
         
-        result = []
-
-        if needsFlags: # Pixoo-Max expects two empty frames with flags 0x05 and 0x06 at the start
-            result.append(self.make_frame([0x00, 0x00, 0x05, 0x00, 0x00]))
-            result.append(self.make_frame([0x00, 0x00, 0x06, 0x00, 0x00, 0x00]))
-
-        for frame in frames:
-            result.append(self.make_frame(frame))
-        
-        return [result, framesCount]
+        return self.encode_frames(decoded, needsFlags)
     
     def process_text(self, text, font, size=None, time=None, color1=None, color2=None):
         if color1 is None or len(color1) < 3: color1 = [0xff, 0xff, 0xff]
         if color2 is None or len(color2) < 3: color2 = [0x01, 0x01, 0x01]
 
-        frames = []
+        decoded = []
         picture_time = 50
         text_margin = 0 if size is None else int((self.screensize - size) / 2)
         text_speed_fast = int(math.ceil(self.screensize / 4))
@@ -463,15 +487,14 @@ class Divoom:
 
             text_speed = text_speed_slow
             framesCount = int(math.floor((img_width - self.screensize) / text_speed))
-            if framesCount > 60: # frames are limited, therefore we need to do bigger jumps
+            if framesCount > self.maxframes: # frames are limited, therefore we need to do bigger jumps
                 text_speed = text_speed_medium
                 picture_time = int(picture_time * (text_speed_medium / text_speed_slow))
                 framesCount = int(math.floor((img_width - self.screensize) / text_speed))
-                if framesCount > 60: # frames are limited, therefore we need to do even bigger jumps
+                if framesCount > self.maxframes: # frames are limited, therefore we need to do even bigger jumps
                     text_speed = text_speed_fast
                     picture_time = int(picture_time * (text_speed_fast / text_speed_medium))
                     framesCount = int(math.floor((img_width - self.screensize) / text_speed))
-            if framesCount > 60: self.logger.warning("{0}: text animation is too wide and is very likely cut off.".format(self.type))
 
             pix = img.load()
             for offset in range(framesCount):
@@ -494,19 +517,9 @@ class Divoom:
                 colorCount = len(colors)
                 if not needsFlags and colorCount >= 256: colorCount = 0
 
-                frame = self.process_frame(pixels, colors, colorCount, framesCount, picture_time if time is None else time, needsFlags)
-                frames.append(frame)
+                decoded.append((pixels, colors, colorCount, picture_time if time is None else time))
         
-        result = []
-
-        if needsFlags: # Pixoo-Max expects two empty frames with flags 0x05 and 0x06 at the start
-            result.append(self.make_frame([0x00, 0x00, 0x05, 0x00, 0x00]))
-            result.append(self.make_frame([0x00, 0x00, 0x06, 0x00, 0x00, 0x00]))
-
-        for frame in frames:
-            result.append(self.make_frame(frame))
-        
-        return [result, framesCount]
+        return self.encode_frames(decoded, needsFlags)
     
     def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):
         timeCode = [0x00, 0x00]

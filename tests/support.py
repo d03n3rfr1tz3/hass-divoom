@@ -164,6 +164,21 @@ class PeerSocket:
         return getattr(self._real, name)
 
 
+def solid_color(index: int) -> tuple[int, int, int]:
+    """A distinct color per frame index, below 512."""
+    return (index % 256, index // 256 * 64, 128)
+
+
+def solid_gif(path: str, frames: int, duration: int = 100, size: int = 16) -> str:
+    """An animation of solid frames in solid_color(index). Distinct colors keep
+    GIF saving from merging frames, and each frame tells where it came from."""
+    from PIL import Image
+
+    images = [Image.new("RGB", (size, size), solid_color(i)) for i in range(frames)]
+    images[0].save(path, save_all=True, append_images=images[1:], duration=duration, loop=0)
+    return path
+
+
 def hexdump(data: bytes) -> str:
     return " ".join(f"{b:02x}" for b in data)
 

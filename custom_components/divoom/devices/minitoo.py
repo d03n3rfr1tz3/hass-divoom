@@ -24,13 +24,13 @@ try:
 except AttributeError:  # Pillow < 9.1
     _NODITHER = Image.NONE
 
-MEDIA_MAX_FRAMES = 255 # the frame count is a single header byte
 MEDIA_MAX_BYTES = 307200 # largest compressed payload the protocol carries
 
 
 class MiniToo(Divoom):
     """Class MiniToo encapsulates the Divoom MiniToo Bluetooth communication."""
 
+    maxframes = 92
     REQUEST_MARK = b"\x04\x8b\x55"
 
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
@@ -75,10 +75,6 @@ class MiniToo(Divoom):
         import zstandard as zstd  # only MiniToo needs it; keep it out of base import
 
         if not images: raise ValueError("at least one frame is required")
-        if len(images) > MEDIA_MAX_FRAMES:
-            self.logger.warning("{0}: {1} frames, keeping the first {2}".format(
-                self.type, len(images), MEDIA_MAX_FRAMES))
-            images = images[:MEDIA_MAX_FRAMES]
         blocks = self.screensize // 16
 
         compressor = zstd.ZstdCompressor(
@@ -87,30 +83,33 @@ class MiniToo(Divoom):
 
         # Thin the animation out evenly until it fits, stretching speed by the
         # same factor to keep the cycle length. A single frame always fits.
-        step = 1
+        count = len(images)
+        keep = min(count, self.maxframes)
         while True:
-            frames = images[::step]
+            frames = [images[i] for i in self.pick_frames(count, keep)]
             zbytes = compressor.compress(
                 b"".join(self._quantize(img).tobytes("raw", "RGB") for img in frames))
-            if len(zbytes) <= MEDIA_MAX_BYTES or len(frames) == 1: break
-            step = max(step + 1, -(-len(zbytes) * step // MEDIA_MAX_BYTES))
-        if step > 1:
-            speed = min(0xffff, speed * step)
-            self.logger.warning("{0}: payload over {1} bytes, keeping 1 in {2} frames".format(
-                self.type, MEDIA_MAX_BYTES, step))
+            if len(zbytes) <= MEDIA_MAX_BYTES or keep == 1: break
+            keep = max(1, min(keep - 1, keep * MEDIA_MAX_BYTES // len(zbytes)))
+        if keep < count:
+            speed = max(1, min(0xffff, round(speed * count / keep)))
+            self.logger.warning("{0}: animation has {1} frames, keeping {2}".format(self.type, count, keep))
 
         header = bytes([0x25, len(frames)]) + speed.to_bytes(2, "big") \
             + bytes([blocks, blocks]) + len(zbytes).to_bytes(4, "big")
         return header + zbytes
 
     def _fit(self, img):
-        """EXIF-transpose, RGB, center-crop square, resize to the 128x128 grid."""
-        img = ImageOps.exif_transpose(img).convert("RGB")
+        """EXIF-transpose, flatten onto black, center-crop square, resize to the
+        128x128 grid. Whole fractions of it scale with NEAREST to keep pixel art sharp."""
+        img = ImageOps.exif_transpose(img).convert("RGBA")
+        img = Image.alpha_composite(Image.new("RGBA", img.size, (0, 0, 0, 255)), img).convert("RGB")
         side = min(img.size)
         left = (img.width - side) // 2
         top = (img.height - side) // 2
+        resample = Image.Resampling.NEAREST if self.screensize % side == 0 else _LANCZOS
         return img.crop((left, top, left + side, top + side)).resize(
-            (self.screensize, self.screensize), _LANCZOS)
+            (self.screensize, self.screensize), resample)
 
     def _quantize(self, img):
         """Reduce to at most 255 colors before compressing. Dithering is off on
@@ -123,7 +122,8 @@ class MiniToo(Divoom):
         streaming and shortly after, so keep listening instead of draining."""
         self.drop_message_buffer()
         result = self.send_command("set gif", packets[0], skipRead=True)
-        self._await_request()
+        if not self._await_request():
+            self.logger.warning("{0}: no request for the animation, sending anyway".format(self.type))
         budget = len(packets) # cap resends; a chatty device must not loop forever
         for packet in packets[1:]:
             result = self.send_command("set gif", packet, skipRead=True)
@@ -172,6 +172,7 @@ class MiniToo(Divoom):
 
     def send_media(self, images, speed=1000):
         """Send frames to the Divoom device as one zstd compressed animation"""
+        if (self.socket == None): return
         return self._send_packets(self._build_packets(self._encode_media(images, speed)))
 
     # --- overrides -------------------------------------------------------
@@ -211,9 +212,9 @@ class MiniToo(Divoom):
             n = getattr(img, "n_frames", 1)
             if n > 1:
                 frames, durations = [], []
-                for i in range(min(n, MEDIA_MAX_FRAMES)):
+                for i in range(n):
                     img.seek(i)
-                    frames.append(self._fit(img.convert("RGB")))
+                    frames.append(self._fit(img))
                     durations.append(img.info.get("duration", 100))
                 speed = max(1, int(sum(durations) / len(durations) if time is None else time))
             else:
@@ -284,6 +285,6 @@ class MiniToo(Divoom):
             y += line_h
 
         if total_h <= S: return self.send_media([img], speed=1000)
-        step = max(S // 16, -(-(total_h + S) // (MEDIA_MAX_FRAMES - 1)))
+        step = max(S // 16, -(-(total_h + S) // (self.maxframes - 1)))
         frames = [img.crop((0, top, S, top + S)) for top in range(0, total_h + S + 1, step)]
         return self.send_media(frames, speed=100 if time is None else max(1, int(time)))

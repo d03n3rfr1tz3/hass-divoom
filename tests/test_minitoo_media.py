@@ -37,6 +37,8 @@ from tests.support import (
     MiniTooResendResponder,
     make_connected_device,
     minitoo_responder,
+    solid_color,
+    solid_gif,
 )
 
 MEDIA_CASES = [name for name, _ in all_cases() if is_media_case("MiniToo", name)]
@@ -55,7 +57,7 @@ MEDIA_MAX_BYTES = 307200
 # below is rebuilt with those two, so without this the content check would
 # compare show_image against itself. Regenerate only after an intentional
 # change to either, and look at the decoded frame before trusting the new hash.
-SMILEY16_RAW_SHA256 = "3c421c55d124d397995b547b8e81c3a8e36331be94f44e7d0644cef3ce0a33f9"
+SMILEY16_RAW_SHA256 = "63f506cbcda03d1c3303167f5c01b9d404916444cdcdc5d29335c99c0d944f10"
 
 
 def _source_file(case_name):
@@ -68,19 +70,22 @@ def _source_file(case_name):
 
 def _expected_frames(device, path):
     """Rebuild the frames and speed a show_image case has to produce. Shares
-    only _fit() and _quantize() with the device, so the frame walk itself stays
-    independent; that the quantizer really caps the palette is checked
-    separately in test_frames_are_quantized."""
+    only _fit(), _quantize() and pick_frames() with the device, so the frame
+    walk itself stays independent; that the quantizer really caps the palette
+    is checked separately in test_frames_are_quantized."""
     with Image.open(path) as img:
         n = getattr(img, "n_frames", 1)
         if n <= 1:
             return [device._quantize(device._fit(img))], 1000
         frames, durations = [], []
-        for i in range(min(n, 255)):
+        for i in range(n):
             img.seek(i)
-            frames.append(device._quantize(device._fit(img.convert("RGB"))))
+            frames.append(device._quantize(device._fit(img)))
             durations.append(img.info.get("duration", 100))
-        return frames, max(1, int(sum(durations) / len(durations)))
+        keep = min(n, MiniToo.maxframes)
+        speed = max(1, int(sum(durations) / len(durations)))
+        if keep < n: speed = round(speed * n / keep)
+        return [frames[i] for i in device.pick_frames(n, keep)], speed
 
 
 def _run_case(case_name, responder=minitoo_responder, **kwargs):
@@ -206,7 +211,7 @@ def test_minitoo_media(case_name):
 
 # --- resend requests (04 8b 55 01 <index LE16>) -----------------------------
 
-RESEND_IMAGE = os.path.join(PIXELART_DIR, "smiley16.gif")  # 38 chunks
+RESEND_IMAGE = os.path.join(PIXELART_DIR, "ha32.gif")  # 9 chunks
 
 
 def _run_show_image(responder, resendwindow=0.5, path=RESEND_IMAGE, time=None):
@@ -275,9 +280,48 @@ def test_oversized_animation_is_thinned(tmp_path):
     frames, speed, stream, raw = _decoded_frames(messages)
 
     assert len(stream) <= MEDIA_MAX_BYTES
-    assert frames == 10, "every second frame of 20 should be kept"
-    assert speed == 200, "the cycle length is preserved by stretching speed"
+    assert 1 < frames < 20
+    assert speed == round(100 * 20 / frames), "the cycle length is preserved by stretching speed"
     assert len(raw) == frames * BYTES_PER_FRAME
+
+
+def test_long_animation_is_thinned_evenly(tmp_path):
+    """Over maxframes, frames are picked evenly over the whole animation
+    instead of cutting it off."""
+    count = 300
+    path = solid_gif(str(tmp_path / "long.gif"), count)
+    frames, speed, _, raw = _decoded_frames(_run_show_image(minitoo_responder, path=path))
+
+    assert frames == MiniToo.maxframes
+    assert speed == round(100 * count / frames)
+    picked = [tuple(raw[i * BYTES_PER_FRAME:i * BYTES_PER_FRAME + 3]) for i in range(frames)]
+    assert picked == [solid_color(i * count // frames) for i in range(frames)]
+
+
+def test_transparency_turns_black(tmp_path):
+    """Transparent pixels show black, not the color they hide."""
+    path = str(tmp_path / "half.png")
+    img = Image.new("RGBA", (16, 16), (255, 255, 255, 0))
+    img.paste((255, 0, 0, 255), (8, 0, 16, 16))
+    img.save(path)
+    frames, _, _, raw = _decoded_frames(_run_show_image(minitoo_responder, path=path))
+
+    assert frames == 1
+    half = SCREEN * SCREEN // 2
+    frame = Image.frombytes("RGB", (SCREEN, SCREEN), raw)
+    assert sorted(frame.getcolors()) == [(half, (0, 0, 0)), (half, (255, 0, 0))]
+    assert frame.getpixel((0, 0)) == (0, 0, 0)
+
+
+def test_send_media_without_connection_encodes_nothing(monkeypatch):
+    """Without a socket there is nobody to wait for, so skip the encoding too."""
+    device = MiniToo(mac="00:00:00:00:00:00")
+
+    def encode(*args, **kwargs):
+        raise AssertionError("encoded without a connection")
+
+    monkeypatch.setattr(device, "_encode_media", encode)
+    assert device.send_media([Image.new("RGB", (SCREEN, SCREEN))]) is None
 
 
 def test_frames_are_quantized():
@@ -323,7 +367,7 @@ def test_image_time_sets_speed():
 def test_long_text_scrolls_vertically():
     frames, speed, _, raw = _decoded_frames(_run_show_text(LONG_TEXT))
 
-    assert 1 < frames <= 255
+    assert 1 < frames <= MiniToo.maxframes
     assert speed == 100
     assert len(raw) == frames * BYTES_PER_FRAME
     assert set(raw[:BYTES_PER_FRAME]) == {0}, "the text starts below the screen"

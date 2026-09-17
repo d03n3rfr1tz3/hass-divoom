@@ -4,6 +4,8 @@ from .divoom import Divoom
 
 class TimeboxMini(Divoom):
     """Class TimeboxMini encapsulates the Timebox Mini Bluetooth communication."""
+    maxframes = 12
+
     def __init__(self, host=None, mac=None, port=1, escapePayload=True, logger=None):
         self.type = "TimeboxMini"
         self.screensize = 11

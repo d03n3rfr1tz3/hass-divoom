@@ -429,6 +429,7 @@ data:
 
 #### MODE image
 Shows a static or animated image.
+Longer animations are thinned out to fit the limits of the device.
 
 | Parameter | Required | Description |
 | ---       | :---:    | --- |
@@ -656,7 +657,7 @@ data:
 ```
 
 #### MODE text
-Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the frame limitation of ~60 frames. The MiniToo shows text as a still image instead, and scrolls it vertically if it does not fit the screen.
+Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the devices frame limit and then scrolls in bigger steps. The MiniToo shows text as a still image instead, and scrolls it vertically if it does not fit the screen.
 
 | Parameter          | Required | Description |
 | ---                | :---:    | --- |
