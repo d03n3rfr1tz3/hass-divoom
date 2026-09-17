@@ -47,6 +47,15 @@ PARAM_FREQUENCY = 'frequency'
 PARAM_NUMBER = 'number'
 PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
+PARAM_VOLUME1 = 'volume1'
+PARAM_VOLUME2 = 'volume2'
+PARAM_VOLUME3 = 'volume3'
+PARAM_VOLUME4 = 'volume4'
+PARAM_VOLUME5 = 'volume5'
+PARAM_VOLUME6 = 'volume6'
+PARAM_VOLUME7 = 'volume7'
+PARAM_VOLUME8 = 'volume8'
+PARAM_BACKGROUND = 'background'
 PARAM_SIZE = 'size'
 
 PARAM_SLEEPMODE = 'sleepmode'
@@ -403,7 +412,9 @@ class DivoomNotificationService(BaseNotificationService):
                 self._device.show_light(color=color, brightness=brightness, power=True, effect=effect)
 
             elif mode == "lyrics":
-                self._device.show_lyrics()
+                effect = data.get(PARAM_EFFECT)
+                background = data.get(PARAM_BACKGROUND)
+                self._device.show_lyrics(effect=effect, background=background)
 
             elif mode == "memorial":
                 number = data.get(PARAM_NUMBER)
@@ -449,7 +460,8 @@ class DivoomNotificationService(BaseNotificationService):
                 color = data.get(PARAM_COLOR)
                 brightness = data.get(PARAM_BRIGHTNESS)
                 frequency = data.get(PARAM_FREQUENCY)
-                self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency)
+                volumes = [data.get(param) for param in (PARAM_VOLUME1, PARAM_VOLUME2, PARAM_VOLUME3, PARAM_VOLUME4, PARAM_VOLUME5, PARAM_VOLUME6, PARAM_VOLUME7, PARAM_VOLUME8)]
+                self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency, volumes)
 
             elif mode == "temperature":
                 value = data.get(PARAM_TEMP) or data.get(PARAM_VALUE)

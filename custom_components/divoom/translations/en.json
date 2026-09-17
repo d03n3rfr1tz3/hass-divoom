@@ -501,6 +501,44 @@
         "brightness": {
           "name": "Brightness",
           "description": "The brightness value between 0 and 100."
+        },
+        "volume1": {
+          "name": "Volume sound 1",
+          "description": "The volume of sound 1 between 0 and 100."
+        },
+        "volume2": {
+          "name": "Volume sound 2",
+          "description": "The volume of sound 2 between 0 and 100."
+        },
+        "volume3": {
+          "name": "Volume sound 3",
+          "description": "The volume of sound 3 between 0 and 100."
+        },
+        "volume4": {
+          "name": "Volume sound 4",
+          "description": "The volume of sound 4 between 0 and 100."
+        },
+        "volume5": {
+          "name": "Volume sound 5",
+          "description": "The volume of sound 5 between 0 and 100."
+        },
+        "volume6": {
+          "name": "Volume sound 6",
+          "description": "The volume of sound 6 between 0 and 100."
+        },
+        "volume7": {
+          "name": "Volume sound 7",
+          "description": "The volume of sound 7 between 0 and 100."
+        },
+        "volume8": {
+          "name": "Volume sound 8",
+          "description": "The volume of sound 8 between 0 and 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "White noise",
+          "description": "One volume per sound. Only for the MiniToo."
         }
       }
     },
@@ -597,6 +635,20 @@
         "device": {
           "name": "Device",
           "description": "The Divoom device to send this to."
+        },
+        "effect": {
+          "name": "Text effect",
+          "description": "The text effect of the lyrics. Only applied together with the background."
+        },
+        "background": {
+          "name": "Background",
+          "description": "The background of the lyrics. Only applied together with the text effect."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Lyrics style",
+          "description": "Text effect and background. Only for the MiniToo."
         }
       }
     },

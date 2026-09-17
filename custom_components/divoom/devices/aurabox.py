@@ -150,7 +150,7 @@ class Aurabox(Divoom):
         
         return result
 
-    def show_lyrics(self):
+    def show_lyrics(self, effect=None, background=None):
         self.unsupported("lyrics view")
 
     def show_noise(self, value=None):
@@ -159,7 +159,7 @@ class Aurabox(Divoom):
     def show_scoreboard(self, blue=None, red=None):
         self.unsupported("scoreboard view")
 
-    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None, volumes=None):
         """Show sleep mode on the Divoom device and optionally sets mode, time"""
         if sleeptime == None: sleeptime = 90
         if sleepmode == None: sleepmode = 0

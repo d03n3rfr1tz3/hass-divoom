@@ -18,6 +18,7 @@ from .devices.divoom import DivoomUnsupportedError
 from .notify import (
     PARAM_ALARMMODE,
     PARAM_AUDIOMODE,
+    PARAM_BACKGROUND,
     PARAM_BACKGROUND_COLOR,
     PARAM_BACKGROUNDMODE,
     PARAM_BRIGHTNESS,
@@ -47,6 +48,14 @@ from .notify import (
     PARAM_UNIT,
     PARAM_VALUE,
     PARAM_VOLUME,
+    PARAM_VOLUME1,
+    PARAM_VOLUME2,
+    PARAM_VOLUME3,
+    PARAM_VOLUME4,
+    PARAM_VOLUME5,
+    PARAM_VOLUME6,
+    PARAM_VOLUME7,
+    PARAM_VOLUME8,
     PARAM_WEATHER,
     PARAM_WEEKDAY,
     WEATHER_MODES,
@@ -82,6 +91,14 @@ CLOCK_ID_TYPES = {"minitoo"}
 CLOCK_CATALOG_URL = "https://app.divoom-gz.com/Channel/{}"
 CLOCK_CATEGORIES = ("Normal", "Nature&Weather", "Retro", "Ambient", "Plan", "Music Reactive", "Pixel Art", "HOLIDAYS")
 CLOCK_PAGE_SIZE = 30
+
+# device types that take one volume per white noise sound in sleep mode
+WHITENOISE_TYPES = {"minitoo"}
+
+# device types that take a text effect and background for lyrics
+LYRIC_CONFIG_TYPES = {"minitoo"}
+LYRIC_EFFECT = vol.All(vol.Coerce(int), vol.Range(min=0, max=5))
+LYRIC_BACKGROUND = vol.All(vol.Coerce(int), vol.Range(min=0, max=20))
 
 # the FM broadcast bands in use worldwide, from OIRT up to ITU
 FREQUENCY = vol.All(vol.Coerce(float), vol.Range(min=64, max=108))
@@ -202,6 +219,14 @@ SERVICE_SCHEMAS = {
         vol.Optional(PARAM_VOLUME): PERCENT,
         vol.Optional(PARAM_COLOR): RGB,
         vol.Optional(PARAM_BRIGHTNESS): PERCENT,
+        vol.Optional(PARAM_VOLUME1): PERCENT,
+        vol.Optional(PARAM_VOLUME2): PERCENT,
+        vol.Optional(PARAM_VOLUME3): PERCENT,
+        vol.Optional(PARAM_VOLUME4): PERCENT,
+        vol.Optional(PARAM_VOLUME5): PERCENT,
+        vol.Optional(PARAM_VOLUME6): PERCENT,
+        vol.Optional(PARAM_VOLUME7): PERCENT,
+        vol.Optional(PARAM_VOLUME8): PERCENT,
     }),
     "datetime": vol.Schema({
         **TARGET_SCHEMA,
@@ -229,6 +254,8 @@ SERVICE_SCHEMAS = {
     }),
     "lyrics": vol.Schema({
         **TARGET_SCHEMA,
+        vol.Optional(PARAM_EFFECT): LYRIC_EFFECT,
+        vol.Optional(PARAM_BACKGROUND): LYRIC_BACKGROUND,
     }),
     "keyboard": vol.Schema({
         **TARGET_SCHEMA,
@@ -407,13 +434,19 @@ def _clock_fields(fields, types, clocks):
         fields.pop("classic")
     return fields
 
+def _drop_section(fields, section, types, supported):
+    """Drop a section none of the configured device types understands."""
+    if types & supported: return fields
+    return {key: value for key, value in fields.items() if key != section}
+
 async def async_refresh_service_descriptions(hass: HomeAssistant) -> None:
     """Point the device field at the devices that actually exist.
 
     services.yaml can only describe a static field, so the picker is built here
     instead - it lists the configured devices and writes the same slug a
-    handwritten automation would use. The clock sections follow the configured
-    device types, and clock_id offers the Divoom catalog once it has loaded.
+    handwritten automation would use. The clock, white noise and lyrics sections
+    follow the configured device types, and clock_id offers the Divoom catalog
+    once it has loaded.
     """
     domainConfig = hass.data.setdefault(DOMAIN, {})
     descriptions = domainConfig.get('descriptions')
@@ -434,4 +467,6 @@ async def async_refresh_service_descriptions(hass: HomeAssistant) -> None:
         if entries:
             fields = {**fields, CONF_DEVICE: {**fields[CONF_DEVICE], "selector": selector}}
             if mode == "clock": fields = _clock_fields(fields, types, clocks)
+            if mode == "sleep": fields = _drop_section(fields, "whitenoise", types, WHITENOISE_TYPES)
+            if mode == "lyrics": fields = _drop_section(fields, "style", types, LYRIC_CONFIG_TYPES)
         async_set_service_schema(hass, DOMAIN, mode, {**description, "fields": fields})

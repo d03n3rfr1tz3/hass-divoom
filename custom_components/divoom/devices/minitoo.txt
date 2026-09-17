@@ -45,6 +45,13 @@ action: divoom.lyrics
 data:
   device: YOUR_DIVOOM_DEVICE
 
+# activate channel 'lyrics' with a specific text effect and background
+action: divoom.lyrics
+data:
+  device: YOUR_DIVOOM_DEVICE
+  effect: 1
+  background: 16
+
 # activate an image or animation, depending of the number of frames found in the file
 action: divoom.image
 data:
@@ -122,15 +129,14 @@ data:
     - thu
     - fri
 
-# activate the sleep mode for 30 minutes
+# activate the sleep mode for 30 minutes with the first and third white noise sound
 action: divoom.sleep
 data:
   device: YOUR_DIVOOM_DEVICE
   value: true
   time: 30
-  sleepmode: 4
-  volume: 10
-  brightness: 50
+  volume1: 40
+  volume3: 20
 
 # activates the memorial in the first slot for 0:00 new year
 action: divoom.memorial

@@ -501,6 +501,44 @@
         "brightness": {
           "name": "Luminosità",
           "description": "Il valore di luminosità tra 0 e 100."
+        },
+        "volume1": {
+          "name": "Volume suono 1",
+          "description": "Il volume del suono 1 tra 0 e 100."
+        },
+        "volume2": {
+          "name": "Volume suono 2",
+          "description": "Il volume del suono 2 tra 0 e 100."
+        },
+        "volume3": {
+          "name": "Volume suono 3",
+          "description": "Il volume del suono 3 tra 0 e 100."
+        },
+        "volume4": {
+          "name": "Volume suono 4",
+          "description": "Il volume del suono 4 tra 0 e 100."
+        },
+        "volume5": {
+          "name": "Volume suono 5",
+          "description": "Il volume del suono 5 tra 0 e 100."
+        },
+        "volume6": {
+          "name": "Volume suono 6",
+          "description": "Il volume del suono 6 tra 0 e 100."
+        },
+        "volume7": {
+          "name": "Volume suono 7",
+          "description": "Il volume del suono 7 tra 0 e 100."
+        },
+        "volume8": {
+          "name": "Volume suono 8",
+          "description": "Il volume del suono 8 tra 0 e 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "Rumore bianco",
+          "description": "Un volume per ogni suono. Solo per il MiniToo."
         }
       }
     },
@@ -597,6 +635,20 @@
         "device": {
           "name": "Dispositivo",
           "description": "Il dispositivo Divoom a cui inviare questa azione."
+        },
+        "effect": {
+          "name": "Effetto testo",
+          "description": "L'effetto del testo della canzone. Applicato solo insieme allo sfondo."
+        },
+        "background": {
+          "name": "Sfondo",
+          "description": "Lo sfondo del testo della canzone. Applicato solo insieme all'effetto testo."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Stile del testo",
+          "description": "Effetto testo e sfondo. Solo per il MiniToo."
         }
       }
     },

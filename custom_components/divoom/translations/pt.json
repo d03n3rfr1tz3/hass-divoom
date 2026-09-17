@@ -501,6 +501,44 @@
         "brightness": {
           "name": "Brilho",
           "description": "O valor de brilho entre 0 e 100."
+        },
+        "volume1": {
+          "name": "Volume som 1",
+          "description": "O volume do som 1 entre 0 e 100."
+        },
+        "volume2": {
+          "name": "Volume som 2",
+          "description": "O volume do som 2 entre 0 e 100."
+        },
+        "volume3": {
+          "name": "Volume som 3",
+          "description": "O volume do som 3 entre 0 e 100."
+        },
+        "volume4": {
+          "name": "Volume som 4",
+          "description": "O volume do som 4 entre 0 e 100."
+        },
+        "volume5": {
+          "name": "Volume som 5",
+          "description": "O volume do som 5 entre 0 e 100."
+        },
+        "volume6": {
+          "name": "Volume som 6",
+          "description": "O volume do som 6 entre 0 e 100."
+        },
+        "volume7": {
+          "name": "Volume som 7",
+          "description": "O volume do som 7 entre 0 e 100."
+        },
+        "volume8": {
+          "name": "Volume som 8",
+          "description": "O volume do som 8 entre 0 e 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "Ruído branco",
+          "description": "Um volume por som. Apenas para o MiniToo."
         }
       }
     },
@@ -597,6 +635,20 @@
         "device": {
           "name": "Dispositivo",
           "description": "O dispositivo Divoom para o qual esta ação é enviada."
+        },
+        "effect": {
+          "name": "Efeito de texto",
+          "description": "O efeito de texto da letra. Só é aplicado junto com o fundo."
+        },
+        "background": {
+          "name": "Fundo",
+          "description": "O fundo da letra. Só é aplicado junto com o efeito de texto."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Estilo da letra",
+          "description": "Efeito de texto e fundo. Apenas para o MiniToo."
         }
       }
     },

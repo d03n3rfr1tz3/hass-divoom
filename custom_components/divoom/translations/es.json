@@ -501,6 +501,44 @@
         "brightness": {
           "name": "Brillo",
           "description": "El valor de brillo entre 0 y 100."
+        },
+        "volume1": {
+          "name": "Volumen sonido 1",
+          "description": "El volumen del sonido 1 entre 0 y 100."
+        },
+        "volume2": {
+          "name": "Volumen sonido 2",
+          "description": "El volumen del sonido 2 entre 0 y 100."
+        },
+        "volume3": {
+          "name": "Volumen sonido 3",
+          "description": "El volumen del sonido 3 entre 0 y 100."
+        },
+        "volume4": {
+          "name": "Volumen sonido 4",
+          "description": "El volumen del sonido 4 entre 0 y 100."
+        },
+        "volume5": {
+          "name": "Volumen sonido 5",
+          "description": "El volumen del sonido 5 entre 0 y 100."
+        },
+        "volume6": {
+          "name": "Volumen sonido 6",
+          "description": "El volumen del sonido 6 entre 0 y 100."
+        },
+        "volume7": {
+          "name": "Volumen sonido 7",
+          "description": "El volumen del sonido 7 entre 0 y 100."
+        },
+        "volume8": {
+          "name": "Volumen sonido 8",
+          "description": "El volumen del sonido 8 entre 0 y 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "Ruido blanco",
+          "description": "Un volumen por sonido. Solo para el MiniToo."
         }
       }
     },
@@ -597,6 +635,20 @@
         "device": {
           "name": "Dispositivo",
           "description": "El dispositivo Divoom al que se envía esta acción."
+        },
+        "effect": {
+          "name": "Efecto de texto",
+          "description": "El efecto de texto de la letra. Solo se aplica junto con el fondo."
+        },
+        "background": {
+          "name": "Fondo",
+          "description": "El fondo de la letra. Solo se aplica junto con el efecto de texto."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Estilo de letra",
+          "description": "Efecto de texto y fondo. Solo para el MiniToo."
         }
       }
     },

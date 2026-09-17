@@ -21,7 +21,7 @@ class PixooMax(Divoom):
     def send_keyboard(self, value=None):
         self.unsupported("changing the keyboard light")
 
-    def show_lyrics(self):
+    def show_lyrics(self, effect=None, background=None):
         self.unsupported("lyrics view")
 
     def send_playstate(self, value=None):

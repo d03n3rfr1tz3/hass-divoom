@@ -88,6 +88,12 @@ FIXED_CASES = {
         value=True, sleeptime=45, sleepmode=1, volume=50,
         color=[9, 9, 9], brightness=60, frequency=99.5,
     ),
+    "show_sleep_volumes": lambda d: d.show_sleep(
+        value=True, sleeptime=45, sleepmode=1, volume=50,
+        volumes=[None, None, 30, None, None, None, None, 80],
+    ),
+    "show_lyrics": lambda d: d.show_lyrics(),
+    "show_lyrics_config": lambda d: d.show_lyrics(effect=3, background=17),
     "show_countdown": lambda d: d.show_countdown(value=True, countdown="00:30"),
     "show_timer": lambda d: d.show_timer(5),
     "show_noise": lambda d: d.show_noise(True),

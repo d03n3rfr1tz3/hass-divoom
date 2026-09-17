@@ -220,6 +220,27 @@ class MiniToo(Divoom):
                 frames, speed = [self._fit(img)], 1000
         return self.send_media(frames, speed=speed)
 
+    def show_lyrics(self, effect=None, background=None):
+        """Show lyrics, the app's Lyric/Enter request, followed by Lyric/SetConfig
+        when both effect and background are given."""
+        result = self.send_json({"Command": "Lyric/Enter"})
+        if effect == None and background == None: return result
+        if effect == None or background == None:
+            self.logger.warning("{0}: lyrics config needs both effect and background".format(self.type))
+            return result
+        return self.send_json({"Command": "Lyric/SetConfig", "TextEffect": int(effect), "Background": int(background)})
+
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None, volumes=None):
+        """Show sleep mode, the app's WhiteNoise/Set request with one volume per sound.
+        Without its own volume, the slot picked by sleepmode gets volume. Color,
+        brightness and frequency are ignored."""
+        if sleeptime == None: sleeptime = 120
+        slots = [0] * 8
+        if volume != None and sleepmode != None and 0 <= int(sleepmode) < len(slots): slots[int(sleepmode)] = int(volume)
+        for index, slot in enumerate((volumes or [])[:len(slots)]):
+            if slot != None: slots[index] = int(slot)
+        return self.send_json({"Command": "WhiteNoise/Set", "EndStatus": 0, "OnOff": 1 if value == True or value == 1 else 0, "Time": int(sleeptime), "Volume": slots})
+
     def show_text(self, text, font, size=None, time=None, color1=None, color2=None):
         """Render wrapped, centered text into a 128x128 frame and show it. Text
         taller than the screen scrolls up from the bottom instead."""

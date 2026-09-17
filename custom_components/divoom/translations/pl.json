@@ -501,6 +501,44 @@
         "brightness": {
           "name": "Jasność",
           "description": "Wartość jasności od 0 do 100."
+        },
+        "volume1": {
+          "name": "Głośność dźwięku 1",
+          "description": "Głośność dźwięku 1 od 0 do 100."
+        },
+        "volume2": {
+          "name": "Głośność dźwięku 2",
+          "description": "Głośność dźwięku 2 od 0 do 100."
+        },
+        "volume3": {
+          "name": "Głośność dźwięku 3",
+          "description": "Głośność dźwięku 3 od 0 do 100."
+        },
+        "volume4": {
+          "name": "Głośność dźwięku 4",
+          "description": "Głośność dźwięku 4 od 0 do 100."
+        },
+        "volume5": {
+          "name": "Głośność dźwięku 5",
+          "description": "Głośność dźwięku 5 od 0 do 100."
+        },
+        "volume6": {
+          "name": "Głośność dźwięku 6",
+          "description": "Głośność dźwięku 6 od 0 do 100."
+        },
+        "volume7": {
+          "name": "Głośność dźwięku 7",
+          "description": "Głośność dźwięku 7 od 0 do 100."
+        },
+        "volume8": {
+          "name": "Głośność dźwięku 8",
+          "description": "Głośność dźwięku 8 od 0 do 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "Biały szum",
+          "description": "Jedna głośność na każdy dźwięk. Tylko dla MiniToo."
         }
       }
     },
@@ -597,6 +635,20 @@
         "device": {
           "name": "Urządzenie",
           "description": "Urządzenie Divoom, do którego ma zostać wysłane polecenie."
+        },
+        "effect": {
+          "name": "Efekt tekstu",
+          "description": "Efekt tekstu piosenki. Działa tylko razem z tłem."
+        },
+        "background": {
+          "name": "Tło",
+          "description": "Tło tekstu piosenki. Działa tylko razem z efektem tekstu."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Styl tekstu piosenki",
+          "description": "Efekt tekstu i tło. Tylko dla MiniToo."
         }
       }
     },

@@ -501,6 +501,44 @@
         "brightness": {
           "name": "Helligkeit",
           "description": "Der Helligkeitswert zwischen 0 und 100."
+        },
+        "volume1": {
+          "name": "Lautstärke Geräusch 1",
+          "description": "Die Lautstärke von Geräusch 1 zwischen 0 und 100."
+        },
+        "volume2": {
+          "name": "Lautstärke Geräusch 2",
+          "description": "Die Lautstärke von Geräusch 2 zwischen 0 und 100."
+        },
+        "volume3": {
+          "name": "Lautstärke Geräusch 3",
+          "description": "Die Lautstärke von Geräusch 3 zwischen 0 und 100."
+        },
+        "volume4": {
+          "name": "Lautstärke Geräusch 4",
+          "description": "Die Lautstärke von Geräusch 4 zwischen 0 und 100."
+        },
+        "volume5": {
+          "name": "Lautstärke Geräusch 5",
+          "description": "Die Lautstärke von Geräusch 5 zwischen 0 und 100."
+        },
+        "volume6": {
+          "name": "Lautstärke Geräusch 6",
+          "description": "Die Lautstärke von Geräusch 6 zwischen 0 und 100."
+        },
+        "volume7": {
+          "name": "Lautstärke Geräusch 7",
+          "description": "Die Lautstärke von Geräusch 7 zwischen 0 und 100."
+        },
+        "volume8": {
+          "name": "Lautstärke Geräusch 8",
+          "description": "Die Lautstärke von Geräusch 8 zwischen 0 und 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "White Noise",
+          "description": "Eine Lautstärke pro Geräusch. Nur für den MiniToo."
         }
       }
     },
@@ -597,6 +635,20 @@
         "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "effect": {
+          "name": "Texteffekt",
+          "description": "Der Texteffekt der Songtexte. Wirkt nur zusammen mit dem Hintergrund."
+        },
+        "background": {
+          "name": "Hintergrund",
+          "description": "Der Hintergrund der Songtexte. Wirkt nur zusammen mit dem Texteffekt."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Songtext-Stil",
+          "description": "Texteffekt und Hintergrund. Nur für den MiniToo."
         }
       }
     },

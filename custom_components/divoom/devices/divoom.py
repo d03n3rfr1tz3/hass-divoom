@@ -777,7 +777,7 @@ class Divoom:
         args += [0x01 if power == True or power == 1 else 0x00, 0x00, 0x00, 0x00]
         return self.send_command("set view", args)
 
-    def show_lyrics(self):
+    def show_lyrics(self, effect=None, background=None):
         self.unimplemented()
 
     def show_memorial(self, number=None, value=None, text=None, animate=True):
@@ -855,7 +855,7 @@ class Divoom:
     def show_scoreboard(self, blue=None, red=None):
         self.unimplemented() # needs a decision, in which way the scoreboard can be accessed (set view or set tool)
 
-    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None, volumes=None):
         """Show sleep mode on the Divoom device and optionally sets mode, volume, time, color, frequency and brightness"""
         if sleeptime == None: sleeptime = 120
         if sleepmode == None: sleepmode = 0

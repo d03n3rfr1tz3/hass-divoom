@@ -375,7 +375,13 @@ DISPATCH_CASES = [
          "color": [255, 255, 0], "brightness": 50, "frequency": 100.3},
         {"value": True, "time": 30, "sleepmode": 4, "volume": 10,
          "color": [255, 255, 0], "brightness": 50, "frequency": 100.3},
-        "show_sleep", (True, 30, 4, 10, [255, 255, 0], 50, 100.3), {},
+        "show_sleep", (True, 30, 4, 10, [255, 255, 0], 50, 100.3, [None] * 8), {},
+    ),
+    (
+        "sleep",
+        {"value": True, "time": 30, "volume1": 40, "volume8": 20},
+        {"value": True, "time": 30, "volume1": 40, "volume8": 20},
+        "show_sleep", (True, 30, None, None, None, None, None, [40, None, None, None, None, None, None, 20]), {},
     ),
     (
         "datetime",
@@ -402,7 +408,12 @@ DISPATCH_CASES = [
         {"value": "sdcard"}, {"value": "sdcard"},
         "show_radio", (), {"value": "sdcard", "frequency": None},
     ),
-    ("lyrics", {}, {}, "show_lyrics", (), {}),
+    ("lyrics", {}, {}, "show_lyrics", (), {"effect": None, "background": None}),
+    (
+        "lyrics",
+        {"effect": 3, "background": 17}, {"effect": 3, "background": 17},
+        "show_lyrics", (), {"effect": 3, "background": 17},
+    ),
     ("keyboard", {"value": "next"}, {"value": "next"}, "send_keyboard", (), {"value": "next"}),
     ("game", {"value": 2}, {"value": 2}, "show_game", (), {"value": 2}),
     (
@@ -555,6 +566,32 @@ async def test_clock_sections_follow_the_configured_device_types(hass, aioclient
 
     fields = await _clock_fields(hass)
     assert {key for key, value in fields.items() if "fields" in value} == sections
+    assert CONF_DEVICE in fields
+
+
+@pytest.mark.parametrize(
+    ("device_types", "present"),
+    [
+        (["minitoo"], True),
+        (["ditoo"], False),
+        (["minitoo", "ditoo"], True),
+        ([], True),
+    ],
+)
+@pytest.mark.parametrize(("mode", "section"), [("sleep", "whitenoise"), ("lyrics", "style")])
+async def test_minitoo_sections_follow_the_configured_device_types(hass, aioclient_mock, device_types, present, mode, section):
+    """The white noise volumes and the lyrics style only reach the MiniToo, so
+    the UI offers them only with one set up."""
+    aioclient_mock.post(CATALOG_URL.format("GetDialType"), json={"DialTypeList": []})
+    assert await async_setup_component(hass, DOMAIN, {})
+    for index, device_type in enumerate(device_types):
+        register_device(hass, mac="11:22:33:44:55:6{}".format(index), device_type=device_type)
+
+    await async_refresh_service_descriptions(hass)
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    fields = (await async_get_all_descriptions(hass))[DOMAIN][mode]["fields"]
+    assert (section in fields) == present
     assert CONF_DEVICE in fields
 
 
@@ -928,7 +965,7 @@ def test_device_examples_match_the_service_schemas():
             SERVICE_SCHEMAS[mode](example["data"])
             checked += 1
 
-    assert checked == 265 # every block, not just the ones that happened to parse
+    assert checked == 266 # every block, not just the ones that happened to parse
 
 
 def _number_selector(field_definition):

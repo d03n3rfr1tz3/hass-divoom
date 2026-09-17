@@ -501,6 +501,44 @@
         "brightness": {
           "name": "Helderheid",
           "description": "De helderheidswaarde tussen 0 en 100."
+        },
+        "volume1": {
+          "name": "Volume geluid 1",
+          "description": "Het volume van geluid 1 tussen 0 en 100."
+        },
+        "volume2": {
+          "name": "Volume geluid 2",
+          "description": "Het volume van geluid 2 tussen 0 en 100."
+        },
+        "volume3": {
+          "name": "Volume geluid 3",
+          "description": "Het volume van geluid 3 tussen 0 en 100."
+        },
+        "volume4": {
+          "name": "Volume geluid 4",
+          "description": "Het volume van geluid 4 tussen 0 en 100."
+        },
+        "volume5": {
+          "name": "Volume geluid 5",
+          "description": "Het volume van geluid 5 tussen 0 en 100."
+        },
+        "volume6": {
+          "name": "Volume geluid 6",
+          "description": "Het volume van geluid 6 tussen 0 en 100."
+        },
+        "volume7": {
+          "name": "Volume geluid 7",
+          "description": "Het volume van geluid 7 tussen 0 en 100."
+        },
+        "volume8": {
+          "name": "Volume geluid 8",
+          "description": "Het volume van geluid 8 tussen 0 en 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "Witte ruis",
+          "description": "Eén volume per geluid. Alleen voor de MiniToo."
         }
       }
     },
@@ -597,6 +635,20 @@
         "device": {
           "name": "Apparaat",
           "description": "Het Divoom-apparaat waarnaar dit wordt gestuurd."
+        },
+        "effect": {
+          "name": "Teksteffect",
+          "description": "Het teksteffect van de songtekst. Werkt alleen samen met de achtergrond."
+        },
+        "background": {
+          "name": "Achtergrond",
+          "description": "De achtergrond van de songtekst. Werkt alleen samen met het teksteffect."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Songtekststijl",
+          "description": "Teksteffect en achtergrond. Alleen voor de MiniToo."
         }
       }
     },

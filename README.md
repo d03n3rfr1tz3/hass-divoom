@@ -476,6 +476,11 @@ data:
 #### MODE lyrics
 Shows the lyrics channel. Might not be supported by every Divoom device.
 
+| Parameter    | Required | Description |
+| ---          | :---:    | --- |
+| `effect`     |          | The text effect of the lyrics, from `0` to `5`. Only the MiniToo understands it. |
+| `background` |          | The background of the lyrics, from `0` to `20`. Only the MiniToo understands it. |
+
 ```yaml
 action: divoom.lyrics
 data:
@@ -620,6 +625,7 @@ Shows the sleep mode, which plays soothing sounds, optionally with a timer and l
 | `volume`     |          | The volume value between 0 and 100. |
 | `color`      |          | The color of the display. Accepts an array of RGB color values. |
 | `brightness` |          | The brightness value between 0 and 100. |
+| `volume1` … `volume8` | | The volume of each of the eight white noise sounds between 0 and 100. Only the MiniToo understands them, other devices ignore them. A sound without its own volume stays off, except the one `sleepmode` picks, which gets `volume`. |
 
 ```yaml
 action: divoom.sleep

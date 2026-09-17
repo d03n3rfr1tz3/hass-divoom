@@ -501,6 +501,44 @@
         "brightness": {
           "name": "Jas",
           "description": "Hodnota jasu mezi 0 a 100."
+        },
+        "volume1": {
+          "name": "Hlasitost zvuku 1",
+          "description": "Hlasitost zvuku 1 v rozsahu 0 až 100."
+        },
+        "volume2": {
+          "name": "Hlasitost zvuku 2",
+          "description": "Hlasitost zvuku 2 v rozsahu 0 až 100."
+        },
+        "volume3": {
+          "name": "Hlasitost zvuku 3",
+          "description": "Hlasitost zvuku 3 v rozsahu 0 až 100."
+        },
+        "volume4": {
+          "name": "Hlasitost zvuku 4",
+          "description": "Hlasitost zvuku 4 v rozsahu 0 až 100."
+        },
+        "volume5": {
+          "name": "Hlasitost zvuku 5",
+          "description": "Hlasitost zvuku 5 v rozsahu 0 až 100."
+        },
+        "volume6": {
+          "name": "Hlasitost zvuku 6",
+          "description": "Hlasitost zvuku 6 v rozsahu 0 až 100."
+        },
+        "volume7": {
+          "name": "Hlasitost zvuku 7",
+          "description": "Hlasitost zvuku 7 v rozsahu 0 až 100."
+        },
+        "volume8": {
+          "name": "Hlasitost zvuku 8",
+          "description": "Hlasitost zvuku 8 v rozsahu 0 až 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "Bílý šum",
+          "description": "Jedna hlasitost pro každý zvuk. Pouze pro MiniToo."
         }
       }
     },
@@ -597,6 +635,20 @@
         "device": {
           "name": "Zařízení",
           "description": "Zařízení Divoom, kterému se má příkaz odeslat."
+        },
+        "effect": {
+          "name": "Efekt textu",
+          "description": "Efekt textu písně. Použije se jen spolu s pozadím."
+        },
+        "background": {
+          "name": "Pozadí",
+          "description": "Pozadí textu písně. Použije se jen spolu s efektem textu."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Styl textu písně",
+          "description": "Efekt textu a pozadí. Pouze pro MiniToo."
         }
       }
     },
