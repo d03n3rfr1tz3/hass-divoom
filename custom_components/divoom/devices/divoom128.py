@@ -226,6 +226,18 @@ class Divoom128(Divoom):
             return result
         return self.send_json({"Command": "Lyric/SetConfig", "TextEffect": int(effect), "Background": int(background)})
 
+    def show_scoreboard(self, blue=None, red=None):
+        """Show scoreboard, the app's set tool request with red and blue score"""
+        if blue == None: blue = 0
+        if isinstance(blue, str): blue = int(blue)
+        if red == None: red = 0
+        if isinstance(red, str): red = int(red)
+
+        args = [0x01, 0x01]
+        args += red.to_bytes(2, byteorder='little')
+        args += blue.to_bytes(2, byteorder='little')
+        return self.send_command("set tool", args)
+
     def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None, volumes=None):
         """Show sleep mode, the app's WhiteNoise/Set request with one volume per sound.
         Without its own volume, the slot picked by sleepmode gets volume. Color,

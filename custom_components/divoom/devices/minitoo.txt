@@ -40,6 +40,13 @@ data:
   device: YOUR_DIVOOM_DEVICE
   number: 2
 
+# activate scoreboard with some scores
+action: divoom.scoreboard
+data:
+  device: YOUR_DIVOOM_DEVICE
+  player1: 2
+  player2: 1
+
 # activate channel 'lyrics'
 action: divoom.lyrics
 data:
