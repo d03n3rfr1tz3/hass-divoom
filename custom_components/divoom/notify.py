@@ -324,7 +324,7 @@ class DivoomNotificationService(BaseNotificationService):
         with self._lock:
             if mode != "connect" and mode != "disconnect":
                 skipPing = True if mode == "gamecontrol" or mode == "raw" else False
-                self._device.reconnect(skipPing=skipPing)
+                if not self._device.reconnect(skipPing=skipPing): return False
 
             if mode == "connect":
                 self._device.connect()

@@ -259,6 +259,18 @@ def test_send_message_other_modes_reconnect_first():
     service._device.send_on.assert_called_once_with()
 
 
+def test_call_mode_stops_when_reconnect_gives_up():
+    """A mode used to be sent onto a dead connection after reconnect() gave
+    up, and the service still reported success."""
+    service = make_mocked_service()
+    service._device.reconnect.return_value = False
+
+    result = service.call_mode("clock", {})
+
+    assert result is False
+    service._device.show_clock.assert_not_called()
+
+
 def test_send_message_invalid_mode_logs_and_returns_false():
     service = make_mocked_service()
 
@@ -301,6 +313,7 @@ def test_send_message_serializes_concurrent_calls_to_same_device():
         release_first_call.wait(timeout=2)
         with state_lock:
             active -= 1
+        return True
 
     service._device.reconnect.side_effect = reconnect
 
@@ -344,6 +357,7 @@ def test_send_message_different_devices_do_not_block_each_other():
     def reconnect_a(skipPing=False):
         a_entered.set()
         release_a.wait(timeout=2)
+        return True
 
     service_a._device.reconnect.side_effect = reconnect_a
 

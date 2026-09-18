@@ -21,13 +21,14 @@ class Divoom128(Divoom):
     """Class Divoom128 encapsulates the 128x128 LCD Bluetooth communication."""
 
     maxframes = 92 # frame limit of the app editor
+    proxypacing = True # resend requests only work while the device keeps up
     MEDIA_WINDOW_LOG = 17
     REQUEST_MARK = b"\x04\x8b\x55"
 
     def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.screensize = 128
         self.chunksize = 256
-        self.resendwindow = 0.5
+        self.resendwindow = 1.0 if host else 0.5
         self.colorpalette = None
         if escapePayload == None: escapePayload = False
         Divoom.__init__(self, host, mac, port, escapePayload, logger)

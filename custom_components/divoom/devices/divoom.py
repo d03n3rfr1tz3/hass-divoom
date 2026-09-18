@@ -59,6 +59,7 @@ class Divoom:
 
     escapePayload = False
     senddelay = 0.015
+    proxypacing = False
     maxframes = 60
     host = None
     mac = None
@@ -131,6 +132,7 @@ class Divoom:
                     self.socket.connect((self.mac, self.port))
                 else:
                     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+                    if self.proxypacing: self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     self.socket.connect((self.host, 7777))
 
                 self.socket.settimeout(3)
@@ -176,41 +178,45 @@ class Divoom:
             self.socket = None
 
     def reconnect(self, skipPing=None):
-        """Reconnects the connection to the Divoom device, if needed."""
+        """Reconnects the connection to the Divoom device, if needed. Returns False after giving up."""
 
-        try:
-            if (self.socket == None):
-                self.connect()
-                time.sleep(0.5)
-
-            if skipPing != True:
-                ping = self.send_ping()
-                if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x69):
+        retries = 0
+        while True:
+            fresh = self.socket == None
+            try:
+                if fresh:
+                    self.connect()
                     time.sleep(0.5)
-                    ping = self.send_ping()
-                if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x69):
-                    time.sleep(1)
-                    ping = self.send_ping()
-                if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x96):
-                    self.socket_errno = 696
-        except socket.error as error:
-            self.socket_errno = error.errno
-        except IOError as error:
-            if error.errno == errno.EPIPE:
-                self.socket_errno = error.errno
 
-        retries = 1
-        while self.socket_errno != None and self.socket_errno > 0 and retries <= 5:
+                if skipPing != True:
+                    timeout = 0.2 if self.host == None else 10 if fresh else 2
+                    ping = self.send_ping(timeout)
+                    if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x69):
+                        time.sleep(0.5)
+                        ping = self.send_ping(timeout)
+                    if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x69):
+                        time.sleep(1)
+                        ping = self.send_ping(timeout)
+                    if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x96):
+                        self.socket_errno = 696
+            except socket.error as error:
+                self.socket_errno = error.errno
+            except IOError as error:
+                if error.errno == errno.EPIPE:
+                    self.socket_errno = error.errno
+
+            if self.socket_errno == None or self.socket_errno <= 0:
+                return True
+            if retries >= 5:
+                self.logger.error("{0}: giving up after {2} attempts (errno = {1}).".format(self.type, self.socket_errno, retries))
+                return False
+
+            retries += 1
             self.logger.warning("{0}: connection lost (errno = {1}). Trying to reconnect for the {2} time.".format(self.type, self.socket_errno, retries))
             if retries > 1:
                 time.sleep(1 * retries)
 
             self.disconnect()
-            self.connect()
-            retries += 1
-
-        if self.socket_errno != None and self.socket_errno > 0:
-            self.logger.error("{0}: giving up after {2} attempts (errno = {1}).".format(self.type, self.socket_errno, retries - 1))
 
     def receive(self, num_bytes=1024, timeout=0.2):
         """Receive n bytes of data from the Divoom device and put it in the input buffer. Returns the number of bytes received."""
@@ -244,9 +250,9 @@ class Divoom:
                 self.socket_errno = error.errno
             raise
 
-    def send_command(self, command, args=None, skipRead=None):
+    def send_command(self, command, args=None, skipRead=None, timeout=0.2):
         """Send command with optional arguments"""
-        if (self.socket == None): return
+        if (self.socket == None): return 0
 
         if args is None:
             args = []
@@ -257,15 +263,15 @@ class Divoom:
         payload += length.to_bytes(2, byteorder='little')
         payload += [command]
         payload += args
-        return self.send_payload(payload, skipRead=skipRead)
+        return self.send_payload(payload, skipRead=skipRead, timeout=timeout)
 
-    def send_payload(self, payload, skipRead=None):
+    def send_payload(self, payload, skipRead=None, timeout=0.2):
         """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
         if (self.socket == None): return 0
 
         result = 0
         request = self.make_message(payload)
-        ready = select.select([], [self.socket], [], 0.1)
+        ready = select.select([], [self.socket], [], 0.1 if self.host == None else 3)
         if ready[1]:
             try:
                 self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
@@ -283,9 +289,9 @@ class Divoom:
             self.logger.warning("{0}: socket not writable, dropping payload".format(self.type))
             return result
 
-        if self.senddelay: time.sleep(self.senddelay)
+        if self.senddelay and (self.host == None or self.proxypacing): time.sleep(self.senddelay)
         if skipRead == False or (skipRead == None and self.logger.isEnabledFor(logging.DEBUG)):
-            ready = select.select([self.socket], [], [], 0.2)
+            ready = select.select([self.socket], [], [], timeout)
             if ready[0]:
                 response = self.socket.recv(1024)
                 self.logger.debug("{0} PAYLOAD IN: {1}".format(self.type, ' '.join([hex(b) for b in response])))
@@ -560,9 +566,10 @@ class Divoom:
 
         return list(result)
 
-    def send_ping(self):
+    def send_ping(self, timeout=0.2):
         """Send a ping (actually it's requesting current view) to the Divoom device to check connectivity"""
-        return self.send_command("get view", [], skipRead=False)
+        if self.host != None: self.clear_input_buffer(0)
+        return self.send_command("get view", [], skipRead=False, timeout=timeout)
     
     def send_on(self):
         """Sets the display on of the Divoom device"""
@@ -977,9 +984,9 @@ class Divoom:
             self.send_command("set temp type", [0x01 if unit == 1 else 0x00])
         return result
 
-    def clear_input_buffer(self):
+    def clear_input_buffer(self, timeout=0.2):
         """Read all input from Divoom device and remove from buffer. """
-        while self.receive() > 0:
+        while self.receive(timeout=timeout) > 0:
             self.drop_message_buffer()
 
     def clear_input_buffer_quick(self):
