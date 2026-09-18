@@ -261,7 +261,7 @@ class Divoom:
 
     def send_payload(self, payload, skipRead=None):
         """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
-        if (self.socket == None): return
+        if (self.socket == None): return 0
 
         result = 0
         request = self.make_message(payload)
