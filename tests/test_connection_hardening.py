@@ -394,44 +394,6 @@ def test_send_payload_paces_a_128_device_via_proxy(monkeypatch):
     assert slept == [0.015, 0.015]
 
 
-class _OptionRecordingSocket:
-    """Records setsockopt(); a socketpair is AF_UNIX on Linux and would
-    reject TCP options."""
-
-    def __init__(self):
-        self.options = []
-
-    def setsockopt(self, level, option, value):
-        self.options.append((level, option, value))
-
-    def connect(self, addr):
-        pass
-
-    def settimeout(self, *_args, **_kwargs):
-        pass
-
-    def sendall(self, data):
-        pass
-
-    def close(self):
-        pass
-
-
-@pytest.mark.parametrize(
-    ("device_cls", "expected"),
-    [(MiniToo, [(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)]), (Pixoo, [])],
-)
-def test_connect_disables_nagle_only_for_proxy_pacing(monkeypatch, device_cls, expected):
-    """Nagle would bundle the paced chunks again; the 16/32 burst keeps it."""
-    fake = _OptionRecordingSocket()
-    monkeypatch.setattr(divoom_module.socket, "socket", lambda *a, **kw: fake)
-    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
-
-    device_cls(host="10.0.0.5", mac="11:22:33:44:55:66").connect()
-
-    assert fake.options == expected
-
-
 @pytest.mark.parametrize(("host", "expected"), [(None, [0.1]), ("10.0.0.5", [3])])
 def test_send_payload_waits_for_the_proxy_to_take_more(monkeypatch, host, expected):
     """A proxy pushing back used to get the message dropped after 0.1s."""

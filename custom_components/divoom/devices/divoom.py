@@ -132,7 +132,6 @@ class Divoom:
                     self.socket.connect((self.mac, self.port))
                 else:
                     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-                    if self.proxypacing: self.socket.setsockopt(socket.IPPROTO_TCP, socket.TCP_NODELAY, 1)
                     self.socket.connect((self.host, 7777))
 
                 self.socket.settimeout(3)
