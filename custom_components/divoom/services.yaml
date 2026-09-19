@@ -5,38 +5,51 @@ clock:
       example: divoom_ditoo
       selector:
         text:
-    clock:
-      required: true
-      example: 1
-      selector:
-        number:
-          min: 0
-          max: 15
-          mode: box
-    twentyfour:
-      example: true
-      selector:
-        boolean:
-    weather:
-      example: false
-      selector:
-        boolean:
-    temp:
-      example: false
-      selector:
-        boolean:
-    calendar:
-      example: true
-      selector:
-        boolean:
-    color:
-      example: [250, 0, 0]
-      selector:
-        color_rgb:
-    hot:
-      example: false
-      selector:
-        boolean:
+    classic:
+      collapsed: false
+      fields:
+        clock:
+          required: false
+          example: 1
+          selector:
+            number:
+              min: 0
+              max: 15
+              mode: box
+        twentyfour:
+          example: true
+          selector:
+            boolean:
+        weather:
+          example: false
+          selector:
+            boolean:
+        temp:
+          example: false
+          selector:
+            boolean:
+        calendar:
+          example: true
+          selector:
+            boolean:
+        color:
+          example: [250, 0, 0]
+          selector:
+            color_rgb:
+        hot:
+          example: false
+          selector:
+            boolean:
+    catalog:
+      collapsed: false
+      fields:
+        clock_id:
+          required: false
+          example: 848
+          selector:
+            number:
+              min: 0
+              mode: box
 
 light:
   fields:
@@ -440,6 +453,73 @@ sleep:
           max: 100
           unit_of_measurement: "%"
           mode: slider
+    whitenoise:
+      collapsed: true
+      fields:
+        volume1:
+          example: 40
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+              mode: slider
+        volume2:
+          example: 40
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+              mode: slider
+        volume3:
+          example: 40
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+              mode: slider
+        volume4:
+          example: 40
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+              mode: slider
+        volume5:
+          example: 40
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+              mode: slider
+        volume6:
+          example: 40
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+              mode: slider
+        volume7:
+          example: 40
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+              mode: slider
+        volume8:
+          example: 40
+          selector:
+            number:
+              min: 0
+              max: 100
+              unit_of_measurement: "%"
+              mode: slider
 
 datetime:
   fields:
@@ -553,6 +633,23 @@ lyrics:
       example: divoom_ditoo
       selector:
         text:
+    style:
+      collapsed: false
+      fields:
+        effect:
+          example: 1
+          selector:
+            number:
+              min: 0
+              max: 5
+              mode: box
+        background:
+          example: 16
+          selector:
+            number:
+              min: 0
+              max: 20
+              mode: box
 
 keyboard:
   fields:

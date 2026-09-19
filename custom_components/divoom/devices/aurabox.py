@@ -4,6 +4,8 @@ from .divoom import Divoom
 
 class Aurabox(Divoom):
     """Class Aurabox encapsulates the Aurabox Bluetooth communication."""
+    maxframes = 12
+
     def __init__(self, host=None, mac=None, port=1, escapePayload=True, logger=None):
         self.type = "Aurabox"
         self.screensize = 10
@@ -84,7 +86,7 @@ class Aurabox(Divoom):
             args += (0).to_bytes(1, byteorder='big')
         return self.send_command("set lightness", args, skipRead=True)
 
-    def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
+    def show_clock(self, clock=None, clock_id=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""
         if twentyfour == None: twentyfour = True
 
@@ -150,7 +152,7 @@ class Aurabox(Divoom):
         
         return result
 
-    def show_lyrics(self):
+    def show_lyrics(self, effect=None, background=None):
         self.unsupported("lyrics view")
 
     def show_noise(self, value=None):
@@ -159,7 +161,7 @@ class Aurabox(Divoom):
     def show_scoreboard(self, blue=None, red=None):
         self.unsupported("scoreboard view")
 
-    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None, volumes=None):
         """Show sleep mode on the Divoom device and optionally sets mode, time"""
         if sleeptime == None: sleeptime = 90
         if sleepmode == None: sleepmode = 0

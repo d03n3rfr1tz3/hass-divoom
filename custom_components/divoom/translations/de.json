@@ -130,6 +130,10 @@
           "name": "Uhren-Stil",
           "description": "Der anzuzeigende Uhren-Stil als Zahl ab 0 bis zu dem, was das Divoom-Gerät unterstützt. Die verfügbaren Stile sind in der offiziellen Divoom-App zu sehen."
         },
+        "clock_id": {
+          "name": "Uhren-ID",
+          "description": "Wählt eine bestimmte Uhr über ihre ID, so wie es die Divoom-App tut. Nur der MiniToo, der Tiivoo 2 und der FlowToo verstehen das, andere Geräte ignorieren es. Wähle eine Uhr aus der Liste oder gib eine beliebige ID ein."
+        },
         "twentyfour": {
           "name": "24-Stunden-Format",
           "description": "Zeigt die Uhrzeit im 24-Stunden- statt im 12-Stunden-Format an."
@@ -153,6 +157,16 @@
         "hot": {
           "name": "Beliebte Bilder anzeigen",
           "description": "Zeigt nacheinander die beliebten Bilder der Divoom-Community an."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Uhrstil",
+          "description": "Für alle Geräte außer dem MiniToo, dem Tiivoo 2 und dem FlowToo."
+        },
+        "catalog": {
+          "name": "Uhren-Katalog",
+          "description": "Wählt eine Uhr über ihre ID. Nur für den MiniToo, den Tiivoo 2 und den FlowToo."
         }
       }
     },
@@ -487,6 +501,44 @@
         "brightness": {
           "name": "Helligkeit",
           "description": "Der Helligkeitswert zwischen 0 und 100."
+        },
+        "volume1": {
+          "name": "Lautstärke Geräusch 1",
+          "description": "Die Lautstärke von Geräusch 1 zwischen 0 und 100."
+        },
+        "volume2": {
+          "name": "Lautstärke Geräusch 2",
+          "description": "Die Lautstärke von Geräusch 2 zwischen 0 und 100."
+        },
+        "volume3": {
+          "name": "Lautstärke Geräusch 3",
+          "description": "Die Lautstärke von Geräusch 3 zwischen 0 und 100."
+        },
+        "volume4": {
+          "name": "Lautstärke Geräusch 4",
+          "description": "Die Lautstärke von Geräusch 4 zwischen 0 und 100."
+        },
+        "volume5": {
+          "name": "Lautstärke Geräusch 5",
+          "description": "Die Lautstärke von Geräusch 5 zwischen 0 und 100."
+        },
+        "volume6": {
+          "name": "Lautstärke Geräusch 6",
+          "description": "Die Lautstärke von Geräusch 6 zwischen 0 und 100."
+        },
+        "volume7": {
+          "name": "Lautstärke Geräusch 7",
+          "description": "Die Lautstärke von Geräusch 7 zwischen 0 und 100."
+        },
+        "volume8": {
+          "name": "Lautstärke Geräusch 8",
+          "description": "Die Lautstärke von Geräusch 8 zwischen 0 und 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "White Noise",
+          "description": "Eine Lautstärke pro Geräusch. Nur für den MiniToo und den Tiivoo 2."
         }
       }
     },
@@ -583,6 +635,20 @@
         "device": {
           "name": "Gerät",
           "description": "Das Divoom-Gerät, an das gesendet werden soll."
+        },
+        "effect": {
+          "name": "Texteffekt",
+          "description": "Der Texteffekt der Songtexte. Wirkt nur zusammen mit dem Hintergrund."
+        },
+        "background": {
+          "name": "Hintergrund",
+          "description": "Der Hintergrund der Songtexte. Wirkt nur zusammen mit dem Texteffekt."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Songtext-Stil",
+          "description": "Texteffekt und Hintergrund. Nur für den MiniToo und den Tiivoo 2."
         }
       }
     },

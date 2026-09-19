@@ -61,14 +61,23 @@ async def test_user_step_with_known_mac_creates_entry(hass):
     await hass.async_block_till_done()
 
 
-async def test_zeroconf_step_with_properties_creates_entry(hass):
+@pytest.mark.parametrize(
+    ("device_name", "device_type"),
+    [
+        ("Pixoo-573A", "pixoo"),
+        ("Divoom MiniToo-App", "minitoo"),
+        ("Divoom Tiivoo 2-Light", "tiivoo2"),
+        ("Divoom FlowToo-App", "flowtoo"),
+    ],
+)
+async def test_zeroconf_step_with_properties_creates_entry(hass, device_name, device_type):
     """Happy path: zeroconf discovery info carries both properties, so the
     device type and name are auto-detected from the mDNS name."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_ZEROCONF},
         data=make_zeroconf_info(
-            {"device_mac": "11:22:33:44:55:66", "device_name": "Pixoo-573A"}
+            {"device_mac": "11:22:33:44:55:66", "device_name": device_name}
         ),
     )
     assert result["type"] == FlowResultType.FORM
@@ -79,14 +88,14 @@ async def test_zeroconf_step_with_properties_creates_entry(hass):
     )
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "device_type"
-    # auto-detected from the "Pixoo-573A" name prefix
+    # auto-detected from the advertised name prefix
     device_type_key = next(
         key for key in result["data_schema"].schema if key == CONF_DEVICE_TYPE
     )
-    assert device_type_key.default() == "pixoo"
+    assert device_type_key.default() == device_type
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_DEVICE_TYPE: "pixoo"}
+        result["flow_id"], {CONF_DEVICE_TYPE: device_type}
     )
 
     result = await hass.config_entries.flow.async_configure(result["flow_id"], {})

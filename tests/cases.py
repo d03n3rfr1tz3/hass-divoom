@@ -11,25 +11,49 @@ from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.backpack import Backpack
 from custom_components.divoom.devices.ditoo import Ditoo
 from custom_components.divoom.devices.ditoomic import DitooMic
+from custom_components.divoom.devices.flowtoo import FlowToo
+from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
+from custom_components.divoom.devices.tiivoo2 import Tiivoo2
 from custom_components.divoom.devices.timebox import Timebox
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from custom_components.divoom.devices.timoo import Timoo
 from custom_components.divoom.devices.tivoo import Tivoo
+from tests.support import media_responder
 
 DEVICE_CLASSES = {
     "Aurabox": Aurabox,
     "Backpack": Backpack,
     "Ditoo": Ditoo,
     "DitooMic": DitooMic,
+    "FlowToo": FlowToo,
+    "MiniToo": MiniToo,
     "Pixoo": Pixoo,
     "PixooMax": PixooMax,
+    "Tiivoo2": Tiivoo2,
     "Timebox": Timebox,
     "TimeboxMini": TimeboxMini,
     "Timoo": Timoo,
     "Tivoo": Tivoo,
 }
+
+# Devices that answer mid-send and need a talking peer, not just a drain.
+DEVICE_RESPONDERS = {
+    "FlowToo": media_responder,
+    "MiniToo": media_responder,
+    "Tiivoo2": media_responder,
+}
+
+# Cases whose traffic is zstd-compressed and therefore not byte-stable across
+# libzstd versions; tests/test_divoom128_media.py verifies those structurally.
+MEDIA_DEVICES = {"FlowToo", "MiniToo", "Tiivoo2"}
+
+
+def is_media_case(device_type: str, case_name: str) -> bool:
+    return device_type in MEDIA_DEVICES and (
+        case_name.startswith("show_image") or case_name == "show_text"
+    )
 
 PIXELART_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "pixelart"))
 FONT_PATH = os.path.normpath(os.path.join(
@@ -51,6 +75,10 @@ FIXED_CASES = {
         clock=3, twentyfour=True, weather=True, temp=True, calendar=True,
         color=[10, 20, 30], hot=True,
     ),
+    "show_clock_id": lambda d: d.show_clock(
+        clock=3, clock_id=848, twentyfour=True, weather=True, temp=True,
+        calendar=True, color=[10, 20, 30], hot=True,
+    ),
     "show_light": lambda d: d.show_light(color=[255, 0, 128], brightness=77, power=True),
     "show_light_effect": lambda d: d.show_light(color=[255, 0, 128], brightness=77, power=True, effect=3),
     "show_effects": lambda d: d.show_effects(2),
@@ -66,6 +94,12 @@ FIXED_CASES = {
         value=True, sleeptime=45, sleepmode=1, volume=50,
         color=[9, 9, 9], brightness=60, frequency=99.5,
     ),
+    "show_sleep_volumes": lambda d: d.show_sleep(
+        value=True, sleeptime=45, sleepmode=1, volume=50,
+        volumes=[None, None, 30, None, None, None, None, 80],
+    ),
+    "show_lyrics": lambda d: d.show_lyrics(),
+    "show_lyrics_config": lambda d: d.show_lyrics(effect=3, background=17),
     "show_countdown": lambda d: d.show_countdown(value=True, countdown="00:30"),
     "show_timer": lambda d: d.show_timer(5),
     "show_noise": lambda d: d.show_noise(True),
@@ -75,7 +109,7 @@ FIXED_CASES = {
     "send_brightness": lambda d: d.send_brightness(42),
     "send_volume": lambda d: d.send_volume(60),
     "send_weather": lambda d: d.send_weather("22°C", weather=3),
-    "send_datetime": lambda d: d.send_datetime("2024-01-02T03:04:05"),
+    "send_datetime": lambda d: d.send_datetime("2024-01-02T03:04:05+00:00"),
     "send_playstate": lambda d: d.send_playstate(True),
     "send_playstate_next": lambda d: d.send_playstate("next"),
     "send_playstate_pause": lambda d: d.send_playstate("pause"),

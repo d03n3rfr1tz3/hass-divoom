@@ -45,7 +45,7 @@ class DitooMic(Divoom):
             args = [0x00]
             return self.send_command("set keyboard", args, skipRead=True)
 
-    def show_lyrics(self):
+    def show_lyrics(self, effect=None, background=None):
         """Show lyrics on the Divoom device with specific score"""
 
         args = [0x06, 0x00, 0x00, 0x00]

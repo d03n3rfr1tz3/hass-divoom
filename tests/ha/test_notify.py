@@ -47,8 +47,12 @@ def make_mocked_service(media_directory="pixelart", font_directory="fonts"):
     return service
 
 
+@pytest.mark.parametrize(
+    ("device_type", "class_name"),
+    [("pixoo", "Pixoo"), ("minitoo", "MiniToo"), ("tiivoo2", "Tiivoo2"), ("flowtoo", "FlowToo")],
+)
 async def test_async_get_service_registers_and_picks_device_class(
-    hass, _patched_device_connect
+    hass, _patched_device_connect, device_type, class_name
 ):
     """Service setup wires up the right device class for device_type,
     registers the service under its MAC in hass.data and connects in the
@@ -58,13 +62,13 @@ async def test_async_get_service_registers_and_picks_device_class(
         {
             CONF_MAC: "11:22:33:44:55:66",
             CONF_PORT: 1,
-            CONF_DEVICE_TYPE: "pixoo",
+            CONF_DEVICE_TYPE: device_type,
             CONF_MEDIA_DIR: "pixelart",
         },
     )
     await hass.async_block_till_done(wait_background_tasks=True)
 
-    assert type(service._device).__name__ == "Pixoo"
+    assert type(service._device).__name__ == class_name
     assert hass.data[DOMAIN]["loaded"]["11:22:33:44:55:66"] is service
     _patched_device_connect.assert_called_once_with()
 
@@ -255,6 +259,18 @@ def test_send_message_other_modes_reconnect_first():
     service._device.send_on.assert_called_once_with()
 
 
+def test_call_mode_stops_when_reconnect_gives_up():
+    """A mode used to be sent onto a dead connection after reconnect() gave
+    up, and the service still reported success."""
+    service = make_mocked_service()
+    service._device.reconnect.return_value = False
+
+    result = service.call_mode("clock", {})
+
+    assert result is False
+    service._device.show_clock.assert_not_called()
+
+
 def test_send_message_invalid_mode_logs_and_returns_false():
     service = make_mocked_service()
 
@@ -297,6 +313,7 @@ def test_send_message_serializes_concurrent_calls_to_same_device():
         release_first_call.wait(timeout=2)
         with state_lock:
             active -= 1
+        return True
 
     service._device.reconnect.side_effect = reconnect
 
@@ -340,6 +357,7 @@ def test_send_message_different_devices_do_not_block_each_other():
     def reconnect_a(skipPing=False):
         a_entered.set()
         release_a.wait(timeout=2)
+        return True
 
     service_a._device.reconnect.side_effect = reconnect_a
 

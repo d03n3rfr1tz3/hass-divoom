@@ -1,16 +1,22 @@
 """Unit tests for the low-level protocol helpers in devices/divoom.py.
 These freeze the CURRENT behaviour (including the checksum branch, which is
-intentional PixooMax-compatibility code - see the plan's "checksum()" note,
-not a bug to be fixed).
+intentional PixooMax-compatibility code, not a bug to be fixed).
 """
 from __future__ import annotations
 
 import os
+import random
+
+import pytest
+from PIL import Image
 
 from custom_components.divoom.devices.aurabox import Aurabox
+from custom_components.divoom.devices.ditoo import Ditoo
+from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
-from tests.support import make_connected_device
+from custom_components.divoom.devices.timeboxmini import TimeboxMini
+from tests.support import make_connected_device, solid_color, solid_gif
 
 PIXELART_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "pixelart"))
 
@@ -44,6 +50,65 @@ def test_checksum_four_byte_branch_real_pixoomax_single_frame():
     payload, _length = frames[-1]
     assert sum(payload) >= 65535
     assert len(device.checksum(payload)) == 4
+
+
+def _time_codes(frames):
+    """LE16 time code of each AA <length LE16> <time LE16> ... frame."""
+    return [int.from_bytes(bytes(payload[3:5]), "little") for payload, _ in frames]
+
+
+def test_pick_frames_spreads_evenly():
+    device = make_pixoo()
+    assert device.pick_frames(20, 10) == list(range(0, 20, 2))
+
+    picks = device.pick_frames(300, 92)
+    assert len(picks) == 92 and picks[0] == 0
+    assert {b - a for a, b in zip(picks, picks[1:])} == {3, 4}
+
+
+def test_process_image_thins_long_animation_evenly(tmp_path):
+    """Over maxframes, frames are picked evenly and each one lasts as long as
+    the frames it stands for."""
+    device = make_pixoo()
+    count = 100
+    frames, frame_count = device.process_image(solid_gif(str(tmp_path / "long.gif"), count, duration=50))
+
+    assert frame_count == len(frames) == Pixoo.maxframes
+    assert sum(_time_codes(frames)) == count * 50
+    # AA <length LE16> <time LE16> <palette flag> <color count> <r g b> ...
+    assert [tuple(payload[7:10]) for payload, _ in frames] == [
+        solid_color(i * count // frame_count) for i in range(frame_count)]
+
+
+def test_process_image_thins_animation_over_the_chunk_index(tmp_path):
+    """60 frames of 256 colors each need more than the 256 chunks a u8 index
+    can address; the animation is thinned out until they fit."""
+    rnd = random.Random(20240912)
+    images = []
+    for _ in range(60):
+        img = Image.new("P", (16, 16))
+        img.putpalette(bytes(rnd.getrandbits(8) for _ in range(768)))
+        img.putdata(rnd.sample(range(256), 256))
+        images.append(img)
+    path = str(tmp_path / "noise.gif")
+    images[0].save(path, save_all=True, append_images=images[1:], duration=100, loop=0)
+
+    device = Ditoo(mac="11:22:33:44:55:66")
+    frames, frame_count = device.process_image(path)
+
+    size = sum(length for _, length in frames)
+    assert 1 < frame_count == len(frames) < 60
+    assert size < 1 << 16 and -(-size // device.chunksize) <= 256
+    assert sum(_time_codes(frames)) == 60 * 100
+
+
+@pytest.mark.parametrize("device_cls", [Aurabox, TimeboxMini])
+def test_process_image_thins_to_twelve_frames_on_old_devices(device_cls, tmp_path):
+    device = device_cls(mac="11:22:33:44:55:66")
+    frames, frame_count = device.process_image(solid_gif(str(tmp_path / "long.gif"), 30))
+
+    assert frame_count == len(frames) == 12
+    assert sum(payload[0] for payload, _ in frames) == 30, "delay bytes in 100 ms keep the total"
 
 
 def test_process_pixels_one_bit_per_pixel():
@@ -163,6 +228,21 @@ def test_show_clock_string_clock_matches_int_clock():
         server_int.close()
 
     assert recorder_str.sent_messages == recorder_int.sent_messages
+
+
+def test_send_json_sorts_keys_and_drops_whitespace():
+    """The app serializes with fastjson's SortField, so the device only ever
+    sees alphabetically sorted, compact JSON."""
+    device, recorder, server_sock = make_connected_device(MiniToo)
+    try:
+        device.send_json({"B": "x", "A": 1})
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    body = b'{"A":1,"B":"x"}'
+    payload = list((len(body) + 3).to_bytes(2, "little")) + [0x01] + list(body)
+    assert recorder.sent_messages == [bytes(device.make_message(payload))]
 
 
 def test_send_gamecontrol_invalid_string_logs_and_sends_nothing():

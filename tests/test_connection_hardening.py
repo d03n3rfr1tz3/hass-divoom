@@ -6,13 +6,16 @@ from __future__ import annotations
 
 import errno
 import logging
+import select
 import socket
+import threading
 
 import pytest
 
 from custom_components.divoom.devices import divoom as divoom_module
+from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
-from tests.support import make_connected_device
+from tests.support import PeerSocket, _serve_forever, make_connected_device
 
 
 @pytest.fixture(autouse=True)
@@ -213,10 +216,216 @@ def test_reconnect_logs_error_after_exhausting_retries(monkeypatch, caplog):
     )
     monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
-    device.reconnect(skipPing=True)
+    result = device.reconnect(skipPing=True)
 
+    assert result is False
     assert device.socket is None
     assert "giving up after 5 attempts" in caplog.text
+
+
+def test_reconnect_pings_without_socket_after_failed_connect(monkeypatch, caplog):
+    """send_command used to return None without a socket, so the proxy
+    reply check raised TypeError on list(None)."""
+    caplog.set_level(logging.ERROR)
+    device = Pixoo(host="10.0.0.5", mac="11:22:33:44:55:66")
+    monkeypatch.setattr(
+        divoom_module.socket, "socket", lambda *a, **kw: _FailingConnectSocket()
+    )
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    result = device.reconnect()
+
+    assert result is False
+    assert device.socket is None
+    assert "giving up after 5 attempts" in caplog.text
+
+
+PROXY_BT_GONE = b"\x96"
+DEVICE_REPLY = bytes.fromhex("0104000446004e0002")
+
+
+def _answer_pings_with(reply):
+    """Responder for the peer: answers every Divoom message (the ping), but
+    not the proxy handshake, which does not end in 0x02."""
+    return lambda data: reply if data.endswith(b"\x02") else None
+
+
+def _proxy_connections(monkeypatch, *responders):
+    """socket.socket() hands out one connected pair per call, each peer
+    answering through its own responder."""
+    clients, peers = [], []
+    for responder in responders:
+        server_sock, client_sock = socket.socketpair()
+        thread = threading.Thread(target=_serve_forever, args=(server_sock, responder), daemon=True)
+        thread.start()
+        clients.append(_PassthroughSocket(client_sock))
+        peers.append(PeerSocket(server_sock, thread))
+    handout = iter(clients)
+    monkeypatch.setattr(divoom_module.socket, "socket", lambda *a, **kw: next(handout))
+    return clients, peers
+
+
+def _record_select_timeouts(monkeypatch, writes=False):
+    real_select = divoom_module.select.select
+    timeouts = []
+
+    def recording_select(rlist, wlist, xlist, timeout):
+        if wlist if writes else rlist:
+            timeouts.append(timeout)
+        return real_select(rlist, wlist, xlist, timeout)
+
+    monkeypatch.setattr(divoom_module.select, "select", recording_select)
+    return timeouts
+
+
+def test_reconnect_pings_after_rebuilding_the_connection(monkeypatch, caplog):
+    """The retry loop used to stop as soon as TCP was up again, so the next
+    command went out while the proxy had no bluetooth link and got lost."""
+    caplog.set_level(logging.WARNING)
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+    clients, peers = _proxy_connections(
+        monkeypatch, _answer_pings_with(PROXY_BT_GONE), _answer_pings_with(DEVICE_REPLY))
+    device = Pixoo(host="10.0.0.5", mac="11:22:33:44:55:66", port=1)
+    try:
+        result = device.reconnect()
+        assert device.socket is clients[1]
+    finally:
+        device.disconnect()
+        for peer in peers:
+            peer.close()
+
+    assert result is True
+    assert caplog.text.count("Trying to reconnect") == 1
+    assert "giving up" not in caplog.text
+
+
+def test_send_ping_skips_stale_replies_via_proxy():
+    """A reply to an earlier command still waiting in the socket used to be
+    taken as the ping's answer, hiding the proxy's 0x96."""
+    device, recorder, server_sock = make_connected_device(
+        Pixoo, host="10.0.0.5", responder=_answer_pings_with(PROXY_BT_GONE))
+    try:
+        server_sock.sendall(DEVICE_REPLY)
+        select.select([recorder], [], [], 1)
+        result = device.send_ping()
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert result == PROXY_BT_GONE
+
+
+def test_reconnect_ping_waits_for_the_proxy_bluetooth_connect(monkeypatch):
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+    clients, peers = _proxy_connections(monkeypatch, _answer_pings_with(DEVICE_REPLY))
+    timeouts = _record_select_timeouts(monkeypatch)
+    device = Pixoo(host="10.0.0.5", mac="11:22:33:44:55:66", port=1)
+    try:
+        device.reconnect()
+    finally:
+        device.disconnect()
+        peers[0].close()
+
+    assert timeouts == [0, 10]
+
+
+@pytest.mark.parametrize(("host", "expected"), [(None, [0.2]), ("10.0.0.5", [0, 2])])
+def test_reconnect_ping_window_on_an_open_connection(monkeypatch, host, expected):
+    device, _, server_sock = make_connected_device(
+        Pixoo, host=host, responder=_answer_pings_with(DEVICE_REPLY))
+    timeouts = _record_select_timeouts(monkeypatch)
+    try:
+        device.reconnect()
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert timeouts == expected
+
+
+def test_send_payload_paces_every_write(monkeypatch):
+    """send_payload is the one write path all devices share, so the pause
+    belongs there - once per message, after the write, and only when one
+    actually happened."""
+    slept = []
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+    device, _, server_sock = make_connected_device(Pixoo)
+    device.senddelay = 0.015
+    try:
+        device.send_command("set brightness", [50])
+        device.send_command("set brightness", [60])
+        device.send_command("set brightness", [70])
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert slept == [0.015, 0.015, 0.015]
+
+
+def test_send_payload_does_not_pace_via_proxy(monkeypatch):
+    slept = []
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+    device, _, server_sock = make_connected_device(Pixoo, host="10.0.0.5")
+    device.senddelay = 0.015
+    try:
+        device.send_command("set brightness", [50])
+        device.send_command("set brightness", [60])
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert slept == []
+
+
+def test_send_payload_paces_a_128_device_via_proxy(monkeypatch):
+    """The 128 upload listens for resend requests in a fixed window, so it
+    must not run ahead of the device through the proxy's buffers."""
+    slept = []
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+    device, _, server_sock = make_connected_device(MiniToo, host="10.0.0.5")
+    device.senddelay = 0.015
+    try:
+        device.send_command("set brightness", [50])
+        device.send_command("set brightness", [60])
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert slept == [0.015, 0.015]
+
+
+@pytest.mark.parametrize(("host", "expected"), [(None, [0.1]), ("10.0.0.5", [3])])
+def test_send_payload_waits_for_the_proxy_to_take_more(monkeypatch, host, expected):
+    """A proxy pushing back used to get the message dropped after 0.1s."""
+    device, _, server_sock = make_connected_device(Pixoo, host=host)
+    timeouts = _record_select_timeouts(monkeypatch, writes=True)
+    try:
+        device.send_command("set brightness", [50])
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert timeouts == expected
+
+
+@pytest.mark.parametrize(("host", "expected"), [(None, 0.5), ("10.0.0.5", 1.0)])
+def test_resend_window_allows_for_the_proxy_delay(host, expected):
+    assert MiniToo(host=host, mac="11:22:33:44:55:66").resendwindow == expected
+
+
+def test_send_payload_does_not_pace_a_dropped_message(monkeypatch):
+    slept = []
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+    device, _, server_sock = make_connected_device(Pixoo)
+    device.senddelay = 0.015
+    monkeypatch.setattr(divoom_module.select, "select", lambda *a, **kw: ([], [], []))
+    try:
+        device.send_command("set brightness", [50])
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert slept == []
 
 
 def test_send_payload_warns_when_socket_not_writable(monkeypatch, caplog):

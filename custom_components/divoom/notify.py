@@ -24,6 +24,7 @@ PARAM_TEXT = 'text'
 PARAM_VALUE = 'value'
 
 PARAM_CLOCK = 'clock'
+PARAM_CLOCK_ID = 'clock_id'
 PARAM_TWENTYFOUR = 'twentyfour'
 PARAM_WEATHER = 'weather'
 PARAM_TEMP = 'temp'
@@ -46,6 +47,15 @@ PARAM_FREQUENCY = 'frequency'
 PARAM_NUMBER = 'number'
 PARAM_WEEKDAY = 'weekday'
 PARAM_VOLUME = 'volume'
+PARAM_VOLUME1 = 'volume1'
+PARAM_VOLUME2 = 'volume2'
+PARAM_VOLUME3 = 'volume3'
+PARAM_VOLUME4 = 'volume4'
+PARAM_VOLUME5 = 'volume5'
+PARAM_VOLUME6 = 'volume6'
+PARAM_VOLUME7 = 'volume7'
+PARAM_VOLUME8 = 'volume8'
+PARAM_BACKGROUND = 'background'
 PARAM_SIZE = 'size'
 
 PARAM_SLEEPMODE = 'sleepmode'
@@ -211,6 +221,14 @@ class DivoomNotificationService(BaseNotificationService):
             from .devices.ditoomic import DitooMic
             self._device = DitooMic(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
+        if device_type == 'flowtoo':
+            from .devices.flowtoo import FlowToo
+            self._device = FlowToo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
+        if device_type == 'minitoo':
+            from .devices.minitoo import MiniToo
+            self._device = MiniToo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
         if device_type == 'pixoo':
             from .devices.pixoo import Pixoo
             self._device = Pixoo(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
@@ -218,6 +236,10 @@ class DivoomNotificationService(BaseNotificationService):
         if device_type == 'pixoomax':
             from .devices.pixoomax import PixooMax
             self._device = PixooMax(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
+        
+        if device_type == 'tiivoo2':
+            from .devices.tiivoo2 import Tiivoo2
+            self._device = Tiivoo2(host=host, mac=mac, port=port, escapePayload=escape_payload, logger=_LOGGER)
         
         if device_type == 'timebox':
             from .devices.timebox import Timebox
@@ -302,7 +324,7 @@ class DivoomNotificationService(BaseNotificationService):
         with self._lock:
             if mode != "connect" and mode != "disconnect":
                 skipPing = True if mode == "gamecontrol" or mode == "raw" else False
-                self._device.reconnect(skipPing=skipPing)
+                if not self._device.reconnect(skipPing=skipPing): return False
 
             if mode == "connect":
                 self._device.connect()
@@ -334,13 +356,14 @@ class DivoomNotificationService(BaseNotificationService):
 
             elif mode == "clock":
                 clock = data.get(PARAM_CLOCK)
+                clock_id = data.get(PARAM_CLOCK_ID)
                 twentyfour = data.get(PARAM_TWENTYFOUR)
                 weather = data.get(PARAM_WEATHER)
                 temp = data.get(PARAM_TEMP)
                 calendar = data.get(PARAM_CALENDAR)
                 color = data.get(PARAM_COLOR)
                 hot = data.get(PARAM_HOT)
-                self._device.show_clock(clock=clock, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
+                self._device.show_clock(clock=clock, clock_id=clock_id, twentyfour=twentyfour, weather=weather, temp=temp, calendar=calendar, color=color, hot=hot)
 
             elif mode == "countdown":
                 value = data.get(PARAM_VALUE)
@@ -397,7 +420,9 @@ class DivoomNotificationService(BaseNotificationService):
                 self._device.show_light(color=color, brightness=brightness, power=True, effect=effect)
 
             elif mode == "lyrics":
-                self._device.show_lyrics()
+                effect = data.get(PARAM_EFFECT)
+                background = data.get(PARAM_BACKGROUND)
+                self._device.show_lyrics(effect=effect, background=background)
 
             elif mode == "memorial":
                 number = data.get(PARAM_NUMBER)
@@ -443,7 +468,8 @@ class DivoomNotificationService(BaseNotificationService):
                 color = data.get(PARAM_COLOR)
                 brightness = data.get(PARAM_BRIGHTNESS)
                 frequency = data.get(PARAM_FREQUENCY)
-                self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency)
+                volumes = [data.get(param) for param in (PARAM_VOLUME1, PARAM_VOLUME2, PARAM_VOLUME3, PARAM_VOLUME4, PARAM_VOLUME5, PARAM_VOLUME6, PARAM_VOLUME7, PARAM_VOLUME8)]
+                self._device.show_sleep(sleepvalue, sleeptime, sleepmode, volume, color, brightness, frequency, volumes)
 
             elif mode == "temperature":
                 value = data.get(PARAM_TEMP) or data.get(PARAM_VALUE)

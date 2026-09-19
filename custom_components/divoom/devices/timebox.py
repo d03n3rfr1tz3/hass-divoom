@@ -18,7 +18,7 @@ class Timebox(Divoom):
     def send_keyboard(self, value=None):
         self.unsupported("changing the keyboard light")
 
-    def show_lyrics(self):
+    def show_lyrics(self, effect=None, background=None):
         """Show lyrics on the Divoom device with specific score"""
 
         args = [0x06, 0x00, 0x00, 0x00]

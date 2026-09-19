@@ -130,6 +130,10 @@
           "name": "Style d'horloge",
           "description": "Le style d'horloge à afficher, sous forme d'un nombre à partir de 0 jusqu'à la valeur maximale prise en charge par l'appareil Divoom. Consultez l'application Divoom officielle pour voir les styles disponibles."
         },
+        "clock_id": {
+          "name": "ID d'horloge",
+          "description": "Sélectionne une horloge précise par son ID, comme le fait l'application Divoom. Seuls le MiniToo, le Tiivoo 2 et le FlowToo le comprennent, les autres appareils l'ignorent. Choisissez une horloge dans la liste ou saisissez un ID."
+        },
         "twentyfour": {
           "name": "Format 24 heures",
           "description": "Affiche l'heure au format 24 heures au lieu du format 12 heures."
@@ -153,6 +157,16 @@
         "hot": {
           "name": "Afficher les images populaires",
           "description": "Fait défiler les images populaires de la communauté Divoom."
+        }
+      },
+      "sections": {
+        "classic": {
+          "name": "Style d'horloge",
+          "description": "Pour tous les appareils sauf le MiniToo, le Tiivoo 2 et le FlowToo."
+        },
+        "catalog": {
+          "name": "Catalogue d'horloges",
+          "description": "Choisit une horloge par son ID. Uniquement pour le MiniToo, le Tiivoo 2 et le FlowToo."
         }
       }
     },
@@ -487,6 +501,44 @@
         "brightness": {
           "name": "Luminosité",
           "description": "La valeur de luminosité entre 0 et 100."
+        },
+        "volume1": {
+          "name": "Volume son 1",
+          "description": "Le volume du son 1 entre 0 et 100."
+        },
+        "volume2": {
+          "name": "Volume son 2",
+          "description": "Le volume du son 2 entre 0 et 100."
+        },
+        "volume3": {
+          "name": "Volume son 3",
+          "description": "Le volume du son 3 entre 0 et 100."
+        },
+        "volume4": {
+          "name": "Volume son 4",
+          "description": "Le volume du son 4 entre 0 et 100."
+        },
+        "volume5": {
+          "name": "Volume son 5",
+          "description": "Le volume du son 5 entre 0 et 100."
+        },
+        "volume6": {
+          "name": "Volume son 6",
+          "description": "Le volume du son 6 entre 0 et 100."
+        },
+        "volume7": {
+          "name": "Volume son 7",
+          "description": "Le volume du son 7 entre 0 et 100."
+        },
+        "volume8": {
+          "name": "Volume son 8",
+          "description": "Le volume du son 8 entre 0 et 100."
+        }
+      },
+      "sections": {
+        "whitenoise": {
+          "name": "Bruit blanc",
+          "description": "Un volume par son. Uniquement pour le MiniToo et le Tiivoo 2."
         }
       }
     },
@@ -583,6 +635,20 @@
         "device": {
           "name": "Appareil",
           "description": "L'appareil Divoom auquel envoyer cette action."
+        },
+        "effect": {
+          "name": "Effet de texte",
+          "description": "L'effet de texte des paroles. Appliqué uniquement avec l'arrière-plan."
+        },
+        "background": {
+          "name": "Arrière-plan",
+          "description": "L'arrière-plan des paroles. Appliqué uniquement avec l'effet de texte."
+        }
+      },
+      "sections": {
+        "style": {
+          "name": "Style des paroles",
+          "description": "Effet de texte et arrière-plan. Uniquement pour le MiniToo et le Tiivoo 2."
         }
       }
     },

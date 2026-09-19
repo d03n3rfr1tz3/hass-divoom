@@ -12,7 +12,16 @@
       "local_name": "Divoom*"
     },
     {
+      "local_name": "FlowToo*"
+    },
+    {
+      "local_name": "MiniToo*"
+    },
+    {
       "local_name": "Pixoo*"
+    },
+    {
+      "local_name": "Tiivoo*"
     },
     {
       "local_name": "Timebox*"
@@ -31,7 +40,7 @@
   "iot_class": "local_push",
   "issue_tracker": "https://github.com/d03n3rfr1tz3/hass-divoom/issues",
   "loggers": ["divoom"],
-  "requirements": [ "pillow>=7.2.0" ],
+  "requirements": [ "pillow>=7.2.0", "zstandard>=0.21.0" ],
   "version": "1.3.1",
   "zeroconf": [
     {
@@ -55,7 +64,25 @@
     {
       "type": "_divoom_esp32._tcp.local.",
       "properties": {
+        "device_name": "flowtoo*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "device_name": "minitoo*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
         "device_name": "pixoo*"
+      }
+    },
+    {
+      "type": "_divoom_esp32._tcp.local.",
+      "properties": {
+        "device_name": "tiivoo*"
       }
     },
     {

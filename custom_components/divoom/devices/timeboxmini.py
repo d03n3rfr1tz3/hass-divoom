@@ -4,6 +4,8 @@ from .divoom import Divoom
 
 class TimeboxMini(Divoom):
     """Class TimeboxMini encapsulates the Timebox Mini Bluetooth communication."""
+    maxframes = 12
+
     def __init__(self, host=None, mac=None, port=1, escapePayload=True, logger=None):
         self.type = "TimeboxMini"
         self.screensize = 11
@@ -53,7 +55,7 @@ class TimeboxMini(Divoom):
 
         return self.send_command("set alarm", args)
 
-    def show_clock(self, clock=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
+    def show_clock(self, clock=None, clock_id=None, twentyfour=None, weather=None, temp=None, calendar=None, color=None, hot=None):
         """Show clock on the Divoom device in the color"""
         if twentyfour == None: twentyfour = True
 
@@ -108,7 +110,7 @@ class TimeboxMini(Divoom):
             args += [0x00]
         return self.send_command("set view", args)
 
-    def show_lyrics(self):
+    def show_lyrics(self, effect=None, background=None):
         self.unsupported("lyrics view")
 
     def show_noise(self, value=None):
@@ -126,7 +128,7 @@ class TimeboxMini(Divoom):
         args += blue.to_bytes(2, byteorder='little')
         return self.send_command("set view", args)
 
-    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None):
+    def show_sleep(self, value=None, sleeptime=None, sleepmode=None, volume=None, color=None, brightness=None, frequency=None, volumes=None):
         """Show sleep mode on the Divoom device and optionally sets mode, time"""
         if sleeptime == None: sleeptime = 90
         if sleepmode == None: sleepmode = 0
