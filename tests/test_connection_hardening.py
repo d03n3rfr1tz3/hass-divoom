@@ -275,7 +275,7 @@ def test_reconnect_logs_error_after_exhausting_retries(monkeypatch, caplog):
 
     assert result is False
     assert device.socket is None
-    assert "giving up after 5 attempts" in caplog.text
+    assert "giving up after 3 attempts" in caplog.text
 
 
 def test_reconnect_pings_without_socket_after_failed_connect(monkeypatch, caplog):
@@ -292,7 +292,39 @@ def test_reconnect_pings_without_socket_after_failed_connect(monkeypatch, caplog
 
     assert result is False
     assert device.socket is None
-    assert "giving up after 5 attempts" in caplog.text
+    assert "giving up after 3 attempts" in caplog.text
+
+
+def test_reconnect_waits_before_every_retry_and_stays_within_budget(monkeypatch):
+    """The backoff used to run before disconnect() and skip the first retry
+    entirely, so the loop reconnected the instant the old link went down -
+    which is what bluetooth answers with EBUSY. Six 10s connects on top of it
+    held the device lock, and an executor thread, for 77s."""
+    budgets = []
+    slept = []
+
+    class _RecordingFailingSocket:
+        def settimeout(self, value):
+            budgets.append(value)
+
+        def connect(self, addr):
+            raise OSError(errno.EHOSTDOWN, "host is down")
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(
+        divoom_module.socket, "socket", lambda *a, **kw: _RecordingFailingSocket()
+    )
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+
+    device = Pixoo(mac="11:22:33:44:55:66")
+
+    assert device.reconnect(skipPing=True) is False
+    # 0.5 settles after each attempt, 1/2/3 back off before each retry
+    assert slept == [0.5, 1, 0.5, 2, 0.5, 3, 0.5]
+    assert budgets == [10, 3, 3, 3]
+    assert sum(slept) + sum(budgets) < 30
 
 
 PROXY_BT_GONE = b"\x96"
@@ -449,11 +481,11 @@ def test_send_payload_paces_a_128_device_via_proxy(monkeypatch):
     assert slept == [0.015, 0.015]
 
 
-@pytest.mark.parametrize(("host", "expected"), [(None, [0.5]), ("10.0.0.5", [3])])
-def test_send_payload_waits_for_the_link_to_take_more(monkeypatch, host, expected):
-    """A device pushing back used to get the message dropped after 0.1s. It waits
-    longer now, but not as long as the buffering proxy: a device that stopped
-    taking bytes mid-animation has lost the transfer anyway."""
+@pytest.mark.parametrize("host", [None, "10.0.0.5"])
+def test_send_payload_waits_for_the_link_to_take_more(monkeypatch, host):
+    """A device pushing back used to get the message dropped after 0.5s on the
+    direct path - stricter than the socket's own 3s timeout, so a transfer the
+    socket would still have finished was aborted mid-animation."""
     device, _, server_sock = make_connected_device(Pixoo, host=host)
     timeouts = _record_select_timeouts(monkeypatch, writes=True)
     try:
@@ -462,7 +494,7 @@ def test_send_payload_waits_for_the_link_to_take_more(monkeypatch, host, expecte
         device.disconnect()
         server_sock.close()
 
-    assert timeouts == expected
+    assert timeouts == [3]
 
 
 @pytest.mark.parametrize(("host", "expected"), [(None, 0.5), ("10.0.0.5", 1.0)])

@@ -58,7 +58,7 @@ class Divoom:
     }
 
     escapePayload = False
-    senddelay = 0.015
+    senddelay = 0.005
     proxypacing = False
     maxframes = 60
     host = None
@@ -123,17 +123,17 @@ class Divoom:
         if unit != None: unit = 1 if unit.upper() == "F" else 0
         return number, unit
 
-    def connect(self):
+    def connect(self, timeout=10):
         """Open a connection to the Divoom device."""
         if (self.socket == None):
             try:
                 if (self.host == None):
                     self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-                    self.socket.settimeout(10)
+                    self.socket.settimeout(timeout)
                     self.socket.connect((self.mac, self.port))
                 else:
                     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
-                    self.socket.settimeout(10)
+                    self.socket.settimeout(timeout)
                     self.socket.connect((self.host, 7777))
 
                 self.socket.settimeout(3)
@@ -186,7 +186,7 @@ class Divoom:
             fresh = self.socket == None
             try:
                 if fresh:
-                    self.connect()
+                    self.connect(10 if retries == 0 else 3)
                     time.sleep(0.5)
 
                 if skipPing != True:
@@ -208,16 +208,15 @@ class Divoom:
 
             if self.socket_errno == None or self.socket_errno <= 0:
                 return True
-            if retries >= 5:
+            if retries >= 3:
                 self.logger.error("{0}: giving up after {2} attempts (errno = {1}).".format(self.type, self.socket_errno, retries))
                 return False
 
             retries += 1
             self.logger.warning("{0}: connection lost (errno = {1}). Trying to reconnect for the {2} time.".format(self.type, self.socket_errno, retries))
-            if retries > 1:
-                time.sleep(1 * retries)
 
             self.disconnect()
+            time.sleep(1 * retries)
 
     def receive(self, num_bytes=1024, timeout=0.2):
         """Receive n bytes of data from the Divoom device and put it in the input buffer. Returns the number of bytes received."""
@@ -272,7 +271,7 @@ class Divoom:
 
         result = 0
         request = self.make_message(payload)
-        ready = select.select([], [self.socket], [], 0.5 if self.host == None else 3)
+        ready = select.select([], [self.socket], [], 3)
         if ready[1]:
             try:
                 self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))

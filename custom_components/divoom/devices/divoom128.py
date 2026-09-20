@@ -21,7 +21,8 @@ class Divoom128(Divoom):
     """Class Divoom128 encapsulates the 128x128 LCD Bluetooth communication."""
 
     maxframes = 92 # frame limit of the app editor
-    proxypacing = True # resend requests only work while the device keeps up
+    senddelay = 0.015
+    proxypacing = True
     MEDIA_WINDOW_LOG = 17
     REQUEST_MARK = b"\x04\x8b\x55"
 
