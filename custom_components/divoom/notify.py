@@ -182,10 +182,14 @@ async def async_get_service(
     previous = loadedServices.get(mac)
     loadedServices[mac] = notificationService
 
+    def _reconnect() -> None:
+        with notificationService._lock:
+            if previous is not None and previous is not notificationService:
+                previous.disconnect()
+            notificationService.connect()
+
     async def _connect() -> None:
-        if previous is not None and previous is not notificationService:
-            await hass.async_add_executor_job(previous.disconnect)
-        await hass.async_add_executor_job(notificationService.connect)
+        await hass.async_add_executor_job(_reconnect)
 
     hass.async_create_background_task(_connect(), f"divoom connect {mac}")
 
@@ -275,11 +279,13 @@ class DivoomNotificationService(BaseNotificationService):
 
     def connect(self):
         with self._lock:
-            self._device.connect()
+            if self._device is not None:
+                self._device.connect()
 
     def disconnect(self):
         with self._lock:
-            self._device.disconnect()
+            if self._device is not None:
+                self._device.disconnect()
 
     def _resolve_colors(self, data):
         """Foreground and background color, either packed into a single color

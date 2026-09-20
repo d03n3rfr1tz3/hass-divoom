@@ -141,10 +141,6 @@ class Divoom:
             except socket.error as error:
                 self.socket_errno = error.errno or errno.ETIMEDOUT
                 self.socket = None
-            except IOError as error:
-                if error.errno == errno.EPIPE:
-                    self.socket_errno = error.errno
-                self.socket = None
 
         if (self.socket != None and self.host != None):
             time.sleep(0.5)
@@ -155,10 +151,6 @@ class Divoom:
                 self.socket.sendall(bytes(conn))
             except socket.error as error:
                 self.socket_errno = error.errno
-                self.socket = None
-            except IOError as error:
-                if error.errno == errno.EPIPE:
-                    self.socket_errno = error.errno
                 self.socket = None
 
     def disconnect(self):
@@ -184,6 +176,7 @@ class Divoom:
         retries = 0
         while True:
             fresh = self.socket == None
+            self.socket_errno = 0
             try:
                 if fresh:
                     self.connect(10 if retries == 0 else 3)
@@ -202,9 +195,6 @@ class Divoom:
                         self.socket_errno = 696
             except socket.error as error:
                 self.socket_errno = error.errno
-            except IOError as error:
-                if error.errno == errno.EPIPE:
-                    self.socket_errno = error.errno
 
             if self.socket_errno == None or self.socket_errno <= 0:
                 return True
@@ -230,9 +220,6 @@ class Divoom:
                 return len(data)
             except socket.error as error:
                 self.socket_errno = error.errno
-            except IOError as error:
-                if error.errno == errno.EPIPE:
-                    self.socket_errno = error.errno
         return 0
 
     def send_raw(self, data):
@@ -244,10 +231,6 @@ class Divoom:
             return len(data)
         except socket.error as error:
             self.socket_errno = error.errno
-            raise
-        except IOError as error:
-            if error.errno == errno.EPIPE:
-                self.socket_errno = error.errno
             raise
 
     def send_command(self, command, args=None, skipRead=None, timeout=0.2):
@@ -280,10 +263,6 @@ class Divoom:
             except socket.error as error:
                 self.socket_errno = error.errno
                 raise
-            except IOError as error:
-                if error.errno == errno.EPIPE:
-                    self.socket_errno = error.errno
-                raise
         else:
             self.socket_errno = 98
             self.logger.error("{0}: socket not writable, aborting".format(self.type))
@@ -293,7 +272,11 @@ class Divoom:
         if skipRead == False or (skipRead == None and self.logger.isEnabledFor(logging.DEBUG)):
             ready = select.select([self.socket], [], [], timeout)
             if ready[0]:
-                response = self.socket.recv(1024)
+                try:
+                    response = self.socket.recv(1024)
+                except socket.error as error:
+                    self.socket_errno = error.errno
+                    raise
                 self.logger.debug("{0} PAYLOAD IN: {1}".format(self.type, ' '.join([hex(b) for b in response])))
                 return response or result
     
@@ -765,13 +748,17 @@ class Divoom:
             for framePart in self.chunks(frameParts, self.chunksize):
                 frame = self.make_framepart(framePartsSize, index, framePart)
                 result = self.send_command("set animation frame", frame, skipRead=True)
+                if not result:
+                    raise OSError(errno.ENOTCONN, "{0}: transfer truncated after {1} chunks".format(self.type, index))
                 index += 1
-        
+
         elif framesCount == 1:
             """Sending as Image"""
             pair = frames[-1]
             frame = self.make_framepart(pair[1], -1, pair[0])
             result = self.send_command("set image", frame, skipRead=True)
+            if not result:
+                raise OSError(errno.ENOTCONN, "{0}: frame not sent".format(self.type))
         return result
 
     def send_keyboard(self, value=None):
@@ -923,13 +910,17 @@ class Divoom:
             for framePart in self.chunks(frameParts, self.chunksize):
                 frame = self.make_framepart(framePartsSize, index, framePart)
                 result = self.send_command("set animation frame", frame, skipRead=True)
+                if not result:
+                    raise OSError(errno.ENOTCONN, "{0}: transfer truncated after {1} chunks".format(self.type, index))
                 index += 1
-        
+
         elif framesCount == 1:
             """Sending as Image"""
             pair = frames[-1]
             frame = self.make_framepart(pair[1], -1, pair[0])
             result = self.send_command("set image", frame, skipRead=True)
+            if not result:
+                raise OSError(errno.ENOTCONN, "{0}: frame not sent".format(self.type))
         return result
 
     def show_timer(self, value=None):

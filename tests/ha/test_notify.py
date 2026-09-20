@@ -397,3 +397,19 @@ def test_send_message_different_devices_do_not_block_each_other():
     finally:
         release_a.set()
         thread_a.join(timeout=2)
+
+
+def test_connect_and_disconnect_survive_an_unknown_device_type(caplog):
+    """__init__ leaves _device as None for a device_type it does not know and
+    only logs. connect()/disconnect() went on to dereference it anyway, so a
+    typo in the config turned into an AttributeError on every call."""
+    with caplog.at_level(logging.ERROR):
+        service = DivoomNotificationService(
+            None, "11:22:33:44:55:66", 1, "nonexistent", "pixelart", "fonts", False
+        )
+
+    assert service._device is None
+    assert "does not exist" in caplog.text
+
+    service.connect()
+    service.disconnect()

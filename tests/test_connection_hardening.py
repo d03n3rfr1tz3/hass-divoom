@@ -558,3 +558,46 @@ def test_show_image_stops_after_an_undeliverable_chunk(monkeypatch):
         server_sock.close()
 
     assert len(recorder.sent_messages) == 2
+
+
+def test_show_image_reports_a_link_that_went_away_mid_transfer():
+    """A socket that disappears mid-animation used to make every remaining
+    send_command() return 0 silently, so a transfer that put a fraction of the
+    chunks on the wire still reported success all the way up to a green button."""
+    device, recorder, server_sock = make_connected_device(Pixoo)
+    real_sendall = recorder.sendall
+
+    def sendall(data):
+        real_sendall(data)
+        if len(recorder.sent_messages) == 2:
+            device.socket = None # what a concurrent disconnect() does
+
+    recorder.sendall = sendall
+    try:
+        with pytest.raises(OSError) as excinfo:
+            device.show_image(os.path.join(PIXELART_DIR, "ha16.gif"))
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert excinfo.value.errno == errno.ENOTCONN
+    assert "truncated after 2 chunks" in str(excinfo.value)
+    assert len(recorder.sent_messages) == 2
+
+
+def test_reconnect_ignores_an_errno_from_an_earlier_failure(caplog):
+    """socket_errno was only ever cleared by a successful connect(), never by a
+    successful ping, so one recorded error tore down every healthy link after it."""
+    device, recorder, server_sock = make_connected_device(Pixoo)
+    socket_before = device.socket
+    device.socket_errno = errno.ECONNRESET # left over from an earlier call
+    try:
+        with caplog.at_level(logging.WARNING):
+            result = device.reconnect(skipPing=True)
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert result is True
+    assert socket_before is recorder
+    assert "connection lost" not in caplog.text
