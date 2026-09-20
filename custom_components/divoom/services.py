@@ -347,6 +347,13 @@ def _make_handler(mode: str):
                 translation_key="mode_unsupported",
                 translation_placeholders={"device": err.device, "mode": mode},
             ) from err
+        except OSError as err:
+            _LOGGER.exception("the %s action lost the connection", mode)
+            raise HomeAssistantError(
+                translation_domain=DOMAIN,
+                translation_key="mode_failed",
+                translation_placeholders={"mode": mode},
+            ) from err
 
         if not result:
             raise HomeAssistantError(

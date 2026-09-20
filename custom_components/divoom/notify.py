@@ -179,9 +179,12 @@ async def async_get_service(
     domainConfig.setdefault('loaded', {})
 
     loadedServices = domainConfig.get('loaded')
+    previous = loadedServices.get(mac)
     loadedServices[mac] = notificationService
-    
+
     async def _connect() -> None:
+        if previous is not None and previous is not notificationService:
+            await hass.async_add_executor_job(previous.disconnect)
         await hass.async_add_executor_job(notificationService.connect)
 
     hass.async_create_background_task(_connect(), f"divoom connect {mac}")
@@ -319,6 +322,9 @@ class DivoomNotificationService(BaseNotificationService):
         except DivoomUnsupportedError:
             if not continue_on_error: raise
             return True # the device already logged the warning, the legacy path stays quiet
+        except OSError:
+            self.disconnect()
+            raise
 
     def _call_mode(self, mode, data):
         with self._lock:

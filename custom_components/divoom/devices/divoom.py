@@ -129,15 +129,17 @@ class Divoom:
             try:
                 if (self.host == None):
                     self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+                    self.socket.settimeout(10)
                     self.socket.connect((self.mac, self.port))
                 else:
                     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+                    self.socket.settimeout(10)
                     self.socket.connect((self.host, 7777))
 
                 self.socket.settimeout(3)
                 self.socket_errno = 0
             except socket.error as error:
-                self.socket_errno = error.errno
+                self.socket_errno = error.errno or errno.ETIMEDOUT
                 self.socket = None
             except IOError as error:
                 if error.errno == errno.EPIPE:
@@ -270,7 +272,7 @@ class Divoom:
 
         result = 0
         request = self.make_message(payload)
-        ready = select.select([], [self.socket], [], 0.1 if self.host == None else 3)
+        ready = select.select([], [self.socket], [], 0.5 if self.host == None else 3)
         if ready[1]:
             try:
                 self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
@@ -285,8 +287,8 @@ class Divoom:
                 raise
         else:
             self.socket_errno = 98
-            self.logger.warning("{0}: socket not writable, dropping payload".format(self.type))
-            return result
+            self.logger.error("{0}: socket not writable, aborting".format(self.type))
+            raise TimeoutError("{0}: socket not writable".format(self.type))
 
         if self.senddelay and (self.host == None or self.proxypacing): time.sleep(self.senddelay)
         if skipRead == False or (skipRead == None and self.logger.isEnabledFor(logging.DEBUG)):

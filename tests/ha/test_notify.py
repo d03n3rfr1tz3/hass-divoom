@@ -73,6 +73,27 @@ async def test_async_get_service_registers_and_picks_device_class(
     _patched_device_connect.assert_called_once_with()
 
 
+async def test_async_get_service_replaces_a_previous_instance(hass, _patched_device_connect):
+    """The device accepts a single connection, so a reload used to leave the
+    old socket open until garbage collection got round to it and the new
+    connect() ran into the reconnect retries instead."""
+    config = {
+        CONF_MAC: "11:22:33:44:55:66",
+        CONF_PORT: 1,
+        CONF_DEVICE_TYPE: "pixoo",
+        CONF_MEDIA_DIR: "pixelart",
+    }
+    first = await async_get_service(hass, dict(config))
+    await hass.async_block_till_done(wait_background_tasks=True)
+    first.disconnect = Mock()
+
+    second = await async_get_service(hass, dict(config))
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    assert hass.data[DOMAIN]["loaded"]["11:22:33:44:55:66"] is second
+    first.disconnect.assert_called_once_with()
+
+
 async def test_async_get_service_invalid_device_type_logs_device_type(hass, caplog):
     """The error message used to format media_directory into the
     "device_type {0} does not exist" string instead of device_type itself."""

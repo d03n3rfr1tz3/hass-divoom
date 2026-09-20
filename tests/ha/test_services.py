@@ -880,6 +880,22 @@ async def test_unsupported_mode_raises_a_translated_error(hass):
     assert error.value.translation_placeholders == {"device": "Pixoo", "mode": "radio"}
 
 
+async def test_connection_loss_raises_a_translated_error(hass):
+    """A raw OSError is not a HomeAssistantError, so continue_on_error cannot
+    swallow it and the whole script aborts on a flaky link."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    entry, service = register_device(hass)
+    service._device.show_light.side_effect = TimeoutError("Pixoo: socket not writable")
+
+    with pytest.raises(HomeAssistantError) as error:
+        await hass.services.async_call(
+            DOMAIN, "light", {CONF_DEVICE: device_slug(entry), "brightness": 50}, blocking=True
+        )
+
+    assert error.value.translation_key == "mode_failed"
+    assert error.value.translation_placeholders == {"mode": "light"}
+
+
 def test_notify_path_continues_on_unsupported_modes():
     """Backwards compatibility: notify.<device> behaved like this before the
     services existed and must keep doing so."""
@@ -887,6 +903,25 @@ def test_notify_path_continues_on_unsupported_modes():
     service._device.show_radio.side_effect = DivoomUnsupportedError("Pixoo", "showing the radio")
 
     assert service.send_message("radio", data={"value": True}) is True
+
+
+def test_call_mode_drops_the_connection_on_a_send_error():
+    """Half a chunked animation went out, so the device is out of step. Leaving
+    the socket open only sent the next call through the reconnect retry loop."""
+    service = make_mocked_service()
+    service._device.show_light.side_effect = TimeoutError("Pixoo: socket not writable")
+
+    with pytest.raises(TimeoutError):
+        service.call_mode("light", {})
+
+    assert service._device.disconnect.called
+
+    # the legacy opt-out covers unsupported modes only, not a broken link
+    service._device.disconnect.reset_mock()
+    with pytest.raises(TimeoutError):
+        service.call_mode("light", {}, continue_on_error=True)
+
+    assert service._device.disconnect.called
 
 
 def test_call_mode_raises_without_continue_on_error():

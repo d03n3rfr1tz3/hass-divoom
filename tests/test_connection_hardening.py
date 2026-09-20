@@ -6,6 +6,7 @@ from __future__ import annotations
 
 import errno
 import logging
+import os
 import select
 import socket
 import threading
@@ -15,6 +16,7 @@ import pytest
 from custom_components.divoom.devices import divoom as divoom_module
 from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
+from tests.cases import PIXELART_DIR
 from tests.support import PeerSocket, _serve_forever, make_connected_device
 
 
@@ -148,6 +150,59 @@ def test_connect_clears_socket_after_connection_failure(monkeypatch):
 
     assert device.socket is None
     assert device.socket_errno == errno.ECONNREFUSED
+
+
+def test_connect_bounds_the_connect_itself(monkeypatch):
+    """settimeout() ran only after connect() returned, so a bluetooth connect
+    that never got answered held the executor thread and the device lock for
+    as long as the OS cared to wait."""
+    calls = []
+
+    class _RecordingSocket:
+        def settimeout(self, value):
+            calls.append(("settimeout", value))
+
+        def connect(self, addr):
+            calls.append(("connect", addr))
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(divoom_module.socket, "socket", lambda *a, **kw: _RecordingSocket())
+
+    device = Pixoo(mac="11:22:33:44:55:66")
+    device.connect()
+
+    assert calls == [
+        ("settimeout", 10),
+        ("connect", ("11:22:33:44:55:66", 1)),
+        ("settimeout", 3),
+    ]
+
+
+def test_connect_timeout_is_recorded_as_a_failure(monkeypatch):
+    """A timed out connect raises TimeoutError carrying no errno, and
+    reconnect() reads a missing errno as "nothing wrong" — so the bounded
+    connect would have reported success while leaving no socket behind."""
+
+    class _TimingOutSocket:
+        def settimeout(self, value):
+            pass
+
+        def connect(self, addr):
+            raise TimeoutError("timed out")
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(divoom_module.socket, "socket", lambda *a, **kw: _TimingOutSocket())
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    device = Pixoo(mac="11:22:33:44:55:66")
+
+    assert device.reconnect() is False
+    assert device.socket is None
+    assert device.socket_errno == errno.ETIMEDOUT
 
 
 def test_connect_and_disconnect_host_mode_send_expected_handshake_bytes(monkeypatch):
@@ -394,9 +449,11 @@ def test_send_payload_paces_a_128_device_via_proxy(monkeypatch):
     assert slept == [0.015, 0.015]
 
 
-@pytest.mark.parametrize(("host", "expected"), [(None, [0.1]), ("10.0.0.5", [3])])
-def test_send_payload_waits_for_the_proxy_to_take_more(monkeypatch, host, expected):
-    """A proxy pushing back used to get the message dropped after 0.1s."""
+@pytest.mark.parametrize(("host", "expected"), [(None, [0.5]), ("10.0.0.5", [3])])
+def test_send_payload_waits_for_the_link_to_take_more(monkeypatch, host, expected):
+    """A device pushing back used to get the message dropped after 0.1s. It waits
+    longer now, but not as long as the buffering proxy: a device that stopped
+    taking bytes mid-animation has lost the transfer anyway."""
     device, _, server_sock = make_connected_device(Pixoo, host=host)
     timeouts = _record_select_timeouts(monkeypatch, writes=True)
     try:
@@ -413,14 +470,15 @@ def test_resend_window_allows_for_the_proxy_delay(host, expected):
     assert MiniToo(host=host, mac="11:22:33:44:55:66").resendwindow == expected
 
 
-def test_send_payload_does_not_pace_a_dropped_message(monkeypatch):
+def test_send_payload_does_not_pace_an_aborted_message(monkeypatch):
     slept = []
     monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
     device, _, server_sock = make_connected_device(Pixoo)
     device.senddelay = 0.015
     monkeypatch.setattr(divoom_module.select, "select", lambda *a, **kw: ([], [], []))
     try:
-        device.send_command("set brightness", [50])
+        with pytest.raises(TimeoutError):
+            device.send_command("set brightness", [50])
     finally:
         device.disconnect()
         server_sock.close()
@@ -428,19 +486,43 @@ def test_send_payload_does_not_pace_a_dropped_message(monkeypatch):
     assert slept == []
 
 
-def test_send_payload_warns_when_socket_not_writable(monkeypatch, caplog):
-    """A full send buffer used to silently drop the message (only
-    socket_errno was set, with nothing logged)."""
-    caplog.set_level(logging.WARNING)
+def test_send_payload_aborts_when_socket_not_writable(monkeypatch, caplog):
+    """A full send buffer used to silently drop the message and carry on, which
+    left the device waiting for the rest of a chunked animation forever."""
+    caplog.set_level(logging.ERROR)
     device, recorder, server_sock = make_connected_device(Pixoo)
     monkeypatch.setattr(divoom_module.select, "select", lambda *a, **kw: ([], [], []))
     try:
-        result = device.send_command("set brightness", [50])
+        with pytest.raises(TimeoutError):
+            device.send_command("set brightness", [50])
     finally:
         device.disconnect()
         server_sock.close()
 
-    assert result == 0
     assert device.socket_errno == 98
     assert recorder.sent_messages == []
     assert "socket not writable" in caplog.text
+
+
+def test_show_image_stops_after_an_undeliverable_chunk(monkeypatch):
+    """The chunk stream carries a total size and an index, so a gap cannot be
+    recovered from. Sending the rest is wasted effort on a dead link."""
+    device, recorder, server_sock = make_connected_device(Pixoo)
+    real_select = divoom_module.select.select
+    remaining = [2] # let the first chunks out, then have the link go quiet
+
+    def stalling_select(rlist, wlist, xlist, timeout):
+        if wlist and not rlist:
+            if remaining[0] <= 0: return ([], [], [])
+            remaining[0] -= 1
+        return real_select(rlist, wlist, xlist, timeout)
+
+    monkeypatch.setattr(divoom_module.select, "select", stalling_select)
+    try:
+        with pytest.raises(TimeoutError):
+            device.show_image(os.path.join(PIXELART_DIR, "ha16.gif"))
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert len(recorder.sent_messages) == 2
