@@ -230,8 +230,7 @@ data:
 In the UI it is a dropdown listing your configured Divoom devices. Just put in the name of your configured divoom device.
 
 If your device does not support the mode you are calling, the action fails with an error telling you
-so, instead of silently doing nothing. Should you want an automation to carry on anyway, use the
-`continue_on_error: true` option that Home Assistant offers on every action.
+so, instead of silently doing nothing.
 
 ### Examples
 
