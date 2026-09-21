@@ -22,7 +22,6 @@ class Divoom128(Divoom):
 
     maxframes = 92 # frame limit of the app editor
     senddelay = 0.015
-    proxypacing = True
     MEDIA_WINDOW_LOG = 17
     REQUEST_MARK = b"\x04\x8b\x55"
 

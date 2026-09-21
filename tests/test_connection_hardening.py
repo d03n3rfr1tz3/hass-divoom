@@ -14,6 +14,8 @@ import threading
 import pytest
 
 from custom_components.divoom.devices import divoom as divoom_module
+from custom_components.divoom.devices.divoom import Divoom
+from custom_components.divoom.devices.divoom128 import Divoom128
 from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
 from tests.cases import PIXELART_DIR
@@ -449,11 +451,25 @@ def test_send_payload_paces_every_write(monkeypatch):
     assert slept == [0.015, 0.015, 0.015]
 
 
-def test_send_payload_does_not_pace_via_proxy(monkeypatch):
+def test_senddelay_defaults_are_per_device_family():
+    """Pacing only pays off where a chunk can be asked for again: Divoom128 has
+    a resend channel, the classic protocol has none, so a pause there only
+    widens the window a stall can land in. Pinned on the classes because the
+    other pacing tests set the value by hand - that is how it spread in the
+    first place."""
+    assert Divoom.senddelay == 0
+    assert Divoom128.senddelay == 0.015
+
+
+@pytest.mark.parametrize("host", [None, "10.0.0.5"])
+def test_send_payload_does_not_pace_a_classic_device(monkeypatch, host):
+    """Same on both paths - senddelay describes the device, not the transport.
+    support.py zeroes it for speed, so read it off the class to stay tied to the
+    shipped default."""
     slept = []
     monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
-    device, _, server_sock = make_connected_device(Pixoo, host="10.0.0.5")
-    device.senddelay = 0.015
+    device, _, server_sock = make_connected_device(Pixoo, host=host)
+    device.senddelay = type(device).senddelay
     try:
         device.send_command("set brightness", [50])
         device.send_command("set brightness", [60])

@@ -58,8 +58,7 @@ class Divoom:
     }
 
     escapePayload = False
-    senddelay = 0.005
-    proxypacing = False
+    senddelay = 0
     maxframes = 60
     host = None
     mac = None
@@ -268,7 +267,7 @@ class Divoom:
             self.logger.error("{0}: socket not writable, aborting".format(self.type))
             raise TimeoutError("{0}: socket not writable".format(self.type))
 
-        if self.senddelay and (self.host == None or self.proxypacing): time.sleep(self.senddelay)
+        if self.senddelay: time.sleep(self.senddelay)
         if skipRead == False or (skipRead == None and self.logger.isEnabledFor(logging.DEBUG)):
             ready = select.select([self.socket], [], [], timeout)
             if ready[0]:
