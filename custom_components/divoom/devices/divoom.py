@@ -221,16 +221,10 @@ class Divoom:
                 self.socket_errno = error.errno
         return 0
 
-    def send_raw(self, data):
-        """Send raw data to the Divoom device."""
-        if (self.socket == None): return
-
-        try:
-            self.socket.sendall(data)
-            return len(data)
-        except socket.error as error:
-            self.socket_errno = error.errno
-            raise
+    def send_raw(self, data, skipRead=None, timeout=0.2):
+        """Send a raw command to the Divoom device, data[0] being the command and the rest its arguments."""
+        if not data: return 0
+        return self.send_command(command=data[0], args=list(data[1:]), skipRead=skipRead, timeout=timeout)
 
     def send_command(self, command, args=None, skipRead=None, timeout=0.2):
         """Send command with optional arguments"""

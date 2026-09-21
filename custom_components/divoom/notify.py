@@ -460,7 +460,7 @@ class DivoomNotificationService(BaseNotificationService):
                 if not raw:
                     _LOGGER.error("Service call needs a raw command")
                     return False
-                self._device.send_command(command=raw[0], args=raw[1:])
+                self._device.send_raw(raw)
 
             elif mode == "scoreboard":
                 player1 = data.get(PARAM_PLAYER1)

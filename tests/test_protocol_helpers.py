@@ -257,6 +257,25 @@ def test_send_gamecontrol_invalid_string_logs_and_sends_nothing():
     assert recorder.sent_messages == []
 
 
+def test_send_raw_frames_the_command_like_any_other():
+    """The raw mode passes the command byte and its arguments as one list and
+    lets the device build length, checksum and envelope - which is what the
+    example in every devices/*.txt promises: [0x74, 0x64] sets brightness
+    to 100%."""
+    device_raw, recorder_raw, server_raw = make_connected_device(Pixoo)
+    device_cmd, recorder_cmd, server_cmd = make_connected_device(Pixoo)
+    try:
+        device_raw.send_raw([0x74, 0x64])
+        device_cmd.send_brightness(100)
+    finally:
+        device_raw.disconnect()
+        server_raw.close()
+        device_cmd.disconnect()
+        server_cmd.close()
+
+    assert recorder_raw.sent_messages == recorder_cmd.sent_messages
+
+
 def test_disconnect_swallows_socket_errors_and_clears_socket():
     """The bare `except:` in disconnect() used to also swallow
     BaseException subclasses like SystemExit/KeyboardInterrupt; narrowing it

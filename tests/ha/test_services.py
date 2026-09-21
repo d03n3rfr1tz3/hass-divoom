@@ -435,7 +435,7 @@ DISPATCH_CASES = [
     (
         "raw",
         {"raw": [0x74, 0x64]}, {"raw": [0x74, 0x64]},
-        "send_command", (), {"command": 0x74, "args": [0x64]},
+        "send_raw", ([0x74, 0x64],), {},
     ),
     ("connect", {}, {}, "connect", (), {}),
     ("disconnect", {}, {}, "disconnect", (), {}),
