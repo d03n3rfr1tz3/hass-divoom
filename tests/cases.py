@@ -71,6 +71,18 @@ def pixelart_files() -> list[str]:
 
 
 FIXED_CASES = {
+    "send_on": lambda d: d.send_on(),
+    "send_off": lambda d: d.send_off(),
+    "show_design": lambda d: d.show_design(),
+    "show_design_tab": lambda d: d.show_design(number=2),
+    "show_equalizer": lambda d: d.show_equalizer(
+        1, audioMode=True, backgroundMode=True, streamMode=True),
+    "show_game": lambda d: d.show_game(),
+    "show_game_value": lambda d: d.show_game(3),
+    "send_gamecontrol": lambda d: d.send_gamecontrol("left"),
+    "send_keyboard": lambda d: d.send_keyboard("next"),
+    "send_playtrack_next": lambda d: d.send_playtrack(True),
+    "send_playtrack_previous": lambda d: d.send_playtrack(False),
     "show_clock": lambda d: d.show_clock(
         clock=3, twentyfour=True, weather=True, temp=True, calendar=True,
         color=[10, 20, 30], hot=True,
