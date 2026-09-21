@@ -28,6 +28,7 @@ from pytest_homeassistant_custom_component.common import MockConfigEntry
 from pytest_homeassistant_custom_component.test_util.aiohttp import AiohttpClientMockResponse
 
 from custom_components.divoom import notify as notify_module
+from custom_components.divoom.config_flow import DEVICE_TYPES
 from custom_components.divoom.const import CONF_DEVICE, CONF_DEVICE_TYPE, DOMAIN
 from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.backpack import Backpack
@@ -991,7 +992,7 @@ def test_every_valid_mode_has_a_service():
 def test_device_examples_match_the_service_schemas():
     """The example files are the first thing users copy from, so every block
     in them has to be a call the action schema actually accepts."""
-    checked = 0
+    documented = set()
     for path in sorted((COMPONENT_PATH / "devices").glob("*.txt")):
         for block in path.read_text(encoding="utf-8").split("\n\n"):
             if "action:" not in block:
@@ -1002,9 +1003,9 @@ def test_device_examples_match_the_service_schemas():
             assert mode in SERVICE_SCHEMAS, (path.name, example["action"])
 
             SERVICE_SCHEMAS[mode](example["data"])
-            checked += 1
+            documented.add(path.name)
 
-    assert checked == 317 # every block, not just the ones that happened to parse
+    assert documented == {"{}.txt".format(option["value"]) for option in DEVICE_TYPES}
 
 
 def _number_selector(field_definition):

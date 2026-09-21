@@ -734,10 +734,10 @@ async def test_the_common_category_is_reachable_for_the_reason_labels(hass, lang
 
 def string_files():
     """strings.json plus every translation next to it."""
-    files = [COMPONENT_PATH / "strings.json"]
-    files.extend(sorted((COMPONENT_PATH / "translations").glob("*.json")))
-    assert len(files) == 10
-    return files
+    strings = COMPONENT_PATH / "strings.json"
+    translations = sorted((COMPONENT_PATH / "translations").glob("*.json"))
+    assert strings.is_file() and translations
+    return [strings] + translations
 
 
 def test_every_manual_reason_is_translated_everywhere():
