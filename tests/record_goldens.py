@@ -40,8 +40,14 @@ def record_all() -> None:
                 server_sock.close()
 
             golden_path = os.path.join(out_dir, f"{case_name}.txt")
+            golden = format_golden(recorder.sent_messages)
+            if not golden:
+                if os.path.exists(golden_path):
+                    os.remove(golden_path)
+                    print(f"removed {golden_path} (sends nothing)")
+                continue
             with open(golden_path, "w", encoding="ascii") as f:
-                f.write(format_golden(recorder.sent_messages))
+                f.write(golden)
             print(f"wrote {golden_path} ({len(recorder.sent_messages)} messages)")
 
 

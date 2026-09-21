@@ -72,13 +72,17 @@ def test_golden_master(device_type, case_name):
     device_cls = DEVICE_CLASSES[device_type]
     case_fn = dict(all_cases())[case_name]
 
-    golden_path = os.path.join(GOLDEN_DIR, device_type, f"{case_name}.txt")
-    assert os.path.exists(golden_path), (
-        f"golden file missing: {golden_path}. "
-        "Run `python tests/record_goldens.py` to generate it."
+    device_dir = os.path.join(GOLDEN_DIR, device_type)
+    assert os.path.isdir(device_dir), (
+        f"no goldens recorded for {device_type}. "
+        "Run `python tests/record_goldens.py` to generate them."
     )
-    with open(golden_path, "r", encoding="ascii") as f:
-        expected = f.read()
+
+    expected = ""
+    golden_path = os.path.join(device_dir, f"{case_name}.txt")
+    if os.path.exists(golden_path):
+        with open(golden_path, "r", encoding="ascii") as f:
+            expected = f.read()
 
     device, recorder, server_sock = make_connected_device(
         device_cls, responder=DEVICE_RESPONDERS.get(device_type))
