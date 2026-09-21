@@ -38,6 +38,58 @@ class RecordingSocket:
         return getattr(self._real, name)
 
 
+class ConnectedSocket(RecordingSocket):
+    """RecordingSocket for tests that go through connect(): the pair is already
+    connected, so connect()/settimeout() have nothing left to do."""
+
+    def connect(self, addr):
+        pass
+
+    def settimeout(self, *_args, **_kwargs):
+        pass
+
+
+class FakeSocket:
+    """Stand-in for socket.socket() itself, for tests that drive connect()
+    without a real pair behind it. Records every call in order and raises where
+    the test asks it to. Handed out for every socket.socket() call, so one
+    instance holds a whole retry sequence."""
+
+    def __init__(self, connect_error=None, send_error=None, shutdown_error=None):
+        self.calls: list[tuple] = []
+        self._errors = {"connect": connect_error, "sendall": send_error,
+                        "shutdown": shutdown_error}
+
+    def _record(self, name, *args):
+        self.calls.append((name, *args))
+        error = self._errors.get(name)
+        if error is not None:
+            raise error
+
+    def settimeout(self, value):
+        self._record("settimeout", value)
+
+    def connect(self, addr):
+        self._record("connect", addr)
+
+    def sendall(self, data, *_args, **_kwargs):
+        self._record("sendall", bytes(data))
+        return len(data)
+
+    def shutdown(self, how):
+        self._record("shutdown")
+
+    def close(self):
+        self._record("close")
+
+    @property
+    def sent_messages(self) -> list[bytes]:
+        return [args[0] for name, *args in self.calls if name == "sendall"]
+
+    def timeouts(self) -> list:
+        return [args[0] for name, *args in self.calls if name == "settimeout"]
+
+
 def media_responder(data: bytes) -> bytes | None:
     """Answer a 0x8b start packet the way a real 128x128 device does: "send the
     animation". Without it Divoom128._await_request() runs into its 2s timeout

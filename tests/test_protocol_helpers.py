@@ -16,7 +16,7 @@ from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
-from tests.support import make_connected_device, solid_color, solid_gif
+from tests.support import FakeSocket, make_connected_device, solid_color, solid_gif
 
 PIXELART_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "pixelart"))
 
@@ -263,15 +263,7 @@ def test_disconnect_swallows_socket_errors_and_clears_socket():
     to `except Exception:` must not change behaviour for ordinary socket
     errors raised from shutdown()."""
     device = Pixoo(mac="11:22:33:44:55:66")
-
-    class RaisingSocket:
-        def shutdown(self, *args, **kwargs):
-            raise OSError("shutdown failed")
-
-        def close(self):
-            pass
-
-    device.socket = RaisingSocket()
+    device.socket = FakeSocket(shutdown_error=OSError("shutdown failed"))
     device.disconnect()
 
     assert device.socket is None
