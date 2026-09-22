@@ -19,9 +19,11 @@
         "data": {
           "mac": "Dispositivo Divoom",
           "port": "Canal/Porta Bluetooth",
+          "adapter": "Adaptador Bluetooth local",
           "host": "Nome de anfitrião/IP ESP32-Divoom"
         },
         "data_description": {
+          "adapter": "Só é necessário se o Home Assistant tiver mais do que um adaptador Bluetooth, por exemplo um chip integrado e um dongle USB. Deixe este campo vazio e o sistema escolhe um adaptador por si.",
           "host": "O ESP32-Divoom é um firmware complementar opcional que atua como proxy Bluetooth Classic. Se o tiver, pode usá-lo em vez de se ligar diretamente ao seu dispositivo Divoom via Bluetooth. Se não, basta deixá-lo vazio e o Home Assistant ligar-se-á diretamente via Bluetooth."
         }
       },
@@ -47,11 +49,13 @@
         "title": "Reconfigurar dispositivo Divoom",
         "description": "Altere as definições de ligação e o tipo do seu dispositivo Divoom.",
         "data": {
+          "adapter": "Adaptador Bluetooth local",
           "host": "Nome de anfitrião/IP ESP32-Divoom",
           "port": "Canal/Porta Bluetooth",
           "device_type": "Tipo"
         },
         "data_description": {
+          "adapter": "Só é necessário se o Home Assistant tiver mais do que um adaptador Bluetooth, por exemplo um chip integrado e um dongle USB. Deixe este campo vazio e o sistema escolhe um adaptador por si.",
           "host": "O ESP32-Divoom é um firmware complementar opcional que atua como proxy Bluetooth Classic. Se o tiver, pode usá-lo em vez de se ligar diretamente ao seu dispositivo Divoom via Bluetooth. Se não, basta deixá-lo vazio e o Home Assistant ligar-se-á diretamente via Bluetooth."
         }
       }

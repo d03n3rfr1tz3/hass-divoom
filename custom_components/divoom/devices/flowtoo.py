@@ -9,9 +9,9 @@ class FlowToo(Divoom128):
 
     MEDIA_WINDOW_LOG = 16
 
-    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "FlowToo"
-        Divoom128.__init__(self, host, mac, port, escapePayload, logger)
+        Divoom128.__init__(self, adapter, host, mac, port, escapePayload, logger)
 
     def _pixels(self, img):
         """Wire bytes of one quantized frame, RGB565 big-endian on this device.

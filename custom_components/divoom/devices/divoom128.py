@@ -25,13 +25,13 @@ class Divoom128(Divoom):
     MEDIA_WINDOW_LOG = 17
     REQUEST_MARK = b"\x04\x8b\x55"
 
-    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.screensize = 128
         self.chunksize = 256
         self.resendwindow = 1.0 if host else 0.5
         self.colorpalette = None
         if escapePayload == None: escapePayload = False
-        Divoom.__init__(self, host, mac, port, escapePayload, logger)
+        Divoom.__init__(self, adapter, host, mac, port, escapePayload, logger)
 
     # --- internals -------------------------------------------------------
 

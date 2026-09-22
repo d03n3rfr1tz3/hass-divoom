@@ -19,9 +19,11 @@
         "data": {
           "mac": "Zařízení Divoom",
           "port": "Kanál/port Bluetooth",
+          "adapter": "Místní adaptér Bluetooth",
           "host": "Název hostitele/IP ESP32-Divoom"
         },
         "data_description": {
+          "adapter": "Potřebné jen tehdy, pokud má Home Assistant více než jeden adaptér Bluetooth, například vestavěný čip a USB dongle. Ponechte pole prázdné a systém vybere adaptér za vás.",
           "host": "ESP32-Divoom je volitelný doprovodný firmware, který funguje jako proxy Bluetooth Classic. Pokud jej používáte, můžete jej zadat zde místo přímého připojení k zařízení Divoom přes Bluetooth. Pokud ne, ponechte pole prázdné a Home Assistant se připojí přímo přes Bluetooth."
         }
       },
@@ -47,11 +49,13 @@
         "title": "Překonfigurovat zařízení Divoom",
         "description": "Změňte nastavení připojení a typ svého zařízení Divoom.",
         "data": {
+          "adapter": "Místní adaptér Bluetooth",
           "host": "Název hostitele/IP ESP32-Divoom",
           "port": "Kanál/port Bluetooth",
           "device_type": "Typ"
         },
         "data_description": {
+          "adapter": "Potřebné jen tehdy, pokud má Home Assistant více než jeden adaptér Bluetooth, například vestavěný čip a USB dongle. Ponechte pole prázdné a systém vybere adaptér za vás.",
           "host": "ESP32-Divoom je volitelný doprovodný firmware, který funguje jako proxy Bluetooth Classic. Pokud jej používáte, můžete jej zadat zde místo přímého připojení k zařízení Divoom přes Bluetooth. Pokud ne, ponechte pole prázdné a Home Assistant se připojí přímo přes Bluetooth."
         }
       }

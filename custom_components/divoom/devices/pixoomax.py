@@ -4,13 +4,13 @@ from .divoom import Divoom
 
 class PixooMax(Divoom):
     """Class PixooMax encapsulates the Pixoo Max Bluetooth communication."""
-    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "PixooMax"
         self.screensize = 32
         self.chunksize = 200
         self.colorpalette = None
         if escapePayload == None: escapePayload = False
-        Divoom.__init__(self, host, mac, port, escapePayload, logger)
+        Divoom.__init__(self, adapter, host, mac, port, escapePayload, logger)
     
     def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
         Divoom.show_alarm(self, number=number, time=time, weekdays=weekdays, alarmMode=0, triggerMode=0, frequency=0, volume=1)

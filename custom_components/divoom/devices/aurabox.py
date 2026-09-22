@@ -6,7 +6,7 @@ class Aurabox(Divoom):
     """Class Aurabox encapsulates the Aurabox Bluetooth communication."""
     maxframes = 12
 
-    def __init__(self, host=None, mac=None, port=1, escapePayload=True, logger=None):
+    def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=True, logger=None):
         self.type = "Aurabox"
         self.screensize = 10
         self.chunksize = 182
@@ -21,7 +21,7 @@ class Aurabox(Divoom):
             [255, 255, 255]
         ]
         if escapePayload == None: escapePayload = True
-        Divoom.__init__(self, host, mac, port, escapePayload, logger)
+        Divoom.__init__(self, adapter, host, mac, port, escapePayload, logger)
         
     def get_color(self, color):
         if color[0] <= 127: color[0] =   0

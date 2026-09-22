@@ -60,15 +60,17 @@ class Divoom:
     escapePayload = False
     senddelay = 0
     maxframes = 60
+    adapter = None
     host = None
     mac = None
     port = 1
 
-    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.socket = None
         self.socket_errno = 0
         self.message_buf = []
 
+        self.adapter = adapter if adapter else None
         self.host = host if host else None
         self.mac = mac
         self.port = port
@@ -129,6 +131,7 @@ class Divoom:
                 if (self.host == None):
                     self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
                     self.socket.settimeout(timeout)
+                    if (self.adapter != None): self.socket.bind((self.adapter, 0))
                     self.socket.connect((self.mac, self.port))
                 else:
                     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
