@@ -89,6 +89,9 @@ Of course you need Bluetooth hardware for that. It does not matter if you use th
 additional dongle. As long as it supports a classic Bluetooth connection via RFCOMM, you are good to go. When in doubt, just try it or have a
 look at the following part of the Home Assistant documentation: https://www.home-assistant.io/integrations/bluetooth/
 
+If your host has more than one Bluetooth adapter, set the optional `adapter` option to the MAC address of the one you paired with. Otherwise the
+system picks one for you, which might not be the paired one. `bluetoothctl list` shows you the adapters of your host with their MAC addresses.
+
 #### Bluetooth Pairing
 As described above, you need to pair your Divoom device at least once to your Home Assistant device. After the pairing is done, this component
 can connect to your Divoom device anytime it's needed, even after restarting your Home Assistant. You have multiple possibilities to pair your
@@ -161,6 +164,7 @@ Divoom device you have, therefore allowing you to add multiple of these snippets
 notify:
   - name: NOTIFIER_NAME
     platform: divoom
+    adapter: "BLUETOOTH_ADAPTER_MAC_ADDRESS"
     host: "PROXY_HOST_OR_IP"
     mac: "DIVOOM_DEVICE_MAC_ADDRESS"
     port: DIVOOM_DEVICE_PORT
@@ -170,6 +174,8 @@ notify:
 ```
 
 * `name` (Recommended): The name for the notify service.
+* `adapter` (Optional): The MAC address of the local Bluetooth adapter to connect through.
+  Just leave it out, if your host has only one Bluetooth adapter.
 * `host` (Optional): The host or IP of your ESP32 with flashed [Bluetooth Proxy](https://github.com/d03n3rfr1tz3/esp32-divoom).
   Beware, that an ESPHome BLE Proxy does not work, because Divoom is using Bluetooth Classic and not Bluetooth Low-Energy.
   Just leave it out, if you want your Home Assistant to directly connect via Bluetooth.
