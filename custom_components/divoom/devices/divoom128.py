@@ -76,17 +76,19 @@ class Divoom128(Divoom):
         # same factor to keep the cycle length. A single frame always fits.
         count = len(images)
         keep = min(count, self.maxframes)
+        pixels = {} # quantize each frame once across thinning rounds
         while True:
-            frames = [images[i] for i in self.pick_frames(count, keep)]
-            zbytes = compressor.compress(
-                b"".join(self._pixels(self._quantize(img)) for img in frames))
+            picked = self.pick_frames(count, keep)
+            for i in picked:
+                if i not in pixels: pixels[i] = self._pixels(self._quantize(images[i]))
+            zbytes = compressor.compress(b"".join(pixels[i] for i in picked))
             if len(zbytes) <= MEDIA_MAX_BYTES or keep == 1: break
             keep = max(1, min(keep - 1, keep * MEDIA_MAX_BYTES // len(zbytes)))
         if keep < count:
             speed = max(1, min(0xffff, round(speed * count / keep)))
             self.logger.warning("{0}: animation has {1} frames, keeping {2}".format(self.type, count, keep))
 
-        header = bytes([0x25, len(frames)]) + speed.to_bytes(2, "big") \
+        header = bytes([0x25, len(picked)]) + speed.to_bytes(2, "big") \
             + bytes([blocks, blocks]) + len(zbytes).to_bytes(4, "big")
         return header + zbytes
 

@@ -120,7 +120,7 @@ FIXED_CASES = {
     ),
     "send_brightness": lambda d: d.send_brightness(42),
     "send_volume": lambda d: d.send_volume(60),
-    "send_weather": lambda d: d.send_weather("22°C", weather=3),
+    "send_weather": lambda d: d.send_weather("22°C", weather=3, unit=None),
     "send_datetime": lambda d: d.send_datetime("2024-01-02T03:04:05+00:00"),
     "send_playstate": lambda d: d.send_playstate(True),
     "send_playstate_next": lambda d: d.send_playstate("next"),

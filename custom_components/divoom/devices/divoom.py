@@ -152,7 +152,7 @@ class Divoom:
             try:
                 self.socket.sendall(bytes(conn))
             except socket.error as error:
-                self.socket_errno = error.errno
+                self.socket_errno = error.errno or errno.ETIMEDOUT
                 self.socket = None
 
     def disconnect(self):
@@ -196,7 +196,7 @@ class Divoom:
                     if (self.host != None and not isinstance(ping, int) and list(ping)[-1] == 0x96):
                         self.socket_errno = 696
             except socket.error as error:
-                self.socket_errno = error.errno
+                self.socket_errno = error.errno or errno.ETIMEDOUT
 
             if self.socket_errno == None or self.socket_errno <= 0:
                 return True
@@ -253,7 +253,8 @@ class Divoom:
         ready = select.select([], [self.socket], [], 3)
         if ready[1]:
             try:
-                self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
+                if self.logger.isEnabledFor(logging.DEBUG):
+                    self.logger.debug("{0} PAYLOAD OUT: {1}".format(self.type, ' '.join([hex(b) for b in request])))
                 self.socket.sendall(bytes(request))
                 result = len(request)
             except socket.error as error:

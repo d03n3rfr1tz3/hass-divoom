@@ -201,5 +201,5 @@ class Aurabox(Divoom):
         args += number.to_bytes(1, byteorder='big')
         return self.send_command("set view", args)
 
-    def send_weather(self, value=None, weather=None):
+    def send_weather(self, value=None, weather=None, unit=None):
         self.unsupported("weather info")

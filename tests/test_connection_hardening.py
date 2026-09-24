@@ -377,6 +377,21 @@ def test_reconnect_ignores_an_errno_from_an_earlier_failure(caplog):
     assert "connection lost" not in caplog.text
 
 
+@pytest.mark.parametrize("host", [None, "10.0.0.5"], ids=["ping", "proxy-handshake"])
+def test_reconnect_treats_a_timeout_as_a_failure(monkeypatch, host):
+    """A timeout carries no errno, and reconnect() read a missing errno as
+    "nothing wrong" - so a timed out ping, or a timed out proxy handshake that
+    left no socket behind, reported a healthy link."""
+    _hands_out(monkeypatch, FakeSocket(send_error=TimeoutError("timed out")))
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+    monkeypatch.setattr(divoom_module.select, "select", lambda r, w, x, t: ([], w, []))
+
+    device = Pixoo(host=host, mac="11:22:33:44:55:66")
+
+    assert device.reconnect() is False
+    assert device.socket_errno == errno.ETIMEDOUT
+
+
 # --- the ping window ---
 
 

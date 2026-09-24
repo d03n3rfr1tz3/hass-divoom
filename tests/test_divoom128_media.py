@@ -296,6 +296,14 @@ def test_oversized_animation_is_thinned(tmp_path):
     assert speed == round(100 * 20 / frames), "the cycle length is preserved by stretching speed"
     assert len(raw) == frames * BYTES_PER_FRAME
 
+    device = MiniToo(mac="00:00:00:00:00:00")
+    with Image.open(path) as img:
+        source = []
+        for i in range(img.n_frames):
+            img.seek(i)
+            source.append(device._quantize(device._fit(img)))
+    assert raw == b"".join(device._pixels(source[i]) for i in device.pick_frames(20, frames))
+
 
 def test_long_animation_is_thinned_evenly(tmp_path):
     """Over maxframes, frames are picked evenly over the whole animation
