@@ -7,10 +7,10 @@
 
 Allows you to send commands to your Divoom device through Home Assistant actions. Every mode your device supports has its own action, like
 `divoom.clock` or `divoom.light`, with all its parameters available in the UI. It allows you to control your Divoom device in your automations
-and scripts however you want. Currently no reading commands or sensors are implemented, because everything works through actions. Just send
-controls/animations to your Divoom device through them.
+and scripts however you want. Currently no reading commands or sensors are implemented. Just send controls/animations to your Divoom device
+through the actions.
 
-The older `notify.NOTIFIER_NAME` service still works exactly as before, so existing automations keep running. See
+The older `notify.NOTIFIER_NAME` service still works, so existing automations keep running. See
 [Legacy: Notify Service](#legacy-notify-service).
 
 ## Table of Contents
@@ -69,9 +69,9 @@ The older `notify.NOTIFIER_NAME` service still works exactly as before, so exist
   * [Credits](#credits)
 
 ## Requirements
-For this component to actually have chance to work, it needs a Bluetooth Classic connection. Unlike Bluetooth Low Energy (BLE), Bluetooth Classic,
+For this component to actually have a chance to work, it needs a Bluetooth Classic connection. Unlike Bluetooth Low Energy (BLE), Bluetooth Classic,
 as the name already indicates, is a bit older. Therefore it brings some difficulties with it, which you might not expect, when you only know BLE
-devices. One for example is that the Bluetooth Proxies from Home Assistant/ ESPHome do only support BLE and therefore cannot be used with this
+devices. One for example is that the Bluetooth Proxies from Home Assistant/ ESPHome only support BLE and therefore cannot be used with this
 component. Another one is the support in Python itself. While a Bluetooth Classic connection is supported natively by Python, the pairing process
 is not. That's why you very likely have to do some manual work, if you somehow did not do it already.
 
@@ -81,15 +81,15 @@ With this you don't have to fiddle around with Bluetooth Pairing in your Home As
 If you are using my Bluetooth Proxy for ESP32, you can skip the whole Bluetooth Hardware and Bluetooth Pairing parts of this documentation.
 
 The Bluetooth Proxy can either be flashed as its own firmware or be built as an [ESPHome](https://esphome.io/) component, which lets you adopt and update it from your
-ESPHome dashboard. Both variants speak the same protocols, so this integration does not care which one you use. Not to be confused with the Bluetooth Proxy that ESPHome
-brings itself, which only supports BLE.
+ESPHome dashboard. This integration works with both variants the same way. Not to be confused with ESPHome's own Bluetooth Proxy, which only
+supports BLE.
 
 #### Bluetooth Hardware
 Of course you need Bluetooth hardware for that. It does not matter if you use the integrated Bluetooth controller of a Raspberry Pi 3/4/5 or an
 additional dongle. As long as it supports a classic Bluetooth connection via RFCOMM, you are good to go. When in doubt, just try it or have a
 look at the following part of the Home Assistant documentation: https://www.home-assistant.io/integrations/bluetooth/
 
-If your host has more than one Bluetooth adapter, set the optional `adapter` option to the MAC address of the one you paired with. Otherwise the
+If your host has more than one Bluetooth adapter, set the optional `adapter` to the MAC address of the one you paired with. Otherwise the
 system picks one for you, which might not be the paired one. `bluetoothctl list` shows you the adapters of your host with their MAC addresses.
 
 #### Bluetooth Pairing
@@ -107,7 +107,7 @@ some placeholders above.
 
 * `HCI_DEVICE`: The id of your Bluetooth controller. Typically just `hci0`, especially if you are using integrated Raspberry Pi Bluetooth.
 * `DIVOOM_DEVICE_MAC`: The MAC address of your Divoom device. You can either get it via the Divoom App or by scanning for it.
-* `DIVOOM_DEVICE_PORT`: The port of your Divoom device. Typically its just `1`, but on some audio-supported devices, like the Timoo, Tivoo or Ditoo it might be `2`. Timebox Mini is also a special case with its `port: 4`.
+* `DIVOOM_DEVICE_PORT`: The port of your Divoom device. Typically it's just `1`, but on some audio-supported devices, like the Timoo, Tivoo or Ditoo it might be `2`. Timebox Mini is also a special case with its `port: 4`.
 
 ## Installation
 First we need to install the component. That can be done in two ways: Easy or Manual
@@ -189,7 +189,7 @@ notify:
 * `escape_payload` (Optional): Adds escaping of the payload, which might be important for some older Divoom devices with
   older firmware (afaik some old Timebox versions). Deactivated by default, because newer versions don't need that.
 
-Here is an example how it could look like.
+Here is an example of how it could look.
 ```yaml
 notify:
   - name: Divoom Pixoo
@@ -215,12 +215,12 @@ notify:
 
 ## Usage
 
-This custom component provides one action per mode of your Divoom device.
-Every mode is its own action, so the UI shows you exactly which parameters
-it has, which of them are required and what they mean.
+This custom component provides one action per mode of your Divoom device,
+so the UI shows you exactly which parameters a mode has, which of them are
+required and what they mean.
 
 ### Basic Modes
-The general structure for all modes are similar, but each mode has different parameter. Below the example
+The general structure for all modes is similar, but each mode has different parameters. Below the example
 of the basic structure, you can find a documentation of each mode. Not all modes are supported across
 all devices. If in doubt, look into your mobile app if your device even has the corresponding feature
 and then look into the example files for your specific device.
@@ -233,7 +233,7 @@ data:
 ```
 
 `device` is required and picks the device you want to talk to.
-In the UI it is a dropdown listing your configured Divoom devices. Just put in the name of your configured divoom device.
+In the UI it is a dropdown listing your configured Divoom devices. In YAML just put in the name of your configured Divoom device.
 
 If your device does not support the mode you are calling, the action fails with an error telling you
 so, instead of silently doing nothing.
@@ -282,18 +282,18 @@ data:
 ```
 
 #### MODE clock
-Shows the clock channel. Be aware, that this mode is very limited on older device like Aurabox or Timebox Mini.
+Shows the clock channel. Be aware, that this mode is very limited on older devices like Aurabox or Timebox Mini.
 
 | Parameter    | Required | Description |
 | ---          | :---:    | --- |
 | `clock`      | ✔*       | The style of the clock. Accepts a number starting from 0 up to what the Divoom device supports.<br/> Examples from Pixoo: `0` = Fullscreen, `1` = Rainbow, `2` = Boxed, `3` = Analog square, <br/> `4` = Fullscreen negative, `5` = Analog round, `6` = Widescreen <br/> The MiniToo, Tiivoo 2 and FlowToo ignore it. |
-| `clock_id`   | ✔*       | Selects a specific clock by its id, the way the Divoom app does. Only the MiniToo, Tiivoo 2 and FlowToo understand it, other devices ignore it. With one of them set up, the UI offers the clocks of the public Divoom catalog, which Home Assistant fetches from `app.divoom-gz.com` once per start. Any other id can still be typed in. Example: `848`. |
+| `clock_id`   | ✔*       | Selects a specific clock by its id. Only the MiniToo, Tiivoo 2 and FlowToo understand it, other devices ignore it. With one of them set up, the UI offers the clocks of the public Divoom catalog, fetched from `app.divoom-gz.com` once per start. Any other id can still be typed in. Example: `848`. |
 | `twentyfour` |          | Changes between 12h or 24h format. <br/> `false` = 12h, `true` = 24h. |
-| `weather`    |          | Actives or deactivates showing the weather with `true` or `false`. |
-| `temp`       |          | Actives or deactivates showing the temperature with `true` or `false`. |
-| `calendar`   |          | Actives or deactivates showing the calendar date with `true` or `false`. |
+| `weather`    |          | Activates or deactivates showing the weather with `true` or `false`. |
+| `temp`       |          | Activates or deactivates showing the temperature with `true` or `false`. |
+| `calendar`   |          | Activates or deactivates showing the calendar date with `true` or `false`. |
 | `color`      |          | The color of the clock. Accepts an array of RGB color values. |
-| `hot`        |          | Actives or deactivates showing the slideshow of the best images with `true` or `false`, which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol |
+| `hot`        |          | Activates or deactivates showing the slideshow of the best images with `true` or `false`, which is right next to the other boolean-like buttons in the app, but a completely separate command in the protocol |
 
 *) At least one of `clock` and `clock_id` has to be given.
 
@@ -392,9 +392,9 @@ Starts the music equalizer.
 | Parameter        | Required | Description |
 | ---              | :---:    | --- |
 | `number`         | ✔        | The number of the concrete equalizer. Look into your phone app and count them. |
-| `audiomode`      |          | Actives or deactivates the original audio mode with `true` or `false`. |
-| `backgroundmode` |          | Actives or deactivates the background audio mode with `true` or `false`. |
-| `streammode`     |          | Actives or deactivates the streaming audio mode with `true` or `false`. |
+| `audiomode`      |          | Activates or deactivates the original audio mode with `true` or `false`. |
+| `backgroundmode` |          | Activates or deactivates the background audio mode with `true` or `false`. |
+| `streammode`     |          | Activates or deactivates the streaming audio mode with `true` or `false`. |
 
 ```yaml
 action: divoom.equalizer
@@ -409,7 +409,7 @@ Shows a game. It is theoretically possible to open games, that are not shown in 
 
 | Parameter | Required | Description |
 | ---       | :---:    | --- |
-| `value`   |          | The number of the concrete game. Depending on your device you may have different amount of games. Look into your phone app and count them. |
+| `value`   |          | The number of the concrete game. Depending on your device you may have a different number of games. Look into your phone app and count them. |
 
 ```yaml
 action: divoom.game
@@ -438,7 +438,7 @@ Longer animations are thinned out to fit the limits of the device.
 
 | Parameter | Required | Description |
 | ---       | :---:    | --- |
-| `file`    | ✔        | Specifes the image file relative to the configured media_directory, that will be displayed. |
+| `file`    | ✔        | Specifies the image file relative to the configured media_directory, that will be displayed. |
 | `time`    |          | The time in milliseconds between each frame. Defaults to timing of the GIF if omitted. |
 
 ```yaml
@@ -662,7 +662,7 @@ data:
 ```
 
 #### MODE text
-Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the devices frame limit and then scrolls in bigger steps. The MiniToo, Tiivoo 2 and FlowToo show text as a still image instead, and scroll it vertically if it does not fit the screen.
+Shows text as a scrolling animation. Font can be any TrueType or OpenType font installed on the system or placed into the `fonts`-folder. The following fonts are included: `arcade.ttf`, `arial.ttf`, `divoom.ttf`, `impact.ttf` and `pixelpowerline.ttf`. Be aware, that a longer text or wide font might not fit into the device's frame limit and then scrolls in bigger steps. The MiniToo, Tiivoo 2 and FlowToo show text as a still image instead, and scroll it vertically if it does not fit the screen.
 
 | Parameter          | Required | Description |
 | ---                | :---:    | --- |
@@ -749,9 +749,9 @@ data:
 ### Legacy: Notify Service
 
 Before the actions existed, everything went through a notify service named after your device.
-That way still works as long as Home Assistant supports legacy notify services, so existing automations
-and scripts keep running unchanged. It is only marked deprecated as a precaution, because Home Assistant is
-phasing legacy notify services out. Should Home Assistant ever remove them, this integration will follow. It is also the only way to control a device from the [Manual Configuration](#manual-configuration),
+It still works, so existing automations and scripts keep running unchanged. It is marked deprecated,
+because Home Assistant is phasing legacy notify services out, and will go away once Home Assistant
+removes them. It is also the only way to control a device from the [Manual Configuration](#manual-configuration),
 because such a device has no config entry to pick.
 
 The parameters are the same ones documented for each mode above, only the wrapping differs: the
@@ -766,8 +766,7 @@ data:
 ```
 
 There is also an older style, where the message is left empty and the mode is passed in through
-the service data as well. It is still supported as of today, but because it looks odd and confuses
-people, it's not the preferred way anymore.
+the service data as well. It is still supported, but no longer the preferred way.
 
 ```yaml
 action: notify.NOTIFIER_NAME
@@ -834,12 +833,12 @@ Examples for Tivoo: [devices/tivoo.txt](https://github.com/d03n3rfr1tz3/hass-div
 Make sure, that you at least paired your Home Assistant device once to your Divoom device. Also make sure, that you have the correct MAC address.
 Also make sure, that your Phone is not currently connected to your Divoom device, because some don't allow that many connections.
 
-If it seems to connect, but looses connection the moment you use any mode, you might have chosen the wrong port. On Pixoo and other non-audio
+If it seems to connect, but loses connection the moment you use any mode, you might have chosen the wrong port. On Pixoo and other non-audio
 devices, it's typically `port: 1`. But on audio devices, like the Timoo, Tivoo or Ditoo, it might be `port: 2`. Timebox Mini is also a special case with its `port: 4`.
 
 ### GIF does not work
 
-The most common problem is, that the GIF does not have the correct size or format. The Divoom devices (and to some extend my code) are nitpicky in that case. Strangly enough the Divoom app lets you download GIFs, but these are typically in the size of 320x320 and not fitting your device.
+The most common problem is, that the GIF does not have the correct size or format. The Divoom devices (and to some extent my code) are nitpicky in that case. Strangely enough the Divoom app lets you download GIFs, but these are typically in the size of 320x320 and not fitting your device.
 Your GIF needs to be exactly the size of your Divoom screen (*16x16* in case of a Pixoo or similar sized device), *non-interlaced* and with a *global color palette*.
 
 I can recommend resizing and converting your GIFs with GIMP. Of course other software might also work, depending on the export/format options. When resizing a GIF downloaded from the Divoom app with GIMP, you better choose no interpolation to not blur your GIF. When exporting with GIMP, make sure to mark the animation checkbox and don't mark the interlace checkbox. For a few more details and an example look into the following comment: https://github.com/d03n3rfr1tz3/hass-divoom/issues/19#issuecomment-1982059358
@@ -850,9 +849,8 @@ Open a terminal in the repository's root folder before running the commands belo
 Requires Python 3.14 or newer, since that's what the Home Assistant version behind
 `pytest-homeassistant-custom-component` in `tests/requirements_test.txt` needs.
 
-The second step resolves the requirements that Home Assistant itself pins for the components
-this integration imports, straight from the manifests of the installed HA version. The
-resulting `requirements_ha.txt` is generated.
+The second step generates `requirements_ha.txt` from the requirements that Home Assistant pins
+for the components this integration imports, taken from the manifests of the installed HA version.
 
 bash/Linux/macOS:
 ```bash
