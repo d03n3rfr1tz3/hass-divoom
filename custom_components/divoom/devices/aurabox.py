@@ -1,5 +1,7 @@
 """Provides class Aurabox that encapsulates the Aurabox Bluetooth communication."""
 
+import errno
+
 from .divoom import Divoom
 
 class Aurabox(Divoom):
@@ -58,6 +60,27 @@ class Aurabox(Divoom):
             result += [((color2 if color2 >= 0 else 0) << 4) | (color1 if color1 >= 0 else 0)]
         return result
 
+    def send_frames(self, frames, framesCount):
+        result = None
+        if framesCount > 1:
+            """Sending as Animation"""
+            index = 0
+            for pair in frames:
+                frame = self.make_framepart(pair[1], index, pair[0])
+                result = self.send_command("set animation frame", frame, skipRead=True)
+                if not result:
+                    raise OSError(errno.ENOTCONN, "{0}: transfer truncated after {1} frames".format(self.type, index))
+                index += 1
+
+        elif framesCount == 1:
+            """Sending as Image"""
+            pair = frames[-1]
+            frame = self.make_framepart(pair[1], -1, pair[0])
+            result = self.send_command("set image", frame, skipRead=True)
+            if not result:
+                raise OSError(errno.ENOTCONN, "{0}: frame not sent".format(self.type))
+        return result
+
     def show_alarm(self, number=None, time=None, weekdays=None, alarmMode=None, triggerMode=None, frequency=None, volume=None):
         """Show alarm tool on the Divoom device"""
 
@@ -110,26 +133,6 @@ class Aurabox(Divoom):
 
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
         self.unsupported("the music equalizer mode")
-
-    def show_image(self, file, time=None):
-        """Show image or animation on the Divoom device"""
-        frames, framesCount = self.process_image(file, time=time)
-        
-        result = None
-        if framesCount > 1:
-            """Sending as Animation"""
-            index = 0
-            for pair in frames:
-                frame = self.make_framepart(pair[1], index, pair[0])
-                result = self.send_command("set animation frame", frame, skipRead=True)
-                index += 1
-        
-        elif framesCount == 1:
-            """Sending as Image"""
-            pair = frames[-1]
-            frame = self.make_framepart(pair[1], -1, pair[0])
-            result = self.send_command("set image", frame, skipRead=True)
-        return result
 
     def send_keyboard(self, value=None):
         self.unsupported("changing the keyboard light")
