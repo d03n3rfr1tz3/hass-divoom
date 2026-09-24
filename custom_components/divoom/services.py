@@ -380,9 +380,9 @@ def async_setup_services(hass: HomeAssistant) -> None:
     _LOGGER.debug("Divoom: successfully registered {} services".format(len(SERVICE_SCHEMAS)))
 
 def _device_options(hass: HomeAssistant):
-    """The configured devices, as the UI dropdown wants them. Each value has to
-    resolve to its own entry, so a shared name falls back to the title slug,
-    then to the entry id."""
+    """The configured devices as dropdown options. Each value must resolve to
+    exactly one entry, so a shared name falls back to the title slug, then to
+    the entry id."""
     entries = hass.config_entries.async_entries(DOMAIN)
 
     def value(entry):
@@ -461,13 +461,11 @@ def _drop_section(fields, section, types, supported):
     return {key: value for key, value in fields.items() if key != section}
 
 async def async_refresh_service_descriptions(hass: HomeAssistant) -> None:
-    """Point the device field at the devices that actually exist.
+    """Adapt the static services.yaml to the configured devices.
 
-    services.yaml can only describe a static field, so the picker is built here
-    instead - it lists the configured devices and writes the same slug a
-    handwritten automation would use. The clock, white noise and lyrics sections
-    follow the configured device types, and clock_id offers the Divoom catalog
-    once it has loaded.
+    The device field becomes a picker of the configured devices, the clock,
+    white noise and lyrics sections follow their device types, and clock_id
+    offers the Divoom catalog once it has loaded.
     """
     domainConfig = hass.data.setdefault(DOMAIN, {})
     descriptions = domainConfig.get('descriptions')

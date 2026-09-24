@@ -245,7 +245,7 @@ class Divoom:
         return self.send_payload(payload, skipRead=skipRead, timeout=timeout)
 
     def send_payload(self, payload, skipRead=None, timeout=0.2):
-        """Send raw payload to the Divoom device. (Will be escaped, checksumed and messaged between 0x01 and 0x02."""
+        """Send raw payload to the Divoom device. (Will be escaped, checksummed and messaged between 0x01 and 0x02.)"""
         if (self.socket == None): return 0
 
         result = 0
@@ -280,7 +280,7 @@ class Divoom:
         return result
 
     def drop_message_buffer(self):
-        """Drop all dat currently in the message buffer,"""
+        """Drop all data currently in the message buffer."""
         self.message_buf = []
     
     def animation_fits(self, frames):
@@ -290,7 +290,7 @@ class Divoom:
         return size < (1 << (32 if wide else 16)) and -(-size // self.chunksize) <= (1 << (16 if wide else 8))
 
     def checksum(self, payload):
-        """Compute the payload checksum. Returned as list with LSM, MSB"""
+        """Compute the payload checksum. Returned as list with LSB, MSB"""
         length = sum(payload)
         csum = []
         csum += length.to_bytes(4 if length >= 65535 else 2, byteorder='little') # Pixoo-Max expects more sometimes
@@ -321,7 +321,7 @@ class Divoom:
             for pixels, colors, colorCount, time in decoded]
         keep = min(count, self.maxframes)
         while keep > 1 and not self.animation_fits(result + [frames[i] for i in self.pick_frames(count, keep)]):
-            keep -= 1 # frame sizes do not depend on the time, so the encoded frames tell
+            keep -= 1 # the frame time does not affect the size, so the encoded frames can be checked as they are
         if keep == count: return [result + frames, count]
 
         self.logger.warning("{0}: animation has {1} frames, keeping {2}".format(self.type, count, keep))

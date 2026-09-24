@@ -24,7 +24,7 @@ class TimeboxMini(Divoom):
         header = []
         header += [0x00, 0x0A, 0x0A, 0x04] # Fixed header
         if index >= 0:
-            header += index.to_bytes(1, byteorder='little') # Pixoo-Max expects more
+            header += index.to_bytes(1, byteorder='little')
         return header + framePart
 
     def process_frame(self, pixels, colors, colorCount, framesCount, time, needsFlags):

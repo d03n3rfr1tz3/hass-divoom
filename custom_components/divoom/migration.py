@@ -415,8 +415,7 @@ class ScanResult:
     def markdown(self, labels=None) -> str:
         """The listing for the repair issue, with why an entry needs a human.
 
-        Without labels the raw reason slugs are used, which keeps the engine
-        tests independent of the translations.
+        Without labels, the raw reason slugs are listed.
         """
         labels = labels or {}
         lines = []
@@ -441,9 +440,8 @@ class ScanResult:
 def service_map(hass: HomeAssistant) -> dict[str, str]:
     """Every notify service name an entry answers to, by device value.
 
-    The entry keeps the name it was created with, renaming it only changes the
-    title - so an automation may call either spelling. Both slugs resolve, see
-    _find_entry in services.py.
+    Renaming an entry changes only its title, not its name, so an automation
+    may call either slug.
     """
     services = {}
     for entry in hass.config_entries.async_entries(DOMAIN):

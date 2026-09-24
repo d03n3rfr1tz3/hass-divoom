@@ -292,8 +292,8 @@ class DivoomNotificationService(BaseNotificationService):
                 self._device.disconnect()
 
     def _resolve_colors(self, data):
-        """Foreground and background color, either packed into a single color
-        list or given as two separate params, which then take precedence."""
+        """Foreground and background color from the color list, overridden by
+        the separate foreground and background params."""
         color = data.get(PARAM_COLOR)
         color1 = color[0] if color is not None and len(color) > 0 else None
         color2 = color[1] if color is not None and len(color) > 1 else None

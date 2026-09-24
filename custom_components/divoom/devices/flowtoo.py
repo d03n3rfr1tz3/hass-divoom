@@ -15,7 +15,7 @@ class FlowToo(Divoom128):
 
     def _pixels(self, img):
         """Wire bytes of one quantized frame, RGB565 big-endian on this device.
-        The bits of each band land in separate positions, so add never carries."""
+        The bands occupy disjoint bits, so ImageChops.add never carries."""
         r, g, b = img.split()
         hi = ImageChops.add(r.point(lambda v: v & 0xf8), g.point(lambda v: v >> 5))
         lo = ImageChops.add(g.point(lambda v: (v & 0x1c) << 3), b.point(lambda v: v >> 3))

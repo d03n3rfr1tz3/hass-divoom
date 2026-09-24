@@ -1,10 +1,8 @@
 """Provides class Divoom128 that encapsulates the 128x128 LCD Bluetooth communication.
 
-These devices are 128x128 color LCDs, not 16x16 LED matrices. Their custom media
-is pushed with the newer 0x8b command: RGB888 frames, Zstandard-compressed,
-wrapped in a start packet plus 256-byte chunks, and streamed only after the
-device asks for them. Channel/tool commands (clock, brightness, on/off, ...)
-share the base protocol, so only the pixel-push path is overridden here.
+Media goes out via the 0x8b command as Zstandard-compressed RGB888 frames, split
+into a start packet and 256-byte chunks that stream once the device asks for
+them. All other commands share the base protocol.
 
 Protocol reverse-engineered by https://github.com/alvinunreal/divoom-minitoo-osx
 """
@@ -94,7 +92,7 @@ class Divoom128(Divoom):
 
     def _fit(self, img):
         """EXIF-transpose, flatten onto black, center-crop square, resize to the
-        128x128 grid. Whole fractions of it scale with NEAREST to keep pixel art sharp."""
+        128x128 grid. Sizes dividing 128 scale with NEAREST to keep pixel art sharp."""
         img = ImageOps.exif_transpose(img).convert("RGBA")
         img = Image.alpha_composite(Image.new("RGBA", img.size, (0, 0, 0, 255)), img).convert("RGB")
         side = min(img.size)
