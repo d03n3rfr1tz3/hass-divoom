@@ -55,9 +55,9 @@ class FakeSocket:
     the test asks it to. Handed out for every socket.socket() call, so one
     instance holds a whole retry sequence."""
 
-    def __init__(self, connect_error=None, send_error=None, shutdown_error=None):
+    def __init__(self, bind_error=None, connect_error=None, send_error=None, shutdown_error=None):
         self.calls: list[tuple] = []
-        self._errors = {"connect": connect_error, "sendall": send_error,
+        self._errors = {"bind": bind_error, "connect": connect_error, "sendall": send_error,
                         "shutdown": shutdown_error}
 
     def _record(self, name, *args):
@@ -68,6 +68,9 @@ class FakeSocket:
 
     def settimeout(self, value):
         self._record("settimeout", value)
+
+    def bind(self, addr):
+        self._record("bind", addr)
 
     def connect(self, addr):
         self._record("connect", addr)

@@ -8,6 +8,13 @@ from homeassistant.helpers import config_validation as cv
 from homeassistant.config_entries import ConfigFlowResult
 from homeassistant.data_entry_flow import AbortFlow
 
+from bluetooth_adapters import (
+    ADAPTER_ADDRESS,
+    DEFAULT_ADDRESS,
+    adapter_human_name,
+    get_adapters,
+)
+
 from homeassistant.components.bluetooth import (
     BluetoothServiceInfo,
     BluetoothServiceInfoBleak,
@@ -26,7 +33,7 @@ from homeassistant.helpers.selector import (
 )
 
 from homeassistant.const import CONF_NAME, CONF_HOST, CONF_MAC, CONF_PORT
-from .const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
+from .const import CONF_ADAPTER, CONF_DEVICE_TYPE, CONF_MEDIA_DIR, CONF_MEDIA_DIR_DEFAULT, CONF_ESCAPE_PAYLOAD, DOMAIN  # pylint:disable=unused-import
 
 _LOGGER = logging.getLogger(__package__)
 
@@ -57,6 +64,32 @@ def _device_type_selector() -> SelectSelector:
         ),
     )
 
+async def _local_adapters(hass) -> list[SelectOptionDict]:
+    """List the local Bluetooth adapters, without the placeholder of systems that do not report one."""
+    try:
+        adapters = get_adapters()
+        await adapters.refresh()
+    except Exception as error:
+        _LOGGER.debug("Divoom: could not list the local bluetooth adapters ({})".format(error))
+        return []
+
+    return [
+        SelectOptionDict(value=details[ADAPTER_ADDRESS].lower(), label=adapter_human_name(adapter, details[ADAPTER_ADDRESS]))
+        for (adapter, details) in adapters.adapters.items()
+        if details[ADAPTER_ADDRESS] != DEFAULT_ADDRESS
+    ]
+
+def _adapter_selector(adapters: list[SelectOptionDict]) -> SelectSelector:
+    return SelectSelector(
+        SelectSelectorConfig(
+            mode=SelectSelectorMode.DROPDOWN,
+            options=adapters,
+            custom_value=True,
+            multiple=False,
+            sort=True,
+        ),
+    )
+
 class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Divoom Bluetooth config flow."""
     VERSION = 1
@@ -64,6 +97,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     def __init__(self):
         """Initialize the config flow."""
         self._discovered_devices: dict[str, BluetoothServiceInfo] = {}
+        self._device_adapter = None
         self._device_host = None
         self._device_name = None
         self._device_mac = None
@@ -74,6 +108,31 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         """Handle a flow initialized by the user."""
+
+        return self.async_show_menu(step_id="user", menu_options=["direct", "proxy"])
+
+    async def async_step_direct(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle the flow step to connect directly via a local Bluetooth adapter."""
+
+        return await self._async_step_device("direct", user_input, {
+            vol.Optional(CONF_ADAPTER): _adapter_selector(await _local_adapters(self.hass)),
+        })
+
+    async def async_step_proxy(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle the flow step to connect via an ESP32-Divoom proxy."""
+
+        return await self._async_step_device("proxy", user_input, {
+            vol.Required(CONF_HOST): cv.string,
+        })
+
+    async def _async_step_device(
+        self, step_id: str, user_input: dict[str, Any] | None, connection: dict
+    ) -> ConfigFlowResult:
+        """Handle the flow step to choose the Divoom device and how to connect to it."""
 
         if user_input is None or CONF_MAC not in user_input:
 
@@ -91,7 +150,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 for (address, discovery) in self._discovered_devices.items()
             ]
             return self.async_show_form(
-                step_id="user",
+                step_id=step_id,
                 data_schema=vol.Schema(
                     {
                         vol.Required(CONF_MAC): SelectSelector(
@@ -104,11 +163,14 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                             ),
                         ),
                         vol.Optional(CONF_PORT, default=1): cv.port,
-                        vol.Optional(CONF_HOST, default=""): cv.string
+                        **connection,
                     }
                 ),
             )
         
+        if CONF_ADAPTER in user_input and user_input[CONF_ADAPTER] != "":
+            self._device_adapter = user_input[CONF_ADAPTER].lower()
+
         if CONF_HOST in user_input and user_input[CONF_HOST] != "":
             self._device_host = user_input[CONF_HOST]
 
@@ -139,6 +201,10 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
         self._device_name = discovery_info.name
         self._device_mac = discovery_info.address.lower()
+
+        discovery_source = discovery_info.source.lower()
+        if discovery_source in {adapter["value"] for adapter in await _local_adapters(self.hass)}:
+            self._device_adapter = discovery_source
 
         await self.async_set_unique_id(self._device_mac)
         await self.async_check_uniqueness()
@@ -266,6 +332,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 title="Divoom {}".format(self._device_name),
                 data={
                     CONF_NAME: "Divoom {}".format(self._device_name),
+                    CONF_ADAPTER: self._device_adapter,
                     CONF_HOST: self._device_host,
                     CONF_MAC: self._device_mac,
                     CONF_PORT: self._device_port,
@@ -282,27 +349,55 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
-        """Handle the flow to change host, port and type of the Divoom device."""
+        """Handle the flow to change adapter, host, port and type of the Divoom device."""
+
+        return self.async_show_menu(step_id="reconfigure", menu_options=["reconfigure_direct", "reconfigure_proxy"])
+
+    async def async_step_reconfigure_direct(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle the flow to reconfigure a direct connection via a local Bluetooth adapter."""
+
+        return await self._async_step_reconfigure_device("reconfigure_direct", user_input, CONF_ADAPTER, {
+            vol.Optional(CONF_ADAPTER): _adapter_selector(await _local_adapters(self.hass)),
+        })
+
+    async def async_step_reconfigure_proxy(
+        self, user_input: dict[str, Any] | None = None
+    ) -> ConfigFlowResult:
+        """Handle the flow to reconfigure a connection via an ESP32-Divoom proxy."""
+
+        return await self._async_step_reconfigure_device("reconfigure_proxy", user_input, CONF_HOST, {
+            vol.Required(CONF_HOST): cv.string,
+        })
+
+    async def _async_step_reconfigure_device(
+        self, step_id: str, user_input: dict[str, Any] | None, connection_key: str, connection: dict
+    ) -> ConfigFlowResult:
+        """Handle the flow to change the connection, port and type of the Divoom device."""
 
         entry = self._get_reconfigure_entry()
 
         if user_input is not None:
             return self.async_update_reload_and_abort(
                 entry,
+                # clears whichever connection was used before
                 data_updates={
-                    CONF_HOST: user_input.get(CONF_HOST) or None,
+                    CONF_ADAPTER: None,
+                    CONF_HOST: None,
+                    connection_key: user_input.get(connection_key) or None,
                     CONF_PORT: user_input[CONF_PORT],
                     CONF_DEVICE_TYPE: user_input[CONF_DEVICE_TYPE],
                 },
             )
 
-        # suggested values instead of defaults, so the host can be cleared
+        # suggested values instead of defaults, so the adapter can be cleared
         return self.async_show_form(
-            step_id="reconfigure",
+            step_id=step_id,
             data_schema=self.add_suggested_values_to_schema(
                 vol.Schema(
                     {
-                        vol.Optional(CONF_HOST): cv.string,
+                        **connection,
                         vol.Required(CONF_PORT): cv.port,
                         vol.Required(CONF_DEVICE_TYPE): _device_type_selector(),
                     }

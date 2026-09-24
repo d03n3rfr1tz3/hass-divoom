@@ -17,7 +17,7 @@ import pytest
 
 from homeassistant.components.notify import ATTR_DATA
 
-from custom_components.divoom.const import CONF_DEVICE_TYPE, CONF_MEDIA_DIR, DOMAIN
+from custom_components.divoom.const import CONF_ADAPTER, CONF_DEVICE_TYPE, CONF_MEDIA_DIR, DOMAIN
 from custom_components.divoom.notify import (
     PARAM_COLOR,
     PARAM_FILE,
@@ -71,6 +71,30 @@ async def test_async_get_service_registers_and_picks_device_class(
     assert type(service._device).__name__ == class_name
     assert hass.data[DOMAIN]["loaded"]["11:22:33:44:55:66"] is service
     _patched_device_connect.assert_called_once_with()
+
+
+@pytest.mark.parametrize(
+    ("adapter_config", "expected_adapter"),
+    [({CONF_ADAPTER: "AA:BB:CC:DD:EE:FF"}, "AA:BB:CC:DD:EE:FF"), ({}, None)],
+)
+async def test_async_get_service_passes_the_adapter_to_the_device(
+    hass, _patched_device_connect, adapter_config, expected_adapter
+):
+    """The adapter is optional and entries created before it existed do not
+    carry the key at all, which has to stay the previous behaviour."""
+    service = await async_get_service(
+        hass,
+        {
+            CONF_MAC: "11:22:33:44:55:66",
+            CONF_PORT: 1,
+            CONF_DEVICE_TYPE: "pixoo",
+            CONF_MEDIA_DIR: "pixelart",
+            **adapter_config,
+        },
+    )
+    await hass.async_block_till_done(wait_background_tasks=True)
+
+    assert service._device.adapter == expected_adapter
 
 
 async def test_async_get_service_replaces_a_previous_instance(hass, _patched_device_connect):
@@ -405,7 +429,7 @@ def test_connect_and_disconnect_survive_an_unknown_device_type(caplog):
     typo in the config turned into an AttributeError on every call."""
     with caplog.at_level(logging.ERROR):
         service = DivoomNotificationService(
-            None, "11:22:33:44:55:66", 1, "nonexistent", "pixelart", "fonts", False
+            None, None, "11:22:33:44:55:66", 1, "nonexistent", "pixelart", "fonts", False
         )
 
     assert service._device is None

@@ -192,6 +192,60 @@ def test_connect_bounds_the_connect_itself(monkeypatch):
     ]
 
 
+def test_connect_binds_to_the_configured_adapter(monkeypatch):
+    """Without a bind() the kernel picks the local adapter itself, so on a host
+    with more than one adapter the connection may go out through the one the
+    device was never paired with."""
+    fake = _hands_out(monkeypatch, FakeSocket())
+
+    device = Pixoo(adapter="AA:BB:CC:DD:EE:FF", mac="11:22:33:44:55:66")
+    device.connect()
+
+    assert fake.calls == [
+        ("settimeout", 10),
+        ("bind", ("AA:BB:CC:DD:EE:FF", 0)),
+        ("connect", ("11:22:33:44:55:66", 1)),
+        ("settimeout", 3),
+    ]
+
+
+def test_connect_without_adapter_does_not_bind(monkeypatch):
+    """No adapter configured has to stay exactly the previous behaviour: let
+    the kernel route the connection."""
+    fake = _hands_out(monkeypatch, FakeSocket())
+
+    device = Pixoo(mac="11:22:33:44:55:66")
+    device.connect()
+
+    assert [name for name, *_args in fake.calls] == ["settimeout", "connect", "settimeout"]
+
+
+def test_connect_host_mode_ignores_the_adapter(monkeypatch):
+    """Host mode talks TCP to the ESP32 proxy; a local bluetooth adapter has
+    no meaning there and binding to it would break the connection."""
+    fake = _hands_out(monkeypatch, FakeSocket())
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    device = Pixoo(adapter="AA:BB:CC:DD:EE:FF", host="10.0.0.5", mac="11:22:33:44:55:66")
+    device.connect()
+
+    assert device.socket is fake
+    assert "bind" not in [name for name, *_args in fake.calls]
+
+
+def test_connect_clears_socket_after_bind_failure(monkeypatch):
+    """A configured adapter that is gone (unplugged dongle) makes bind() fail,
+    which has to be reported like any other connection failure instead of
+    leaving an unusable socket behind."""
+    _hands_out(monkeypatch, FakeSocket(bind_error=OSError(errno.EADDRNOTAVAIL, "not available")))
+
+    device = Pixoo(adapter="AA:BB:CC:DD:EE:FF", mac="11:22:33:44:55:66")
+    device.connect()
+
+    assert device.socket is None
+    assert device.socket_errno == errno.EADDRNOTAVAIL
+
+
 def test_connect_timeout_is_recorded_as_a_failure(monkeypatch):
     """A timed out connect raises TimeoutError carrying no errno, and
     reconnect() reads a missing errno as "nothing wrong" — so the bounded

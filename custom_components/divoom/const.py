@@ -4,6 +4,7 @@ from homeassistant.const import Platform
 PLATFORMS = [Platform.NOTIFY]
 DOMAIN: Final = "divoom"
 
+CONF_ADAPTER: Final = 'adapter'
 CONF_DEVICE: Final = 'device'
 CONF_DEVICE_TYPE: Final = 'device_type'
 CONF_MEDIA_DIR: Final = 'media_directory'

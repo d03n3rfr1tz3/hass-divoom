@@ -6,13 +6,13 @@ class TimeboxMini(Divoom):
     """Class TimeboxMini encapsulates the Timebox Mini Bluetooth communication."""
     maxframes = 12
 
-    def __init__(self, host=None, mac=None, port=1, escapePayload=True, logger=None):
+    def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=True, logger=None):
         self.type = "TimeboxMini"
         self.screensize = 11
         self.chunksize = 182
         self.colorpalette = None
         if escapePayload == None: escapePayload = True
-        Divoom.__init__(self, host, mac, port, escapePayload, logger)
+        Divoom.__init__(self, adapter, host, mac, port, escapePayload, logger)
         
     def make_frame(self, frame):
         length = len(frame)

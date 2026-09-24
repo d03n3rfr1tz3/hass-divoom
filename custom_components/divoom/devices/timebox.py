@@ -4,13 +4,13 @@ from .divoom import Divoom
 
 class Timebox(Divoom):
     """Class Timebox encapsulates the Timebox Bluetooth communication."""
-    def __init__(self, host=None, mac=None, port=1, escapePayload=False, logger=None):
+    def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "Timebox"
         self.screensize = 16
         self.chunksize = 200
         self.colorpalette = None
         if escapePayload == None: escapePayload = False
-        Divoom.__init__(self, host, mac, port, escapePayload, logger)
+        Divoom.__init__(self, adapter, host, mac, port, escapePayload, logger)
         
     def show_equalizer(self, number, audioMode=False, backgroundMode=False, streamMode=False):
         self.unsupported("the music equalizer mode")

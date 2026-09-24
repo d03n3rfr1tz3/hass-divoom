@@ -22,7 +22,9 @@ import types
 from unittest.mock import patch
 
 import pytest
+from bluetooth_adapters import ADAPTER_ADDRESS
 
+from custom_components.divoom import config_flow as divoom_config_flow
 from custom_components.divoom.devices import divoom as divoom_device
 from custom_components.divoom.notify import DivoomNotificationService
 
@@ -31,6 +33,37 @@ from custom_components.divoom.notify import DivoomNotificationService
 def _skip_bluetooth_dependency_setup(hass):
     hass.config.components.add("bluetooth_adapters")
     hass.config.components.add("bluetooth")
+
+
+@pytest.fixture(autouse=True)
+def local_adapters():
+    """Hand the config flow a fixed set of local bluetooth adapters.
+
+    Listing them for real goes through the same DBus code path as the
+    dependency setup above, which is not available here. Tests that care about
+    the adapters take this fixture and adjust its dict."""
+
+    class _Adapters:
+        def __init__(self):
+            self.adapters = {
+                "hci0": {ADAPTER_ADDRESS: "AA:BB:CC:DD:EE:FF"},
+                "hci1": {ADAPTER_ADDRESS: "AA:BB:CC:DD:EE:00"},
+            }
+
+        async def refresh(self):
+            pass
+
+    adapters = _Adapters()
+    with patch.object(divoom_config_flow, "get_adapters", lambda: adapters):
+        yield adapters
+
+
+@pytest.fixture(autouse=True)
+def _no_discovered_devices():
+    """The device form lists what the bluetooth manager has seen, and that
+    manager is never set up here (see above)."""
+    with patch.object(divoom_config_flow, "async_discovered_service_info", return_value=[]):
+        yield
 
 
 @pytest.fixture(autouse=True)
