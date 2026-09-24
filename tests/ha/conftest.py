@@ -59,6 +59,14 @@ def local_adapters():
 
 
 @pytest.fixture(autouse=True)
+def _no_discovered_devices():
+    """The device form lists what the bluetooth manager has seen, and that
+    manager is never set up here (see above)."""
+    with patch.object(divoom_config_flow, "async_discovered_service_info", return_value=[]):
+        yield
+
+
+@pytest.fixture(autouse=True)
 def _patched_device_connect():
     """Keep every HA test from opening a real connection to a device.
 

@@ -15,16 +15,34 @@
     "step": {
       "user": {
         "title": "Zařízení Divoom",
+        "description": "Jak se má Home Assistant připojit k vašemu zařízení Divoom?",
+        "menu_options": {
+          "direct": "Přímo přes Bluetooth",
+          "proxy": "Přes proxy ESP32-Divoom"
+        }
+      },
+      "direct": {
+        "title": "Zařízení Divoom",
         "description": "Vyberte své zařízení Divoom.",
         "data": {
           "mac": "Zařízení Divoom",
           "port": "Kanál/port Bluetooth",
-          "adapter": "Místní adaptér Bluetooth",
+          "adapter": "Místní adaptér Bluetooth"
+        },
+        "data_description": {
+          "adapter": "Potřebné jen tehdy, pokud má Home Assistant více než jeden adaptér Bluetooth. Ponechte pole prázdné a systém jeden vybere."
+        }
+      },
+      "proxy": {
+        "title": "Zařízení Divoom",
+        "description": "Vyberte své zařízení Divoom.",
+        "data": {
+          "mac": "Zařízení Divoom",
+          "port": "Kanál/port Bluetooth",
           "host": "Název hostitele/IP ESP32-Divoom"
         },
         "data_description": {
-          "adapter": "Potřebné jen tehdy, pokud má Home Assistant více než jeden adaptér Bluetooth, například vestavěný čip a USB dongle. Ponechte pole prázdné a systém vybere adaptér za vás.",
-          "host": "ESP32-Divoom je volitelný doprovodný firmware, který funguje jako proxy Bluetooth Classic. Pokud jej používáte, můžete jej zadat zde místo přímého připojení k zařízení Divoom přes Bluetooth. Pokud ne, ponechte pole prázdné a Home Assistant se připojí přímo přes Bluetooth."
+          "host": "Název hostitele nebo IP vašeho ESP32 s firmwarem ESP32-Divoom."
         }
       },
       "device_port": {
@@ -47,16 +65,34 @@
       },
       "reconfigure": {
         "title": "Překonfigurovat zařízení Divoom",
+        "description": "Jak se má Home Assistant připojit k vašemu zařízení Divoom?",
+        "menu_options": {
+          "reconfigure_direct": "Přímo přes Bluetooth",
+          "reconfigure_proxy": "Přes proxy ESP32-Divoom"
+        }
+      },
+      "reconfigure_direct": {
+        "title": "Překonfigurovat zařízení Divoom",
         "description": "Změňte nastavení připojení a typ svého zařízení Divoom.",
         "data": {
           "adapter": "Místní adaptér Bluetooth",
+          "port": "Kanál/port Bluetooth",
+          "device_type": "Typ"
+        },
+        "data_description": {
+          "adapter": "Potřebné jen tehdy, pokud má Home Assistant více než jeden adaptér Bluetooth. Ponechte pole prázdné a systém jeden vybere."
+        }
+      },
+      "reconfigure_proxy": {
+        "title": "Překonfigurovat zařízení Divoom",
+        "description": "Změňte nastavení připojení a typ svého zařízení Divoom.",
+        "data": {
           "host": "Název hostitele/IP ESP32-Divoom",
           "port": "Kanál/port Bluetooth",
           "device_type": "Typ"
         },
         "data_description": {
-          "adapter": "Potřebné jen tehdy, pokud má Home Assistant více než jeden adaptér Bluetooth, například vestavěný čip a USB dongle. Ponechte pole prázdné a systém vybere adaptér za vás.",
-          "host": "ESP32-Divoom je volitelný doprovodný firmware, který funguje jako proxy Bluetooth Classic. Pokud jej používáte, můžete jej zadat zde místo přímého připojení k zařízení Divoom přes Bluetooth. Pokud ne, ponechte pole prázdné a Home Assistant se připojí přímo přes Bluetooth."
+          "host": "Název hostitele nebo IP vašeho ESP32 s firmwarem ESP32-Divoom."
         }
       }
     },

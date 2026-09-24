@@ -15,16 +15,34 @@
     "step": {
       "user": {
         "title": "Divoom-apparaat",
+        "description": "Hoe moet Home Assistant verbinding maken met je Divoom-apparaat?",
+        "menu_options": {
+          "direct": "Rechtstreeks via Bluetooth",
+          "proxy": "Via ESP32-Divoom-proxy"
+        }
+      },
+      "direct": {
+        "title": "Divoom-apparaat",
         "description": "Selecteer je Divoom-apparaat.",
         "data": {
           "mac": "Divoom-apparaat",
           "port": "Bluetooth-kanaal/-poort",
-          "adapter": "Lokale Bluetooth-adapter",
+          "adapter": "Lokale Bluetooth-adapter"
+        },
+        "data_description": {
+          "adapter": "Alleen nodig als Home Assistant meer dan één Bluetooth-adapter heeft. Laat dit veld leeg, dan kiest het systeem er een."
+        }
+      },
+      "proxy": {
+        "title": "Divoom-apparaat",
+        "description": "Selecteer je Divoom-apparaat.",
+        "data": {
+          "mac": "Divoom-apparaat",
+          "port": "Bluetooth-kanaal/-poort",
           "host": "ESP32-Divoom hostnaam/IP"
         },
         "data_description": {
-          "adapter": "Alleen nodig als Home Assistant meer dan één Bluetooth-adapter heeft, bijvoorbeeld een ingebouwde chip en een USB-dongle. Laat dit veld leeg, dan kiest het systeem een adapter voor je.",
-          "host": "ESP32-Divoom is optionele begeleidende firmware die als Bluetooth Classic-proxy werkt. Als je die gebruikt, kun je hem hier invullen in plaats van rechtstreeks via Bluetooth met je Divoom-apparaat te verbinden. Zo niet, laat dit veld dan leeg en maakt Home Assistant rechtstreeks verbinding via Bluetooth."
+          "host": "Hostnaam of IP van je ESP32 met de ESP32-Divoom-firmware."
         }
       },
       "device_port": {
@@ -47,16 +65,34 @@
       },
       "reconfigure": {
         "title": "Divoom-apparaat opnieuw configureren",
+        "description": "Hoe moet Home Assistant verbinding maken met je Divoom-apparaat?",
+        "menu_options": {
+          "reconfigure_direct": "Rechtstreeks via Bluetooth",
+          "reconfigure_proxy": "Via ESP32-Divoom-proxy"
+        }
+      },
+      "reconfigure_direct": {
+        "title": "Divoom-apparaat opnieuw configureren",
         "description": "Wijzig de verbindingsinstellingen en het type van je Divoom-apparaat.",
         "data": {
           "adapter": "Lokale Bluetooth-adapter",
+          "port": "Bluetooth-kanaal/-poort",
+          "device_type": "Type"
+        },
+        "data_description": {
+          "adapter": "Alleen nodig als Home Assistant meer dan één Bluetooth-adapter heeft. Laat dit veld leeg, dan kiest het systeem er een."
+        }
+      },
+      "reconfigure_proxy": {
+        "title": "Divoom-apparaat opnieuw configureren",
+        "description": "Wijzig de verbindingsinstellingen en het type van je Divoom-apparaat.",
+        "data": {
           "host": "ESP32-Divoom hostnaam/IP",
           "port": "Bluetooth-kanaal/-poort",
           "device_type": "Type"
         },
         "data_description": {
-          "adapter": "Alleen nodig als Home Assistant meer dan één Bluetooth-adapter heeft, bijvoorbeeld een ingebouwde chip en een USB-dongle. Laat dit veld leeg, dan kiest het systeem een adapter voor je.",
-          "host": "ESP32-Divoom is optionele begeleidende firmware die als Bluetooth Classic-proxy werkt. Als je die gebruikt, kun je hem hier invullen in plaats van rechtstreeks via Bluetooth met je Divoom-apparaat te verbinden. Zo niet, laat dit veld dan leeg en maakt Home Assistant rechtstreeks verbinding via Bluetooth."
+          "host": "Hostnaam of IP van je ESP32 met de ESP32-Divoom-firmware."
         }
       }
     },
