@@ -1,6 +1,5 @@
 """Unit tests for the low-level protocol helpers in devices/divoom.py.
-These freeze the CURRENT behaviour (including the checksum branch, which is
-intentional PixooMax-compatibility code, not a bug to be fixed).
+The 4-byte checksum branch is intended, for the PixooMax.
 """
 from __future__ import annotations
 
@@ -195,9 +194,7 @@ def test_make_message_with_escaping():
 
 
 def test_send_weather_celsius_sends_set_temp_type_zero():
-    """value[-2] == "°C" compares a single character against a 2-character
-    string and is never true - value[-2:] is required for the "set temp
-    type" follow-up command to ever be sent."""
+    """A Celsius value is followed by "set temp type" 0."""
     device, recorder, server_sock = make_connected_device(Pixoo)
     try:
         device.send_weather("22°C", weather=3)
@@ -215,11 +212,8 @@ def test_send_weather_celsius_sends_set_temp_type_zero():
 
 
 def test_send_weather_fahrenheit_sends_set_temp_type_one():
-    """The device always interprets the "set temp" value as Celsius (the
-    "set temp type" flag only controls how it is *displayed*), so a
-    Fahrenheit input must be converted to Celsius before being sent -
-    confirmed by a BT snoop of the official app, which sends the same
-    Celsius reading regardless of the selected display unit."""
+    """"set temp" is always Celsius, "set temp type" only picks the displayed
+    unit, so Fahrenheit is converted first, as the official app does."""
     device, recorder, server_sock = make_connected_device(Pixoo)
     try:
         device.send_weather("70°F", weather=3)
@@ -237,8 +231,7 @@ def test_send_weather_fahrenheit_sends_set_temp_type_one():
 
 
 def test_show_clock_string_clock_matches_int_clock():
-    """clock arrives as a string from HA service calls; show_clock must
-    accept it the same way show_alarm already does."""
+    """show_clock accepts clock as a string, as HA service calls send it."""
     device_str, recorder_str, server_str = make_connected_device(Pixoo)
     device_int, recorder_int, server_int = make_connected_device(Pixoo)
     try:
@@ -254,8 +247,7 @@ def test_show_clock_string_clock_matches_int_clock():
 
 
 def test_send_json_sorts_keys_and_drops_whitespace():
-    """The app serializes with fastjson's SortField, so the device only ever
-    sees alphabetically sorted, compact JSON."""
+    """The device gets compact JSON with sorted keys, as the app sends it."""
     device, recorder, server_sock = make_connected_device(MiniToo)
     try:
         device.send_json({"B": "x", "A": 1})
@@ -281,10 +273,9 @@ def test_send_gamecontrol_invalid_string_logs_and_sends_nothing():
 
 
 def test_send_raw_frames_the_command_like_any_other():
-    """The raw mode passes the command byte and its arguments as one list and
-    lets the device build length, checksum and envelope - which is what the
-    example in every devices/*.txt promises: [0x74, 0x64] sets brightness
-    to 100%."""
+    """Raw mode takes the command byte and its arguments as one list and gets
+    length, checksum and envelope built, as in the devices/*.txt example:
+    [0x74, 0x64] sets brightness to 100%."""
     device_raw, recorder_raw, server_raw = make_connected_device(Pixoo)
     device_cmd, recorder_cmd, server_cmd = make_connected_device(Pixoo)
     try:
@@ -300,10 +291,7 @@ def test_send_raw_frames_the_command_like_any_other():
 
 
 def test_disconnect_swallows_socket_errors_and_clears_socket():
-    """The bare `except:` in disconnect() used to also swallow
-    BaseException subclasses like SystemExit/KeyboardInterrupt; narrowing it
-    to `except Exception:` must not change behaviour for ordinary socket
-    errors raised from shutdown()."""
+    """disconnect() swallows socket errors from shutdown() and clears the socket."""
     device = Pixoo(mac="11:22:33:44:55:66")
     device.socket = FakeSocket(shutdown_error=OSError("shutdown failed"))
     device.disconnect()

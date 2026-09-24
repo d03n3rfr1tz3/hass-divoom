@@ -1,9 +1,6 @@
-"""HA integration tests for notify.py: service setup via async_get_service,
-and send_message's mode dispatch. The dispatch tests swap in a unittest.mock.Mock()
-for DivoomNotificationService._device, skipping DivoomNotificationService.__init__
-entirely (it picks a real device class and constructs a real socket-backed object).
-So these run with no socket involved at all, only asserting which show_*/send_* call
-reaches the mock and with what arguments.
+"""HA integration tests for notify.py: service setup via async_get_service and
+send_message's mode dispatch. The dispatch tests use a Mock() as device and assert
+which show_*/send_* call reaches it.
 """
 from __future__ import annotations
 
@@ -37,8 +34,7 @@ from homeassistant.const import CONF_HOST, CONF_MAC, CONF_PORT
 
 def make_mocked_service(media_directory="pixelart", font_directory="fonts"):
     """A DivoomNotificationService with a Mock() in place of a real device,
-    bypassing __init__ (which would instantiate a real, socket-backed
-    device class)."""
+    bypassing __init__, which would create a socket-backed one."""
     service = DivoomNotificationService.__new__(DivoomNotificationService)
     service._device = Mock()
     service._media_directory = media_directory
@@ -80,8 +76,8 @@ async def test_async_get_service_registers_and_picks_device_class(
 async def test_async_get_service_passes_the_adapter_to_the_device(
     hass, _patched_device_connect, adapter_config, expected_adapter
 ):
-    """The adapter is optional and entries created before it existed do not
-    carry the key at all, which has to stay the previous behaviour."""
+    """The configured adapter reaches the device. Entries without the key get
+    no adapter."""
     service = await async_get_service(
         hass,
         {
@@ -98,9 +94,8 @@ async def test_async_get_service_passes_the_adapter_to_the_device(
 
 
 async def test_async_get_service_replaces_a_previous_instance(hass, _patched_device_connect):
-    """The device accepts a single connection, so a reload used to leave the
-    old socket open until garbage collection got round to it and the new
-    connect() ran into the reconnect retries instead."""
+    """A reload disconnects the previous instance, as the device accepts only
+    a single connection."""
     config = {
         CONF_MAC: "11:22:33:44:55:66",
         CONF_PORT: 1,
@@ -119,8 +114,7 @@ async def test_async_get_service_replaces_a_previous_instance(hass, _patched_dev
 
 
 async def test_async_get_service_invalid_device_type_logs_device_type(hass, caplog):
-    """The error message used to format media_directory into the
-    "device_type {0} does not exist" string instead of device_type itself."""
+    """The error names the unknown device_type."""
     caplog.set_level(logging.ERROR)
     service = await async_get_service(
         hass,
@@ -138,9 +132,8 @@ async def test_async_get_service_invalid_device_type_logs_device_type(hass, capl
 
 
 def test_del_and_exit_are_noop_when_device_is_none():
-    """__init__ leaves _device as None for an unrecognised device_type;
-    __del__/__exit__ used to call self._device.disconnect() unconditionally
-    and crash with AttributeError in that case."""
+    """__del__/__exit__ cope with _device being None, as __init__ leaves it
+    for an unknown device_type."""
     service = DivoomNotificationService.__new__(DivoomNotificationService)
     service._device = None
 
@@ -229,9 +222,7 @@ def test_send_message_image_mode_without_file_logs_and_returns_false():
 
 
 def test_send_message_image_mode_rejects_path_traversal():
-    """os.path.join drops the base directory entirely for an absolute
-    filename, and '../' can walk back out of a relative one - both used to
-    let a service call read any file the HA process can access."""
+    """A filename cannot walk out of the media directory."""
     service = make_mocked_service(media_directory="/media/pixelart")
 
     result = service.send_message(
@@ -243,8 +234,7 @@ def test_send_message_image_mode_rejects_path_traversal():
 
 
 def test_send_message_text_mode_without_font_still_calls_show_text():
-    """font is optional - PARAM_FONT absent must not be treated as a
-    traversal rejection."""
+    """font is optional, so a missing PARAM_FONT is no traversal rejection."""
     service = make_mocked_service()
 
     result = service.send_message(data={PARAM_MODE: "text", PARAM_TEXT: "hello"})
@@ -305,8 +295,7 @@ def test_send_message_other_modes_reconnect_first():
 
 
 def test_call_mode_stops_when_reconnect_gives_up():
-    """A mode used to be sent onto a dead connection after reconnect() gave
-    up, and the service still reported success."""
+    """Once reconnect() gives up, the mode is not sent and the call fails."""
     service = make_mocked_service()
     service._device.reconnect.return_value = False
 
@@ -322,8 +311,7 @@ def test_send_message_invalid_mode_logs_and_returns_false():
     result = service.send_message(data={PARAM_MODE: "not-a-real-mode"})
 
     assert result is False
-    # unknown modes still reconnect first (that check runs before the mode
-    # dispatch), but no show_*/send_* call is ever reached for them
+    # unknown modes still reconnect first, but reach no show_*/send_* call
     service._device.reconnect.assert_called_once_with(skipPing=False)
     assert len(service._device.mock_calls) == 1
 
@@ -338,10 +326,8 @@ def test_send_message_empty_message_and_no_data_returns_false():
 
 
 def test_send_message_serializes_concurrent_calls_to_same_device():
-    """Two service calls against the same DivoomNotificationService (the
-    situation HA creates by running each service call in its own executor
-    thread) used to share the underlying device's socket/buffer without any
-    synchronisation. self._lock must serialize them."""
+    """HA runs each service call in its own executor thread, so self._lock
+    serializes calls to the same device."""
     service = make_mocked_service()
     active = 0
     max_active = 0
@@ -391,8 +377,7 @@ def test_send_message_serializes_concurrent_calls_to_same_device():
 
 
 def test_send_message_different_devices_do_not_block_each_other():
-    """The lock lives on the DivoomNotificationService instance, so it must
-    not serialize calls across two different devices."""
+    """The lock is per instance, so calls to different devices run in parallel."""
     service_a = make_mocked_service()
     service_b = make_mocked_service()
 
@@ -413,8 +398,7 @@ def test_send_message_different_devices_do_not_block_each_other():
     try:
         assert a_entered.wait(timeout=2)
 
-        # service_b's send_message must complete promptly even though service_a
-        # is still blocked inside its own reconnect().
+        # service_b completes while service_a still blocks in its reconnect()
         result_b = service_b.send_message(data={PARAM_MODE: "on"})
         assert result_b is True
         service_b._device.send_on.assert_called_once_with()
@@ -424,9 +408,8 @@ def test_send_message_different_devices_do_not_block_each_other():
 
 
 def test_connect_and_disconnect_survive_an_unknown_device_type(caplog):
-    """__init__ leaves _device as None for a device_type it does not know and
-    only logs. connect()/disconnect() went on to dereference it anyway, so a
-    typo in the config turned into an AttributeError on every call."""
+    """An unknown device_type is logged, and connect()/disconnect() then do
+    nothing instead of raising."""
     with caplog.at_level(logging.ERROR):
         service = DivoomNotificationService(
             None, None, "11:22:33:44:55:66", 1, "nonexistent", "pixelart", "fonts", False

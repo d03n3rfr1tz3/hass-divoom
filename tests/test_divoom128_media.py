@@ -1,19 +1,8 @@
-"""Structural verification of the 128x128 media path (opcode 0x8b).
+"""Structural checks of the 128x128 media path (opcode 0x8b).
 
-These cases are deliberately absent from tests/goldens/: the payload is one
-Zstandard stream, whose bytes are not guaranteed identical across
-zstandard/libzstd versions, so a recorded hexdump would be flaky - and at
-roughly 1.5 MB it would be unreadable besides. Instead everything a golden
-would freeze is checked here directly, and more sharply: envelope and
-checksum of every message (recomputed through the device's own
-make_message), the start packet, gapless chunk indices and sizes, the media
-header, and - after decompressing - the pixel buffer itself, compared
-against an independently rebuilt reference.
-
-The comparison is against the *decompressed* bytes, so it stays valid no
-matter how the compressor version changes. One frozen hash pins
-Divoom128._fit()/_quantize() themselves; without it the content check would
-only compare show_image against itself.
+Its zstd payload is not byte-stable across libzstd versions, so instead of
+goldens these tests check envelope, checksums, start packet, chunk indices,
+media header and the decompressed pixels against a rebuilt reference.
 """
 from __future__ import annotations
 
@@ -56,15 +45,12 @@ ZSTD_MAGIC = b"\x28\xb5\x2f\xfd"
 
 MEDIA_MAX_BYTES = 307200
 
-# bytes per pixel and zstd window_log per device. Every media device needs an
-# entry here, or the parametrized case below fails on the lookup.
+# bytes per pixel and zstd window_log, one entry per media device
 MEDIA_DEVICE_SPECS = {"FlowToo": (2, 16), "MiniToo": (3, 17), "Tiivoo2": (3, 17)}
 
 # sha256 of pixelart/smiley16.gif run through Divoom128._fit() and _quantize().
-# This pins the crop/resample/quantize pipeline itself - the reference buffer
-# below is rebuilt with those two, so without this the content check would
-# compare show_image against itself. Regenerate only after an intentional
-# change to either, and look at the decoded frame before trusting the new hash.
+# The reference below is rebuilt with both, so this hash pins them. Regenerate
+# only after an intended change, and check the decoded frame first.
 SMILEY16_RAW_SHA256 = "63f506cbcda03d1c3303167f5c01b9d404916444cdcdc5d29335c99c0d944f10"
 
 
@@ -77,10 +63,8 @@ def _source_file(case_name):
 
 
 def _expected_frames(device, path):
-    """Rebuild the frames and speed a show_image case has to produce. Shares
-    only _fit(), _quantize() and pick_frames() with the device, so the frame
-    walk itself stays independent; that the quantizer really caps the palette
-    is checked separately in test_frames_are_quantized."""
+    """Rebuild the frames and speed a show_image case has to produce, sharing
+    only _fit(), _quantize() and pick_frames() with the device."""
     with Image.open(path) as img:
         n = getattr(img, "n_frames", 1)
         if n <= 1:
@@ -129,8 +113,8 @@ def _decoded_frames(messages):
 
 
 def test_await_request_sees_the_device_reply():
-    """The handshake itself: without this a broken _await_request() would only
-    make the cases below slow (2s timeout each), never red."""
+    """_await_request() sees the device's reply to the start packet. Without
+    this test, a broken handshake would only slow the media cases down."""
     device, _, server_sock = make_connected_device(
         MiniToo, responder=media_responder)
     try:
@@ -205,10 +189,8 @@ def test_divoom128_media(case_name, device_type):
 
     path = _source_file(case_name)
     if path is None:
-        # show_text: rebuilding the glyphs would compare show_text against
-        # itself, and would depend on the FreeType build the same way the
-        # goldens in test_golden_devices.py do. Length and framing above are
-        # what is actually verifiable here.
+        # show_text: rebuilt glyphs would compare show_text against itself and
+        # depend on the FreeType build, so length and framing above must do
         assert frames == 1
         return
 
@@ -253,8 +235,8 @@ def test_resend_request_mid_stream():
 
 
 def test_resend_request_in_the_linger_window():
-    """The device may only ask once the last chunk is out - _send_packets keeps
-    listening for resendwindow seconds instead of draining blindly."""
+    """A resend request arriving after the last chunk is still served, as
+    _send_packets keeps listening for resendwindow seconds."""
     responder = MediaResendResponder(2, after_chunks=1, delay=0.15)
     messages = _run_show_image(responder)
 
@@ -273,8 +255,7 @@ def test_resend_request_with_unknown_index_is_ignored():
 
 def _noise_gif(path, frames=20, seed=20240912):
     """A GIF that cannot be compressed away: full-entropy 128x128 noise. 20 of
-    these frames come to ~466 KB compressed, well over MEDIA_MAX_BYTES, so the
-    encoder has to thin them out."""
+    these frames exceed MEDIA_MAX_BYTES, so the encoder has to thin them out."""
     rnd = random.Random(seed)
     images = [
         Image.frombytes("RGB", (SCREEN, SCREEN),
@@ -363,8 +344,7 @@ def test_flowtoo_pixels_are_rgb565_big_endian(tmp_path):
 
 
 def test_frames_are_quantized():
-    """Frames are capped at 255 colors before compressing; without it the
-    payload is needlessly large."""
+    """Frames are capped at 255 colors before compressing."""
     _, messages = _run_case(image_case_name("ha32.gif"))
     frames, _, _, raw = _decoded_frames(messages)
 

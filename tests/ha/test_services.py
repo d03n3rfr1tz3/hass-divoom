@@ -1,9 +1,7 @@
 """HA integration tests for services.py: the divoom.* domain services.
 
-Like test_notify.py these swap a unittest.mock.Mock() in for the device, so
-no socket is ever involved - what's asserted is which show_*/send_* call
-reaches the mock, and how the service layer resolves its target and reports
-failures.
+They use a Mock() as device and assert which show_*/send_* call reaches it,
+and how the service layer resolves its target and reports failures.
 """
 from __future__ import annotations
 
@@ -80,9 +78,8 @@ def register_named_device(hass, mac, title, name="Divoom Device"):
 
 
 async def test_async_setup_registers_clock_service(hass):
-    """Services are registered in async_setup, so they exist even with no
-    config entry at all - a call then fails with a readable message instead
-    of "unknown service"."""
+    """Services are registered in async_setup, so without a config entry a
+    call fails with a readable message instead of "unknown service"."""
     assert await async_setup_component(hass, DOMAIN, {})
     await hass.async_block_till_done()
 
@@ -105,8 +102,8 @@ async def test_resolve_target_accepts_the_name_in_any_spelling(hass, device):
 
 
 async def test_resolve_target_still_accepts_a_raw_entry_id(hass):
-    """What the config_entry picker used to write, so automations built
-    before the rename keep working."""
+    """A raw entry ID still resolves, as automations built with the former
+    config_entry picker carry one."""
     entry, service = register_device(hass)
 
     assert _resolve_target(hass, {CONF_DEVICE: entry.entry_id}) is service
@@ -122,7 +119,7 @@ async def test_resolve_target_unknown_device_raises(hass):
 
 
 async def test_resolve_target_ambiguous_device_raises(hass):
-    """A slug that fits two entries used to pick the first one silently."""
+    """A slug that fits two entries raises instead of picking one."""
     register_named_device(hass, "11:22:33:44:55:60", "Divoom PixooMax")
     register_named_device(hass, "11:22:33:44:55:61", "Divoom Ditoo")
 
@@ -199,8 +196,8 @@ async def test_device_field_offers_the_configured_devices(hass):
     ids=["title-slug", "entry-id"],
 )
 async def test_device_field_values_reach_their_own_device(hass, titles, expected):
-    """Two entries sharing a name offered the same value, so picking the second
-    one in the UI always hit the first."""
+    """Entries sharing a name get distinct values, each reaching its own
+    device."""
     assert await async_setup_component(hass, DOMAIN, {})
     devices = [
         register_named_device(hass, "11:22:33:44:55:6{}".format(i), title)
@@ -278,10 +275,8 @@ async def test_clock_service_calls_show_clock_off_the_event_loop(hass):
 
 
 async def test_clock_service_omits_unset_fields(hass):
-    """services.yaml deliberately carries no `default:` values - an untouched
-    field has to arrive as None, or the service path would send commands the
-    notify path doesn't (show_clock only emits "set time type" when
-    twentyfour is not None, and "set hot" when hot is not None)."""
+    """services.yaml carries no `default:` values, so an untouched field
+    arrives as None and the service path sends no more than the notify path."""
     assert await async_setup_component(hass, DOMAIN, {})
     entry, service = register_device(hass)
 
@@ -322,9 +317,8 @@ async def test_clock_service_raises_when_call_mode_fails(hass):
 
 
 async def test_notify_and_service_clock_paths_produce_identical_show_clock_call(hass):
-    """The whole point of extracting call_mode: both entry points share one
-    lock, one reconnect and one dispatch, so the same parameters must reach
-    the device identically either way."""
+    """Both entry points share call_mode, so the same parameters reach the
+    device identically."""
     assert await async_setup_component(hass, DOMAIN, {})
     entry, via_service = register_device(hass)
     via_notify = make_mocked_service()
@@ -571,9 +565,8 @@ async def test_notify_and_service_paths_match(hass, mode, params, notify_data, m
     ],
 )
 async def test_service_requires_mandatory_field(hass, mode, params):
-    """Without these the device call would be a silent no-op or the device
-    default would pick for the caller, so the schema has to reject the call
-    instead of letting it look successful."""
+    """The schema rejects a call without these, instead of a silent no-op or
+    a device default picking for the caller."""
     assert await async_setup_component(hass, DOMAIN, {})
     entry, service = register_device(hass)
 
@@ -754,8 +747,7 @@ async def test_image_outside_media_directory_raises(hass):
 
 
 async def test_brightness_zero_is_sent(hass):
-    """0 is a legitimate brightness. It used to fall through the truthy `or`
-    chain in notify.py down to None, where send_brightness returns silently."""
+    """0 is a legitimate brightness and reaches the device."""
     assert await async_setup_component(hass, DOMAIN, {})
     entry, service = register_device(hass)
 
@@ -768,8 +760,7 @@ async def test_brightness_zero_is_sent(hass):
 
 @pytest.mark.parametrize("key", ["brightness", "number", "value"])
 def test_brightness_accepts_any_of_its_three_keys(key):
-    """The notify path deliberately tolerates the wrong key. Fixing the falsy-0
-    bug must not narrow that down to `brightness` only."""
+    """The notify path accepts all three keys, also with a value of 0."""
     service = make_mocked_service()
 
     service.call_mode("brightness", {key: 0})
@@ -829,8 +820,8 @@ def test_alarm_accepts_both_time_formats(time_value):
     ],
 )
 def test_countdown_reads_minutes_and_seconds_from_the_end(countdown_value, expected):
-    """The countdown takes mm:ss, so a three-part value has to be read from
-    the back - reading it from the front turned the hours into minutes."""
+    """The countdown takes mm:ss, so a three-part value is read from the
+    back."""
     device = Pixoo(mac="11:22:33:44:55:66")
     device.send_command = Mock()
 
@@ -897,9 +888,8 @@ def _temperature_byte(calls):
 )
 def test_weather_value_accepts_number_and_unit(kwargs):
     """The UI splits temperature into a number and an optional unit, older
-    automations pack both into one string - every spelling has to end up as
-    the same celsius byte. An explicit unit wins over the one in the string,
-    which is why the last case sends 77 rather than converting it."""
+    automations pack both into one string. Every spelling ends up as the same
+    celsius byte, and an explicit unit wins over the string, hence 77 last."""
     expected = kwargs.pop("extra", 25)
 
     assert _temperature_byte(_weather_calls(**kwargs)) == expected
@@ -962,8 +952,8 @@ async def test_connection_loss_raises_a_translated_error(hass):
 
 
 def test_notify_path_continues_on_unsupported_modes():
-    """Backwards compatibility: notify.<device> behaved like this before the
-    services existed and must keep doing so."""
+    """notify.<device> skips unsupported modes and reports success, for
+    backwards compatibility."""
     service = make_mocked_service()
     service._device.show_radio.side_effect = DivoomUnsupportedError("Pixoo", "showing the radio")
 
@@ -971,8 +961,8 @@ def test_notify_path_continues_on_unsupported_modes():
 
 
 def test_call_mode_drops_the_connection_on_a_send_error():
-    """Half a chunked animation went out, so the device is out of step. Leaving
-    the socket open only sent the next call through the reconnect retry loop."""
+    """A send error may leave the device out of step mid-animation, so the
+    connection is dropped and the next call connects afresh."""
     service = make_mocked_service()
     service._device.show_light.side_effect = TimeoutError("Pixoo: socket not writable")
 
@@ -1002,8 +992,8 @@ def test_call_mode_raises_without_continue_on_error():
 
 
 def test_unsupported_warns_before_it_raises(caplog):
-    """The log line is unchanged from before the exception existed, so log
-    based troubleshooting keeps working."""
+    """An unsupported mode is logged before it raises, so log based
+    troubleshooting works."""
     device = Pixoo(mac="11:22:33:44:55:66")
 
     with pytest.raises(DivoomUnsupportedError):
@@ -1033,9 +1023,8 @@ def test_signal_is_backpack_only():
 
 @pytest.mark.parametrize("device_cls", [Aurabox, TimeboxMini])
 def test_temperature_is_aurabox_and_timeboxmini_only(device_cls):
-    """Only these two have a temperature channel - everywhere else the mode
-    used to switch the clock instead, which is a setting change nobody asked
-    for, so it has to be refused rather than guessed."""
+    """Only these two have a temperature channel. Other devices refuse the
+    mode instead of switching the clock."""
     device = device_cls(mac="11:22:33:44:55:66")
     device.send_command = Mock()
 
@@ -1141,9 +1130,9 @@ BOUNDED_NUMBER_IDS = [
 
 @pytest.mark.parametrize("mode,field", BOUNDED_NUMBER_FIELDS, ids=BOUNDED_NUMBER_IDS)
 def test_number_fields_stop_at_the_protocol_limit(mode, field):
-    """Above the width the protocol packs the value into, to_bytes would
-    raise OverflowError deep in the executor thread - the schema has to
-    catch it first, while the limit itself still has to be reachable."""
+    """The schema rejects values too wide for the protocol, which to_bytes
+    would otherwise raise on in the executor thread. The limit itself stays
+    reachable."""
     limit = _number_selector(_fields(SERVICES_YAML[mode])[field])["max"]
     schema = SERVICE_SCHEMAS[mode]
     payload = {CONF_DEVICE: "divoom_test", **VALID_PARAMS.get(mode, {})}
@@ -1190,9 +1179,8 @@ def _keys(node):
 
 
 def test_translation_keys_are_valid():
-    """Select options become JSON keys under "selector", and hassfest only
-    accepts [a-z0-9-_] there. "°C" passes every test in this file and still
-    fails the whole validation in CI, so the rule is checked here too."""
+    """Select options become JSON keys under "selector", where hassfest only
+    accepts [a-z0-9-_], so e.g. "°C" is invalid."""
     for path in [COMPONENT_PATH / "strings.json", *(COMPONENT_PATH / "translations").glob("*.json")]:
         document = json.loads(path.read_text(encoding="utf-8"))
         invalid = [key for key in _keys(document) if not TRANSLATION_KEY.match(key)]
@@ -1200,9 +1188,8 @@ def test_translation_keys_are_valid():
 
 
 def test_every_service_field_is_a_known_notify_param():
-    """Every service field is passed straight into call_mode's data dict. A
-    name call_mode doesn't know would be silently ignored - the call would
-    look successful and do nothing."""
+    """Service fields go straight into call_mode's data dict, where an unknown
+    name would be silently ignored."""
     notify_params = {
         value for name, value in vars(notify_module).items()
         if name.startswith("PARAM_") and isinstance(value, str)
@@ -1214,9 +1201,8 @@ def test_every_service_field_is_a_known_notify_param():
 
 
 def test_services_yaml_strings_and_translations_stay_in_sync():
-    """services.yaml, the voluptuous schemas and the ten string files are
-    maintained by hand and drift easily. Every mode added in a later step
-    passes through here."""
+    """services.yaml, the voluptuous schemas and the string files are
+    maintained by hand and must match."""
     services_yaml = load_yaml(str(COMPONENT_PATH / "services.yaml"))
     strings = json.loads((COMPONENT_PATH / "strings.json").read_text(encoding="utf-8"))
 

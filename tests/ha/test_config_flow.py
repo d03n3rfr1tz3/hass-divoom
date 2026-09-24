@@ -25,9 +25,8 @@ pytestmark = pytest.mark.usefixtures("enable_custom_integrations")
 
 
 def make_bluetooth_info(source: str) -> SimpleNamespace:
-    """The three attributes async_step_bluetooth reads. A real
-    BluetoothServiceInfoBleak would additionally need a BLEDevice and
-    advertisement data, which the step never looks at."""
+    """The three attributes async_step_bluetooth reads, instead of a full
+    BluetoothServiceInfoBleak."""
     return SimpleNamespace(name="Pixoo-573A", address="11:22:33:44:55:66", source=source)
 
 
@@ -52,10 +51,8 @@ async def choose(hass, result, next_step_id):
 
 
 async def test_user_step_with_known_mac_creates_entry(hass):
-    """Entering the MAC by hand jumps straight to the device_type step
-    (device_port is only reached via bluetooth/
-    zeroconf discovery, which pre-populates _device_name for its
-    name-prefix autodetection)."""
+    """Entering the MAC by hand goes straight to the device_type step. The
+    device_port step is only reached via discovery."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
@@ -107,8 +104,8 @@ async def test_user_step_with_adapter_stores_it_lowercased(hass):
 
 
 async def test_user_step_via_proxy_stores_the_host(hass):
-    """The proxy way asks for the host only, so no adapter can end up next to
-    it where it would be ignored."""
+    """The proxy form asks for the host only, so no ignored adapter ends up
+    next to it."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
@@ -132,8 +129,8 @@ async def test_user_step_via_proxy_stores_the_host(hass):
 
 
 async def test_an_undiscovered_device_is_named_after_its_type(hass):
-    """Without a discovered name every such entry was "Divoom Device", so a
-    second one got the same service slug and notify name as the first."""
+    """Without a discovered name, the entry is named after its device type,
+    so devices of different types get their own service slug and notify name."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN, context={"source": config_entries.SOURCE_USER}
     )
@@ -207,8 +204,8 @@ async def test_bluetooth_step_ignores_a_remote_scanner_as_adapter(hass):
     ],
 )
 async def test_zeroconf_step_with_properties_creates_entry(hass, device_name, device_type):
-    """Happy path: zeroconf discovery info carries both properties, so the
-    device type and name are auto-detected from the mDNS name."""
+    """With both properties in the discovery info, device type and name are
+    detected from the mDNS name."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_ZEROCONF},
@@ -242,8 +239,7 @@ async def test_zeroconf_step_with_properties_creates_entry(hass, device_name, de
 
 
 async def test_zeroconf_step_missing_device_mac_is_handled(hass):
-    """A missing device_mac property can't be recovered from - the flow
-    aborts instead of crashing on discovery_info.properties.get(...).lower()."""
+    """A missing device_mac property aborts the flow."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_ZEROCONF},
@@ -254,8 +250,7 @@ async def test_zeroconf_step_missing_device_mac_is_handled(hass):
 
 
 async def test_zeroconf_step_missing_device_name_is_handled(hass):
-    """A missing device_name property falls back to "Device" instead of
-    crashing on self._device_name.lower() in async_step_device_port."""
+    """A missing device_name property falls back to "Device"."""
     result = await hass.config_entries.flow.async_init(
         DOMAIN,
         context={"source": config_entries.SOURCE_ZEROCONF},
@@ -312,9 +307,8 @@ async def test_reconfigure_updates_connection_and_keeps_identity(hass):
     ],
 )
 async def test_reconfigure_sets_and_clears_the_adapter(hass, adapter_input, expected_adapter):
-    """Reconfigure is the only way to pick another adapter or to hand the
-    choice back to the system, so leaving the field out has to clear it. Entries
-    created before the option existed carry no adapter key at all."""
+    """Reconfigure sets the adapter, and leaving the field out clears it,
+    handing the choice back to the system."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id="11:22:33:44:55:66",

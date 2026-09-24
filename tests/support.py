@@ -1,10 +1,7 @@
 """Shared helpers for the golden-master test suite.
 
-The core trick: `device.socket` only needs to behave like a real connected
-socket (`select.select`, `.send()`/`.sendall()`, `.recv()`, `.fileno()`).
-`RecordingSocket` wraps one end of a real `socket.socketpair()` so all of
-that keeps working exactly as in production, while additionally recording
-every `send()`/`sendall()` call as one separate captured message.
+RecordingSocket wraps one end of a real socketpair, so select, send and recv
+behave as in production, and records every send()/sendall() as one message.
 """
 from __future__ import annotations
 
@@ -94,16 +91,14 @@ class FakeSocket:
 
 
 def media_responder(data: bytes) -> bytes | None:
-    """Answer a 0x8b start packet the way a real 128x128 device does: "send the
-    animation". Without it Divoom128._await_request() runs into its 2s timeout
-    on every media case and the handshake stays untested."""
+    """Answer a 0x8b start packet the way a 128x128 device does, with "send the
+    animation"."""
     return MEDIA_READY if data.startswith(MEDIA_START_PREFIX) else None
 
 
 def media_resend_request(index: int) -> bytes:
     """The device's "resend the chunk at index" message: 04 8b 55 01 <index LE16>.
-    Built through a 128x128 device's make_message so the envelope and checksum
-    come from the implementation, not from hand."""
+    Envelope and checksum come from a 128x128 device's make_message."""
     from custom_components.divoom.devices.minitoo import MiniToo
 
     args = [0x8B, 0x55, 0x01] + list(int(index).to_bytes(2, "little"))
@@ -115,9 +110,8 @@ class MediaResendResponder:
     """Responder that answers the start packet and then, once `after_chunks` chunk
     packets have arrived, asks a single time for `index` to be resent.
 
-    `delay` holds that answer back by that many seconds, which is how the
-    linger-window case is reached: the stream is long over by then, so the
-    request can only be served after the last chunk."""
+    `delay` holds that request back by as many seconds, so it arrives only
+    after the last chunk."""
 
     def __init__(self, index: int, after_chunks: int = 3, delay: float = 0.0):
         self.index = index
@@ -166,8 +160,7 @@ def make_connected_device(device_cls, mac="11:22:33:44:55:66", responder=None, *
     bypassing connect() so tests need no real Bluetooth/TCP hardware.
 
     `responder` is an optional callback receiving each message read from the
-    device; whatever it returns is sent back. Without one the peer
-    only drains, exactly as before.
+    device; whatever it returns is sent back. Without one the peer only drains.
 
     Returns (device, recorder, server_sock). Call device.disconnect() and
     server_sock.close() when done.
@@ -179,14 +172,10 @@ def make_connected_device(device_cls, mac="11:22:33:44:55:66", responder=None, *
     device.socket = recorder
     device.socket_errno = 0
 
-    # Send pacing is meant for real hardware; over a socketpair it is pure
-    # sleeping - roughly 16s across the suite for the MiniToo alone.
+    # send pacing is only needed by real hardware
     device.senddelay = 0
 
-    # Likewise the window MiniToo keeps listening for resend requests in: 0.5s
-    # per media case would dominate the suite, 0.2s matches what the
-    # clear_input_buffer() it replaced used to cost. Tests that exercise a
-    # resend raise it themselves.
+    # shorter resend window to keep the suite fast, resend tests raise it themselves
     if hasattr(device, "resendwindow"):
         device.resendwindow = 0.2
 
@@ -251,12 +240,8 @@ def parse_golden(text: str) -> list[bytes]:
 def unescape_message(message: bytes) -> bytes:
     """Reverse Divoom.escape_payload's 0x03,X -> X-0x03 substitution.
 
-    Devices with escapePayload=True (e.g. TimeboxMini) escape every 0x01-0x03
-    byte in the checksummed payload as a 2-byte sequence, so the *wire*
-    length of an otherwise-identical message varies with how many payload
-    bytes happen to fall in that range. Comparing messages after unescaping
-    removes that variance while still catching any real structural
-    difference (frame count, command, sizes)."""
+    With escapePayload, the wire length depends on how many payload bytes fall
+    into 0x01-0x03. Comparing unescaped messages removes that variance."""
     result = bytearray()
     i = 0
     while i < len(message):

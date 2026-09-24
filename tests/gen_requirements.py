@@ -1,10 +1,8 @@
 """Resolve the Home Assistant requirements our integration pulls in at import time.
 
-Reads custom_components/divoom/manifest.json, walks the "dependencies" closure through
-the manifests of the *installed* homeassistant version and prints the collected
-"requirements" as a pip requirements file. That keeps tests/requirements_test.txt down to
-a single hand-maintained pin (pytest-homeassistant-custom-component, which picks the HA
-version) instead of hand-copied mirrors of HA's own pins.
+Walks the "dependencies" of our manifest.json through the manifests of the installed
+homeassistant and prints their "requirements" as a pip requirements file, so that
+tests/requirements_test.txt only needs to pin pytest-homeassistant-custom-component.
 
 Usage: python tests/gen_requirements.py [--output requirements_ha.txt]
 """
@@ -21,10 +19,8 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parent.parent
 OWN_MANIFEST = REPO_ROOT / "custom_components" / "divoom" / "manifest.json"
 
-# homeassistant.components.usb.serial_proxy_stub unconditionally imports
-# serialx.platforms.serial_esphome, which needs aioesphomeapi. HA's own usb/manifest.json
-# does not declare that (only esphome/manifest.json does, and real installs always have
-# esphome next to usb). Only the requirements of these domains are taken, no recursion.
+# usb imports aioesphomeapi without declaring it, real installs get it through esphome.
+# Only the requirements of these domains are taken, no recursion.
 EXTRA_REQUIREMENT_DOMAINS = ("esphome",)
 
 
@@ -34,11 +30,8 @@ def fail(message):
 
 
 def ha_components_dir():
-    """Locate homeassistant/components without importing homeassistant.
-
-    Importing it would drag in homeassistant.runner and its POSIX-only fcntl, which only
-    works here thanks to the Windows shim in tests/sitecustomize.py.
-    """
+    """Locate homeassistant/components without importing homeassistant, which needs the
+    POSIX-only fcntl."""
     spec = importlib.util.find_spec("homeassistant")
     if spec is None or spec.origin is None:
         fail("homeassistant is not installed - run 'pip install -r tests/requirements_test.txt' first")

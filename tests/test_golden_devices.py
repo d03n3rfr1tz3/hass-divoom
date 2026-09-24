@@ -1,41 +1,15 @@
-"""Golden-master tests: every case in tests/cases.py must produce byte-for-
-byte the same Bluetooth traffic as recorded in tests/goldens/.
+"""Golden-master tests: every case in tests/cases.py must send byte-for-byte
+the traffic recorded in tests/goldens/. After an intended output change,
+regenerate them with `python tests/record_goldens.py` and review the diff.
 
-If a test here fails after an intentional, approved code change, regenerate
-the affected golden file(s) with `python tests/record_goldens.py` and review
-the diff before trusting it.
-
-Exception: "show_text" cases are checked structurally (message count, byte
-length and envelope header per message) instead of byte-for-byte. Text
-rendering goes through PIL/FreeType, and at very small font sizes (e.g.
-TimeboxMini's screensize=11) sub-pixel hinting differs between the FreeType
-build bundled in the Windows Pillow wheel (used to record these goldens) and
-the manylinux/Ubuntu wheel used in CI, even with an identical pinned Pillow
-version - confirmed via GitHub Actions run 29178182736, where only
-TimeboxMini-show_text failed while every other case (including show_text on
-the other 9 device types) stayed green. This only shifts individual pixel
-bytes within animation frames that actually contain the glyph, never the
-protocol framing or frame count, so the structural check below still catches
-real regressions (wrong command, wrong frame count, wrong message sizes)
-without being flaky across platforms.
-TimeboxMini also has escapePayload=True, so a shifted pixel byte can additionally
-land in the 0x01-0x03 range and get escaped to 2 bytes on one platform but not
-the other, changing the *wire* message length by exactly that much even though
-the underlying frame is identical. Messages are therefore unescaped (only
-when the device actually escapes, i.e. device.escapePayload) before the
-length/header comparison, which removes exactly that variance without
-loosening the check any further.
-
-Second exception: the MiniToo pushes its pixels as one Zstandard stream, whose
-bytes are not guaranteed identical across zstandard/libzstd versions, so a
-recorded golden would be flaky - and at roughly 1.5 MB of hex it would be
-unreadable besides. Its show_image_*/show_text cases are therefore left out
-here entirely (see cases.is_media_case) and verified in
-tests/test_divoom128_media.py instead, which checks the framing, the chunk
-indices, the checksums, the header and the *decompressed* pixel buffer. That
-is a stronger check than a golden, not a weaker one. Everything else the
-MiniToo sends goes through the base class and is compared byte-for-byte below
-like any other device.
+Exceptions:
+- show_text is compared structurally (message count, lengths, headers), as
+  FreeType hinting at small font sizes differs between the Windows and Linux
+  Pillow wheels. Escaping devices are compared unescaped, since a shifted
+  pixel can change the escaped length.
+- The media cases of the 128x128 devices are zstd streams, which are not
+  byte-stable across libzstd versions. tests/test_divoom128_media.py checks
+  them instead.
 """
 from __future__ import annotations
 

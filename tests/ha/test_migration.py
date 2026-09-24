@@ -236,12 +236,8 @@ PARITY_CASES = [
 
 @pytest.mark.parametrize("name,legacy,expected", PARITY_CASES, ids=[c[0] for c in PARITY_CASES])
 def test_migrated_call_behaves_like_the_legacy_one(name, legacy, expected):
-    """The whole point of the migration: the device must see the same calls.
-
-    One end runs the original notify payload through send_message, the other
-    runs the converted params through the same dispatch the divoom.* services
-    use, and both mocked devices must have been driven identically.
-    """
+    """The legacy payload via send_message and the converted params via the
+    divoom.* dispatch drive the mocked devices identically."""
     conversion = convert_step(dict(legacy), SERVICES)
     mode = conversion.mode
     params = {key: value for key, value in conversion.data.items() if key != CONF_DEVICE}
@@ -280,8 +276,8 @@ REMAP_IDS = [
 
 @pytest.mark.parametrize("device_cls,method,legacy", REMAP_CASES, ids=REMAP_IDS)
 def test_remapped_values_reach_the_device_identically(device_cls, method, legacy):
-    """The migration spells out the numbers these three modes used to take,
-    so the device has to end up sending the very same bytes for both."""
+    """The migration replaces the legacy numbers of these modes with names,
+    so the device must send the same bytes for both."""
     value = legacy["data"]["data"]["value"]
     migrated = convert_step(dict(legacy), SERVICES).data["value"]
 
@@ -388,7 +384,7 @@ async def test_a_renamed_entry_is_matched_by_either_name(hass, service, device):
 
 
 async def test_a_manually_added_entry_is_matched_by_its_title(hass):
-    """The config flow names those Divoom Device, the user renames them."""
+    """An entry renamed after it was added is matched by its title."""
     register_entry(hass, name="Divoom Device", title="Divoom PixooMax")
 
     conversion = convert_step(
@@ -451,9 +447,7 @@ async def test_migrate_rewrites_both_files(hass, yaml_files):
 
 
 async def test_migrate_writes_real_utf8(hass, yaml_files):
-    """write_utf8_file_atomic hands text straight to AtomicWriter without an
-    encoding, so anything but bytes would be written in the platform locale
-    and °C plus umlauts would come back undecodable."""
+    """The files are written as UTF-8, not in the platform locale."""
     automations, _ = yaml_files
     register_entry(hass)
     async_mock_service(hass, "automation", "reload", schema=vol.Schema({}))
@@ -628,8 +622,8 @@ async def test_scan_flags_unconvertible_entries_as_manual(hass):
 
 
 async def test_scan_flags_a_call_no_entry_answers_to(hass):
-    """The bug that let a renamed device slip through: another entry exists, so
-    the scan runs, but nothing answers to the name the automation calls."""
+    """A call no entry answers to is flagged, e.g. after renaming a device,
+    as long as another entry exists."""
     register_entry(hass, name="Divoom Pixoo", mac="aa:bb:cc:dd:ee:ff")
     await setup_automation(
         hass,
@@ -722,8 +716,8 @@ async def test_issue_translations_are_reachable_for_the_frontend(hass, language)
 
 @pytest.mark.parametrize("language", ["en", "de"])
 async def test_the_common_category_is_reachable_for_the_reason_labels(hass, language):
-    """The reasons sit in their own category since hassfest rejected them under
-    the issue, so prove the loader hands that one out too."""
+    """The reasons sit in the `common` category, as hassfest rejects them
+    under the issue, so the loader must hand that one out too."""
     resources = await translation.async_get_translations(hass, language, "common", [DOMAIN])
 
     strings = json.loads((COMPONENT_PATH / "strings.json").read_text(encoding="utf-8"))

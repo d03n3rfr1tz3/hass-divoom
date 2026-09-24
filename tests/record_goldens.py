@@ -1,10 +1,7 @@
-"""Regenerates the golden-master files under tests/goldens/ from the
-CURRENTLY installed code.
+"""Regenerates the golden-master files under tests/goldens/ from the current code.
 
-Only run this after an intentionally approved output change, and only for
-the specific device/case whose behaviour actually changed. Never run it to
-"fix" a failing golden-master test without first confirming the new bytes
-are correct.
+Only run this after an intended output change, and review the diff before
+committing it.
 
 Usage (from the repository root): python tests/record_goldens.py
 """

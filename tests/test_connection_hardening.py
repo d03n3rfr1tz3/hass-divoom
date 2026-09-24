@@ -1,7 +1,4 @@
-"""Tests of devices/divoom.py: none of these touch the message bytes sent
-over an already-open connection, only connection lifecycle/error-handling
-behaviour, so they live separately from the golden-master and
-protocol-helper tests."""
+"""Connection lifecycle and error handling of devices/divoom.py."""
 from __future__ import annotations
 
 import errno
@@ -31,10 +28,8 @@ from tests.support import (
 
 @pytest.fixture(autouse=True)
 def _ensure_bluetooth_socket_constants(monkeypatch):
-    """AF_BLUETOOTH/BTPROTO_RFCOMM are missing on some Python builds without
-    bluetooth headers (e.g. some CI runners). These tests mock socket.socket()
-    entirely, so a placeholder value is enough to keep the attribute access
-    from raising."""
+    """AF_BLUETOOTH/BTPROTO_RFCOMM are missing on Python builds without
+    bluetooth headers. socket.socket() is mocked here, so placeholders suffice."""
     monkeypatch.setattr(socket, "AF_BLUETOOTH", getattr(socket, "AF_BLUETOOTH", 31), raising=False)
     monkeypatch.setattr(socket, "BTPROTO_RFCOMM", getattr(socket, "BTPROTO_RFCOMM", 3), raising=False)
 
@@ -107,9 +102,8 @@ def _record_select_timeouts(monkeypatch, writes=False):
 
 
 def test_message_buf_is_isolated_per_instance():
-    """message_buf used to be a class attribute (a mutable list), so
-    receive() on one device instance (self.message_buf += data) mutated the
-    list shared by every Divoom instance."""
+    """Each instance has its own message_buf, so receiving on one device leaves
+    the others untouched."""
     device_a, recorder_a, server_a = make_connected_device(Pixoo)
     device_b, recorder_b, server_b = make_connected_device(Pixoo)
     try:
@@ -143,9 +137,8 @@ def test_receive_returns_zero_when_nothing_ready():
 
 
 def test_receive_returns_zero_on_socket_error():
-    """recv() raising used to leave receive() falling off the end of the
-    function, implicitly returning None; clear_input_buffer()'s
-    `while self.receive() > 0` would then crash with a TypeError."""
+    """recv() raising makes receive() return 0, so `while self.receive() > 0`
+    loops end cleanly."""
     device, recorder, server_sock = make_connected_device(Pixoo)
     try:
         server_sock.send(b"\x01")
@@ -164,9 +157,8 @@ def test_receive_returns_zero_on_socket_error():
 
 
 def test_connect_clears_socket_after_connection_failure(monkeypatch):
-    """socket.connect() failing used to leave self.socket pointing at a
-    never-connected socket object, so later code thought the device was
-    connected."""
+    """A failed socket.connect() leaves no socket behind, so the device does
+    not count as connected."""
     device = Pixoo(mac="11:22:33:44:55:66")
     _hands_out(monkeypatch, FakeSocket(connect_error=OSError(errno.ECONNREFUSED, "refused")))
 
@@ -177,9 +169,8 @@ def test_connect_clears_socket_after_connection_failure(monkeypatch):
 
 
 def test_connect_bounds_the_connect_itself(monkeypatch):
-    """settimeout() ran only after connect() returned, so a bluetooth connect
-    that never got answered held the executor thread and the device lock for
-    as long as the OS cared to wait."""
+    """The timeout is set before connect(), so an unanswered bluetooth connect
+    cannot hold the executor thread and the device lock indefinitely."""
     fake = _hands_out(monkeypatch, FakeSocket())
 
     device = Pixoo(mac="11:22:33:44:55:66")
@@ -193,9 +184,8 @@ def test_connect_bounds_the_connect_itself(monkeypatch):
 
 
 def test_connect_binds_to_the_configured_adapter(monkeypatch):
-    """Without a bind() the kernel picks the local adapter itself, so on a host
-    with more than one adapter the connection may go out through the one the
-    device was never paired with."""
+    """The socket binds to the configured adapter, so on a host with several
+    adapters the connection goes out through the one the device is paired with."""
     fake = _hands_out(monkeypatch, FakeSocket())
 
     device = Pixoo(adapter="AA:BB:CC:DD:EE:FF", mac="11:22:33:44:55:66")
@@ -210,8 +200,7 @@ def test_connect_binds_to_the_configured_adapter(monkeypatch):
 
 
 def test_connect_without_adapter_does_not_bind(monkeypatch):
-    """No adapter configured has to stay exactly the previous behaviour: let
-    the kernel route the connection."""
+    """Without a configured adapter, the kernel routes the connection."""
     fake = _hands_out(monkeypatch, FakeSocket())
 
     device = Pixoo(mac="11:22:33:44:55:66")
@@ -221,8 +210,8 @@ def test_connect_without_adapter_does_not_bind(monkeypatch):
 
 
 def test_connect_host_mode_ignores_the_adapter(monkeypatch):
-    """Host mode talks TCP to the ESP32 proxy; a local bluetooth adapter has
-    no meaning there and binding to it would break the connection."""
+    """Host mode talks TCP to the ESP32 proxy, so a local bluetooth adapter
+    has no meaning there."""
     fake = _hands_out(monkeypatch, FakeSocket())
     monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
@@ -234,9 +223,8 @@ def test_connect_host_mode_ignores_the_adapter(monkeypatch):
 
 
 def test_connect_clears_socket_after_bind_failure(monkeypatch):
-    """A configured adapter that is gone (unplugged dongle) makes bind() fail,
-    which has to be reported like any other connection failure instead of
-    leaving an unusable socket behind."""
+    """A bind() failure, e.g. from an unplugged dongle, is recorded like any
+    other connection failure and leaves no socket behind."""
     _hands_out(monkeypatch, FakeSocket(bind_error=OSError(errno.EADDRNOTAVAIL, "not available")))
 
     device = Pixoo(adapter="AA:BB:CC:DD:EE:FF", mac="11:22:33:44:55:66")
@@ -247,9 +235,8 @@ def test_connect_clears_socket_after_bind_failure(monkeypatch):
 
 
 def test_connect_timeout_is_recorded_as_a_failure(monkeypatch):
-    """A timed out connect raises TimeoutError carrying no errno, and
-    reconnect() reads a missing errno as "nothing wrong" — so the bounded
-    connect would have reported success while leaving no socket behind."""
+    """A timed out connect counts as a failure, although TimeoutError carries
+    no errno."""
     _hands_out(monkeypatch, FakeSocket(connect_error=TimeoutError("timed out")))
     monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
@@ -261,10 +248,8 @@ def test_connect_timeout_is_recorded_as_a_failure(monkeypatch):
 
 
 def test_connect_and_disconnect_host_mode_send_expected_handshake_bytes(monkeypatch):
-    """The ESP32-proxy (host-mode) open/close handshake bytes were never
-    covered by the golden-master suite (which only exercises mac/Bluetooth
-    devices). This locks in the exact bytes across the send() -> sendall()
-    change."""
+    """The ESP32 proxy open/close handshake, which the golden-master suite
+    does not cover."""
     fake = _hands_out(monkeypatch, FakeSocket())
     monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
@@ -283,9 +268,8 @@ def test_connect_and_disconnect_host_mode_send_expected_handshake_bytes(monkeypa
 
 
 def test_connect_host_mode_handshake_failure_clears_socket(monkeypatch):
-    """The 0x69 handshake send() used to be unguarded: a failure there
-    raised straight out of connect() instead of being recorded like every
-    other connection failure."""
+    """A failing 0x69 handshake is recorded like any other connection failure
+    instead of raising out of connect()."""
     _hands_out(monkeypatch, FakeSocket(send_error=OSError(errno.EPIPE, "broken pipe")))
     monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
@@ -305,9 +289,8 @@ def test_connect_host_mode_handshake_failure_clears_socket(monkeypatch):
     ids=["direct-without-a-ping", "proxy-pinging-without-a-socket"],
 )
 def test_reconnect_gives_up_after_exhausting_retries(monkeypatch, caplog, host, skip_ping):
-    """The proxy case also covers a regression of its own: send_command used to
-    return None without a socket, so the proxy reply check raised TypeError on
-    list(None) instead of reaching the retry limit."""
+    """Via the proxy, the reply check copes with a missing socket and still
+    reaches the retry limit."""
     caplog.set_level(logging.ERROR)
     device = Pixoo(host=host, mac="11:22:33:44:55:66")
     _hands_out(monkeypatch, FakeSocket(connect_error=OSError(errno.ECONNREFUSED, "refused")))
@@ -321,10 +304,8 @@ def test_reconnect_gives_up_after_exhausting_retries(monkeypatch, caplog, host, 
 
 
 def test_reconnect_waits_before_every_retry_and_stays_within_budget(monkeypatch):
-    """The backoff used to run before disconnect() and skip the first retry
-    entirely, so the loop reconnected the instant the old link went down -
-    which is what bluetooth answers with EBUSY. Six 10s connects on top of it
-    held the device lock, and an executor thread, for 77s."""
+    """Every retry waits after disconnect(), as bluetooth answers an instant
+    reconnect with EBUSY, and all attempts together stay within a time budget."""
     slept = []
     fake = _hands_out(monkeypatch, FakeSocket(connect_error=OSError(errno.EHOSTDOWN, "host is down")))
     monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
@@ -339,8 +320,8 @@ def test_reconnect_waits_before_every_retry_and_stays_within_budget(monkeypatch)
 
 
 def test_reconnect_pings_after_rebuilding_the_connection(monkeypatch, caplog):
-    """The retry loop used to stop as soon as TCP was up again, so the next
-    command went out while the proxy had no bluetooth link and got lost."""
+    """A rebuilt proxy connection counts only once the ping confirms the
+    proxy's bluetooth link, so the next command does not get lost."""
     caplog.set_level(logging.WARNING)
     monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
     clients, peers = _proxy_connections(
@@ -360,8 +341,8 @@ def test_reconnect_pings_after_rebuilding_the_connection(monkeypatch, caplog):
 
 
 def test_reconnect_ignores_an_errno_from_an_earlier_failure(caplog):
-    """socket_errno was only ever cleared by a successful connect(), never by a
-    successful ping, so one recorded error tore down every healthy link after it."""
+    """An errno left over from an earlier call does not tear down a healthy
+    link."""
     device, recorder, server_sock = make_connected_device(Pixoo)
     socket_before = device.socket
     device.socket_errno = errno.ECONNRESET # left over from an earlier call
@@ -379,9 +360,8 @@ def test_reconnect_ignores_an_errno_from_an_earlier_failure(caplog):
 
 @pytest.mark.parametrize("host", [None, "10.0.0.5"], ids=["ping", "proxy-handshake"])
 def test_reconnect_treats_a_timeout_as_a_failure(monkeypatch, host):
-    """A timeout carries no errno, and reconnect() read a missing errno as
-    "nothing wrong" - so a timed out ping, or a timed out proxy handshake that
-    left no socket behind, reported a healthy link."""
+    """A timed out ping or proxy handshake counts as a failure, although a
+    timeout carries no errno."""
     _hands_out(monkeypatch, FakeSocket(send_error=TimeoutError("timed out")))
     monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
     monkeypatch.setattr(divoom_module.select, "select", lambda r, w, x, t: ([], w, []))
@@ -396,8 +376,8 @@ def test_reconnect_treats_a_timeout_as_a_failure(monkeypatch, host):
 
 
 def test_send_ping_skips_stale_replies_via_proxy():
-    """A reply to an earlier command still waiting in the socket used to be
-    taken as the ping's answer, hiding the proxy's 0x96."""
+    """Replies to earlier commands still waiting in the socket are skipped, so
+    the ping sees the proxy's 0x96."""
     device, recorder, server_sock = make_connected_device(
         Pixoo, host="10.0.0.5", responder=_answer_pings_with(PROXY_BT_GONE))
     try:
@@ -443,11 +423,8 @@ def test_reconnect_ping_window_on_an_open_connection(monkeypatch, host, expected
 
 
 def test_senddelay_defaults_are_per_device_family():
-    """Pacing only pays off where a chunk can be asked for again: Divoom128 has
-    a resend channel, the classic protocol has none, so a pause there only
-    widens the window a stall can land in. Pinned on the classes because the
-    other pacing tests set the value by hand - that is how it spread in the
-    first place."""
+    """Only Divoom128 paces its writes, as only it can ask for a chunk again.
+    Checked on the classes, since the other tests set senddelay by hand."""
     assert Divoom.senddelay == 0
     assert Divoom128.senddelay == 0.015
 
@@ -461,9 +438,7 @@ def test_resend_window_allows_for_the_proxy_delay(host, expected):
 
 
 def test_send_payload_paces_every_write(monkeypatch):
-    """send_payload is the one write path all devices share, so the pause
-    belongs there - once per message, after the write, and only when one
-    actually happened."""
+    """send_payload pauses once per message, after the write."""
     slept = []
     monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
     device, _, server_sock = make_connected_device(Pixoo)
@@ -481,9 +456,8 @@ def test_send_payload_paces_every_write(monkeypatch):
 
 @pytest.mark.parametrize("host", [None, "10.0.0.5"])
 def test_send_payload_does_not_pace_a_classic_device(monkeypatch, host):
-    """Same on both paths - senddelay describes the device, not the transport.
-    support.py zeroes it for speed, so read it off the class to stay tied to the
-    shipped default."""
+    """senddelay describes the device, not the transport. Read off the class,
+    as support.py zeroes it."""
     slept = []
     monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
     device, _, server_sock = make_connected_device(Pixoo, host=host)
@@ -520,9 +494,8 @@ def test_send_payload_paces_a_128_device_via_proxy(monkeypatch):
 
 @pytest.mark.parametrize("host", [None, "10.0.0.5"])
 def test_send_payload_waits_for_the_link_to_take_more(monkeypatch, host):
-    """A device pushing back used to get the message dropped after 0.5s on the
-    direct path - stricter than the socket's own 3s timeout, so a transfer the
-    socket would still have finished was aborted mid-animation."""
+    """A device pushing back gets the socket's full 3s timeout to take more
+    data, on both paths."""
     device, _, server_sock = make_connected_device(Pixoo, host=host)
     timeouts = _record_select_timeouts(monkeypatch, writes=True)
     try:
@@ -535,9 +508,8 @@ def test_send_payload_waits_for_the_link_to_take_more(monkeypatch, host):
 
 
 def test_send_payload_aborts_when_socket_not_writable(monkeypatch, caplog):
-    """A full send buffer used to silently drop the message and carry on, which
-    left the device waiting for the rest of a chunked animation forever. Nothing
-    is paced either - the pause belongs after a write that happened."""
+    """A send buffer that stays full aborts with an error instead of dropping
+    the message silently. Without a write, nothing is paced."""
     caplog.set_level(logging.ERROR)
     slept = []
     monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
@@ -582,9 +554,8 @@ def test_show_image_stops_after_an_undeliverable_chunk(monkeypatch):
 
 
 def test_show_image_reports_a_link_that_went_away_mid_transfer():
-    """A socket that disappears mid-animation used to make every remaining
-    send_command() return 0 silently, so a transfer that put a fraction of the
-    chunks on the wire still reported success all the way up to a green button."""
+    """A socket that disappears mid-animation makes show_image raise instead
+    of reporting success."""
     device, recorder, server_sock = make_connected_device(Pixoo)
     real_sendall = recorder.sendall
 
@@ -632,10 +603,9 @@ def _record_skip_read(monkeypatch):
     ids=["send_ping", "send_brightness", "show_light"],
 )
 def test_only_the_ping_waits_for_a_reply(monkeypatch, call, expected):
-    """skipRead=False exists exactly once in the component, in send_ping. Every
-    other call site is fire-and-forget or leaves the default in place, where only
-    debug logging turns the read on. No golden covers this: skipRead changes no
-    byte on the wire."""
+    """Only send_ping sets skipRead=False. Every other call site sends without
+    waiting or keeps the default, which reads only with debug logging. No golden
+    covers this, as skipRead changes no byte on the wire."""
     flags = _record_skip_read(monkeypatch)
     device, _, server_sock = make_connected_device(
         Pixoo, responder=_answer_pings_with(DEVICE_REPLY))
@@ -676,9 +646,8 @@ def test_show_image_never_blocks_between_chunks(monkeypatch, device_cls, respond
 )
 def test_debug_logging_turns_a_default_command_into_a_read(
         monkeypatch, level, read_timeouts, reads_back):
-    """Debug logging does more than add log lines: a default command then waits
-    for a reply and returns the reply bytes instead of the byte count. reconnect()
-    branches on isinstance(ping, int), so the two levels are not the same system."""
+    """With debug logging, a default command waits for a reply and returns its
+    bytes instead of the byte count, which reconnect() branches on."""
     logger = logging.getLogger("read-gate-{0}".format(logging.getLevelName(level)))
     logger.setLevel(level)
     device, _, server_sock = make_connected_device(

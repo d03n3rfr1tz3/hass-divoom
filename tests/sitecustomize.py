@@ -1,32 +1,9 @@
-"""Local Windows test-environment shim, auto-imported by Python's `site`
-module at interpreter startup (before pytest or anything else runs).
+"""Windows-only test shims, auto-imported by `site` before pytest starts.
 
-homeassistant.runner unconditionally imports the POSIX-only stdlib module
-`fcntl` (used only for a single-instance pidfile lock when actually running
-the HA server - never during component/unit testing). Without this shim,
-`pytest_homeassistant_custom_component` cannot even be loaded as a pytest
-plugin on Windows, before any test collection happens. Real platforms (CI
-runs on Linux) keep using the real `fcntl` module untouched.
-
-Also swaps the default asyncio event loop policy for the Selector one, and
-patches `socket.socketpair` to bypass pytest-socket. Both address the same
-underlying problem: `pytest_homeassistant_custom_component.plugins` installs
-its own unconditional `pytest_runtest_setup()` hook that calls
-`pytest_socket.disable_socket(allow_unix_socket=True)` before every single
-test, no matter what fixtures/markers that test uses. On POSIX this is
-harmless for asyncio, because a loop's self-pipe is created with a native
-AF_UNIX `socketpair()` syscall that bypasses the patched `socket.socket`
-class entirely. Windows has no native socketpair syscall, so the stdlib falls
-back to `_fallback_socketpair()`, a pure-Python implementation that opens a
-loopback AF_INET connection *through* `socket.socket(...)` - which
-pytest-socket then blocks with `SocketBlockedError`, breaking every test that
-merely uses an async fixture (e.g. `hass`). The event loop policy swap
-(`HassEventLoopPolicy` inherits from whatever `asyncio.DefaultEventLoopPolicy`
-resolves to at class-definition time, and that patch has to land before
-`homeassistant.runner` is imported) just picks the simpler Selector loop; the
-`socket.socketpair` patch is what actually avoids the block, by rebuilding
-the same loopback-pair logic against a `socket.socket` reference captured
-before pytest-socket can ever monkeypatch it.
+- `fcntl`/`resource` stubs, as homeassistant.runner imports these POSIX-only modules.
+- Selector event loop policy, which HassEventLoopPolicy inherits once defined.
+- `socket.socketpair` on the unpatched socket class: Windows builds the event
+  loop's self-pipe over loopback TCP, which pytest-socket would block.
 """
 import sys
 
@@ -62,11 +39,8 @@ if sys.platform == "win32":
                 except (BlockingIOError, InterruptedError):
                     pass
                 csock.setblocking(True)
-                # lsock.accept() would internally call the module-level
-                # `socket(...)` name to wrap the accepted fd, which resolves
-                # to whatever pytest-socket has patched `socket.socket` to by
-                # then. Use the private fd-only accept and wrap it ourselves
-                # with the captured real class instead.
+                # lsock.accept() wraps the fd with the module-level socket
+                # class, which pytest-socket may have patched by then
                 fd, _ = lsock._accept()
                 ssock = _real_socket_cls(family, type, proto, fileno=fd)
             except OSError:

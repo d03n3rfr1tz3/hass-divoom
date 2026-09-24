@@ -1,7 +1,5 @@
-"""Registry of golden-master test cases exercised against every Divoom
-device. Shared by tests/test_golden_devices.py (assertions) and
-tests/record_goldens.py (golden generation) so both use the exact same
-device/case set.
+"""Golden-master cases run against every Divoom device, shared by
+tests/test_golden_devices.py and tests/record_goldens.py.
 """
 from __future__ import annotations
 
@@ -62,8 +60,7 @@ FONT_PATH = os.path.normpath(os.path.join(
 
 
 def pixelart_files() -> list[str]:
-    """List every file under pixelart/, sorted, so files added later are
-    picked up automatically instead of relying on a hardcoded name list."""
+    """List every file under pixelart/, sorted."""
     return sorted(
         name for name in os.listdir(PIXELART_DIR)
         if os.path.isfile(os.path.join(PIXELART_DIR, name))
