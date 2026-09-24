@@ -147,6 +147,9 @@
     "device_not_found": {
       "message": "Pro {device} nebylo nalezeno žádné zařízení Divoom."
     },
+    "device_ambiguous": {
+      "message": "{device} odpovídá více zařízením Divoom. Vyberte prosím zařízení v akci znovu."
+    },
     "device_not_loaded": {
       "message": "Zařízení Divoom {title} není načteno. Zkontrolujte, zda se integrace správně nastavila."
     },

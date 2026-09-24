@@ -300,6 +300,9 @@ def device_slug(entry) -> str:
     """The name the device is addressed by, unchanged by renaming the entry."""
     return slugify(entry.data.get(CONF_NAME) or entry.title)
 
+def _matches(entry, slug) -> bool:
+    return slug in (device_slug(entry), slugify(entry.title))
+
 def _find_entry(hass: HomeAssistant, device: str):
     """The entry a device value points at, by name, by slug or by raw id."""
     entry = hass.config_entries.async_get_entry(device)
@@ -307,11 +310,15 @@ def _find_entry(hass: HomeAssistant, device: str):
         return entry
 
     slug = slugify(device)
-    for entry in hass.config_entries.async_entries(DOMAIN):
-        if slug in (device_slug(entry), slugify(entry.title)):
-            return entry
+    entries = [entry for entry in hass.config_entries.async_entries(DOMAIN) if _matches(entry, slug)]
+    if len(entries) > 1:
+        raise ServiceValidationError(
+            translation_domain=DOMAIN,
+            translation_key="device_ambiguous",
+            translation_placeholders={"device": device},
+        )
 
-    return None
+    return entries[0] if entries else None
 
 def _resolve_target(hass: HomeAssistant, data):
     device = data[CONF_DEVICE]
@@ -373,17 +380,24 @@ def async_setup_services(hass: HomeAssistant) -> None:
     _LOGGER.debug("Divoom: successfully registered {} services".format(len(SERVICE_SCHEMAS)))
 
 def _device_options(hass: HomeAssistant):
-    """The configured devices, as the UI dropdown wants them."""
-    return [
-        {"value": device_slug(entry), "label": entry.title}
-        for entry in hass.config_entries.async_entries(DOMAIN)
-    ]
+    """The configured devices, as the UI dropdown wants them. Each value has to
+    resolve to its own entry, so a shared name falls back to the title slug,
+    then to the entry id."""
+    entries = hass.config_entries.async_entries(DOMAIN)
 
-def _dropdown(options):
+    def value(entry):
+        for slug in (device_slug(entry), slugify(entry.title)):
+            if sum(_matches(other, slug) for other in entries) == 1:
+                return slug
+        return entry.entry_id
+
+    return [{"value": value(entry), "label": entry.title} for entry in entries]
+
+def _dropdown(options, custom_value=True):
     return {"select": {
         "options": options,
         "mode": "dropdown",
-        "custom_value": True,
+        "custom_value": custom_value,
         "sort": True,
     }}
 
@@ -467,7 +481,7 @@ async def async_refresh_service_descriptions(hass: HomeAssistant) -> None:
     if types & CLOCK_ID_TYPES and clocks is None and 'clocks_task' not in domainConfig:
         domainConfig['clocks_task'] = hass.async_create_background_task(_load_clock_options(hass), "divoom clock catalog", eager_start=False)
 
-    selector = _dropdown(_device_options(hass))
+    selector = _dropdown(_device_options(hass), custom_value=False) # shows the title once picked
 
     for mode, description in descriptions.items():
         fields = description.get("fields", {})

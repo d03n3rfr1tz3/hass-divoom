@@ -18,7 +18,7 @@ import aiohttp
 import pytest
 import voluptuous as vol
 
-from homeassistant.const import CONF_MAC
+from homeassistant.const import CONF_MAC, CONF_NAME
 from homeassistant.exceptions import HomeAssistantError, ServiceValidationError
 from homeassistant.helpers.selector import selector
 from homeassistant.helpers.service import async_get_all_descriptions
@@ -67,6 +67,18 @@ def register_device(hass, mac="11:22:33:44:55:66", loaded=True, device_type=None
     return entry, service
 
 
+def register_named_device(hass, mac, title, name="Divoom Device"):
+    """A manually added entry keeps its placeholder name when the user renames
+    the title, so the name alone doesn't tell such entries apart."""
+    entry = MockConfigEntry(domain=DOMAIN, data={CONF_MAC: mac, CONF_NAME: name}, title=title)
+    entry.add_to_hass(hass)
+
+    service = make_mocked_service()
+    hass.data.setdefault(DOMAIN, {}).setdefault("loaded", {})[mac] = service
+
+    return entry, service
+
+
 async def test_async_setup_registers_clock_service(hass):
     """Services are registered in async_setup, so they exist even with no
     config entry at all - a call then fails with a readable message instead
@@ -107,6 +119,17 @@ async def test_resolve_target_unknown_device_raises(hass):
         _resolve_target(hass, {CONF_DEVICE: "divoom_kitchen"})
 
     assert error.value.translation_key == "device_not_found"
+
+
+async def test_resolve_target_ambiguous_device_raises(hass):
+    """A slug that fits two entries used to pick the first one silently."""
+    register_named_device(hass, "11:22:33:44:55:60", "Divoom PixooMax")
+    register_named_device(hass, "11:22:33:44:55:61", "Divoom Ditoo")
+
+    with pytest.raises(ServiceValidationError) as error:
+        _resolve_target(hass, {CONF_DEVICE: "divoom_device"})
+
+    assert error.value.translation_key == "device_ambiguous"
 
 
 async def test_resolve_target_entry_of_another_domain_raises(hass):
@@ -160,9 +183,50 @@ async def test_device_field_offers_the_configured_devices(hass):
         assert field["selector"]["select"]["options"] == [
             {"value": device_slug(entry), "label": entry.title}
         ], mode
+        # a custom value picker would show the slug instead of the title once picked
+        assert field["selector"]["select"]["custom_value"] is False, mode
 
         # a key the frontend doesn't know would just show nothing
         selector(field["selector"])
+
+
+@pytest.mark.parametrize(
+    ("titles", "expected"),
+    [
+        (["Divoom PixooMax", "Divoom Ditoo"], ["divoom_pixoomax", "divoom_ditoo"]),
+        (["Divoom Device", "Divoom Device"], None),
+    ],
+    ids=["title-slug", "entry-id"],
+)
+async def test_device_field_values_reach_their_own_device(hass, titles, expected):
+    """Two entries sharing a name offered the same value, so picking the second
+    one in the UI always hit the first."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    devices = [
+        register_named_device(hass, "11:22:33:44:55:6{}".format(i), title)
+        for i, title in enumerate(titles)
+    ]
+
+    await async_refresh_service_descriptions(hass)
+
+    options = (await _device_field(hass))["selector"]["select"]["options"]
+    values = [option["value"] for option in options]
+    assert values == (expected or [entry.entry_id for entry, _ in devices])
+    for value, (entry, service) in zip(values, devices):
+        assert _resolve_target(hass, {CONF_DEVICE: value}) is service
+
+
+async def test_device_field_keeps_a_unique_name_as_value(hass):
+    """Existing automations store the name slug, so an entry that is the only
+    one with its name keeps it."""
+    assert await async_setup_component(hass, DOMAIN, {})
+    register_named_device(hass, "11:22:33:44:55:60", "Divoom PixooMax")
+    register_named_device(hass, "11:22:33:44:55:61", "Divoom Ditoo", name="Divoom Ditoo")
+
+    await async_refresh_service_descriptions(hass)
+
+    options = (await _device_field(hass))["selector"]["select"]["options"]
+    assert [option["value"] for option in options] == ["divoom_device", "divoom_ditoo"]
 
 
 async def test_device_field_falls_back_to_the_static_selector(hass):
@@ -1182,6 +1246,7 @@ def test_services_yaml_strings_and_translations_stay_in_sync():
 
     # every translation_key raised by services.py must be translatable
     assert set(strings["exceptions"]) == {
+        "device_ambiguous",
         "device_not_found",
         "device_not_loaded",
         "mode_failed",

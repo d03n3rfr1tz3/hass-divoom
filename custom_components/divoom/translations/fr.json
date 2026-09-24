@@ -147,6 +147,9 @@
     "device_not_found": {
       "message": "Aucun appareil Divoom n'a été trouvé pour {device}."
     },
+    "device_ambiguous": {
+      "message": "Plusieurs appareils Divoom correspondent à {device}. Veuillez sélectionner à nouveau l'appareil dans l'action."
+    },
     "device_not_loaded": {
       "message": "L'appareil Divoom {title} n'est pas chargé. Vérifiez que l'intégration s'est configurée correctement."
     },

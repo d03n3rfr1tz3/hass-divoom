@@ -147,6 +147,9 @@
     "device_not_found": {
       "message": "No Divoom device found for {device}."
     },
+    "device_ambiguous": {
+      "message": "More than one Divoom device matches {device}. Please pick the device again in the action."
+    },
     "device_not_loaded": {
       "message": "The Divoom device {title} is not loaded. Check whether the integration was set up successfully."
     },

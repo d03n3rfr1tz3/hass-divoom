@@ -280,6 +280,8 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         if user_input is not None:
             if CONF_DEVICE_TYPE in user_input:
                 self._device_type = user_input[CONF_DEVICE_TYPE]
+                if self._device_name == "Device": # no discovered name, so several entries would share it
+                    self._device_name = next((t["label"] for t in DEVICE_TYPES if t["value"] == self._device_type), self._device_name)
 
             return await self.async_step_confirm()
 

@@ -147,6 +147,9 @@
     "device_not_found": {
       "message": "Er is geen Divoom-apparaat gevonden voor {device}."
     },
+    "device_ambiguous": {
+      "message": "Meerdere Divoom-apparaten komen overeen met {device}. Kies het apparaat opnieuw in de actie."
+    },
     "device_not_loaded": {
       "message": "Het Divoom-apparaat {title} is niet geladen. Controleer of de integratie correct is ingesteld."
     },

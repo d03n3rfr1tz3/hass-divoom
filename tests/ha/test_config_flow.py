@@ -131,6 +131,27 @@ async def test_user_step_via_proxy_stores_the_host(hass):
     await hass.async_block_till_done()
 
 
+async def test_an_undiscovered_device_is_named_after_its_type(hass):
+    """Without a discovered name every such entry was "Divoom Device", so a
+    second one got the same service slug and notify name as the first."""
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await choose(hass, result, "proxy")
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: 1, CONF_HOST: "10.0.0.42"}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_DEVICE_TYPE: "pixoomax"}
+    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["title"] == "Divoom Pixoo Max"
+    assert result["data"][CONF_NAME] == "Divoom Pixoo Max"
+
+    await hass.async_block_till_done()
+
+
 async def test_bluetooth_step_suggests_the_discovering_adapter(hass):
     """The adapter that saw the device is the one it is paired with, so it is
     the obvious default for the connection."""
