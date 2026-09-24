@@ -331,6 +331,35 @@ class Divoom:
             result.append(self.make_frame(self.process_frame(pixels, colors, colorCount, keep, time, needsFlags)))
         return [result, keep]
 
+    def send_frames(self, frames, framesCount):
+        """Send encoded frames as image or animation"""
+        result = None
+        if framesCount > 1:
+            """Sending as Animation"""
+            frameParts = []
+            framePartsSize = 0
+
+            for pair in frames:
+                frameParts += pair[0]
+                framePartsSize += pair[1]
+
+            index = 0
+            for framePart in self.chunks(frameParts, self.chunksize):
+                frame = self.make_framepart(framePartsSize, index, framePart)
+                result = self.send_command("set animation frame", frame, skipRead=True)
+                if not result:
+                    raise OSError(errno.ENOTCONN, "{0}: transfer truncated after {1} chunks".format(self.type, index))
+                index += 1
+
+        elif framesCount == 1:
+            """Sending as Image"""
+            pair = frames[-1]
+            frame = self.make_framepart(pair[1], -1, pair[0])
+            result = self.send_command("set image", frame, skipRead=True)
+            if not result:
+                raise OSError(errno.ENOTCONN, "{0}: frame not sent".format(self.type))
+        return result
+
     def escape_payload(self, payload):
         """Escaping is not needed anymore as some smarter guys found out"""
         if self.escapePayload == None or self.escapePayload == False:
@@ -729,33 +758,7 @@ class Divoom:
     def show_image(self, file, time=None):
         """Show image or animation on the Divoom device"""
         frames, framesCount = self.process_image(file, time=time)
-        
-        result = None
-        if framesCount > 1:
-            """Sending as Animation"""
-            frameParts = []
-            framePartsSize = 0
-            
-            for pair in frames:
-                frameParts += pair[0]
-                framePartsSize += pair[1]
-            
-            index = 0
-            for framePart in self.chunks(frameParts, self.chunksize):
-                frame = self.make_framepart(framePartsSize, index, framePart)
-                result = self.send_command("set animation frame", frame, skipRead=True)
-                if not result:
-                    raise OSError(errno.ENOTCONN, "{0}: transfer truncated after {1} chunks".format(self.type, index))
-                index += 1
-
-        elif framesCount == 1:
-            """Sending as Image"""
-            pair = frames[-1]
-            frame = self.make_framepart(pair[1], -1, pair[0])
-            result = self.send_command("set image", frame, skipRead=True)
-            if not result:
-                raise OSError(errno.ENOTCONN, "{0}: frame not sent".format(self.type))
-        return result
+        return self.send_frames(frames, framesCount)
 
     def send_keyboard(self, value=None):
         self.unimplemented()
@@ -889,35 +892,9 @@ class Divoom:
         self.unsupported("the temperature mode")
 
     def show_text(self, text, font, size=None, time=None, color1=None, color2=None):
-        """Show image or animation on the Divoom device"""
+        """Show scrolling text on the Divoom device"""
         frames, framesCount = self.process_text(text, font, size=size, time=time, color1=color1, color2=color2)
-        
-        result = None
-        if framesCount > 1:
-            """Sending as Animation"""
-            frameParts = []
-            framePartsSize = 0
-            
-            for pair in frames:
-                frameParts += pair[0]
-                framePartsSize += pair[1]
-            
-            index = 0
-            for framePart in self.chunks(frameParts, self.chunksize):
-                frame = self.make_framepart(framePartsSize, index, framePart)
-                result = self.send_command("set animation frame", frame, skipRead=True)
-                if not result:
-                    raise OSError(errno.ENOTCONN, "{0}: transfer truncated after {1} chunks".format(self.type, index))
-                index += 1
-
-        elif framesCount == 1:
-            """Sending as Image"""
-            pair = frames[-1]
-            frame = self.make_framepart(pair[1], -1, pair[0])
-            result = self.send_command("set image", frame, skipRead=True)
-            if not result:
-                raise OSError(errno.ENOTCONN, "{0}: frame not sent".format(self.type))
-        return result
+        return self.send_frames(frames, framesCount)
 
     def show_timer(self, value=None):
         """Show timer tool on the Divoom device"""

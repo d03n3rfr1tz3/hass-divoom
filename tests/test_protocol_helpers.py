@@ -12,10 +12,12 @@ from PIL import Image
 
 from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.ditoo import Ditoo
+from custom_components.divoom.devices.divoom128 import Divoom128
 from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
+from tests.cases import DEVICE_CLASSES
 from tests.support import FakeSocket, make_connected_device, solid_color, solid_gif
 
 PIXELART_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "pixelart"))
@@ -109,6 +111,27 @@ def test_process_image_thins_to_twelve_frames_on_old_devices(device_cls, tmp_pat
 
     assert frame_count == len(frames) == 12
     assert sum(payload[0] for payload, _ in frames) == 30, "delay bytes in 100 ms keep the total"
+
+
+@pytest.mark.parametrize("device_cls", [
+    cls for cls in DEVICE_CLASSES.values() if not issubclass(cls, Divoom128)],
+    ids=lambda cls: cls.__name__)
+def test_show_text_sends_frames_like_show_image(device_cls, tmp_path):
+    """Both differ only in how frames are made, so they must send them alike."""
+    gif = solid_gif(str(tmp_path / "anim.gif"), frames=4)
+    device, recorder, server_sock = make_connected_device(device_cls)
+    try:
+        frames = device.process_image(gif)
+        device.show_image(gif)
+        image_messages = list(recorder.sent_messages)
+        recorder.sent_messages.clear()
+        device.process_text = lambda *args, **kwargs: frames
+        device.show_text("HA", None)
+    finally:
+        device.disconnect()
+        server_sock.close()
+
+    assert recorder.sent_messages == image_messages
 
 
 def test_process_pixels_one_bit_per_pixel():
