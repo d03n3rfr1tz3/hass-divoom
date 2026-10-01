@@ -11,7 +11,6 @@
   },
   "config": {
     "flow_title": "{name} ({mac}{host_text})",
-    "title": "Divoom (BT)",
     "step": {
       "user": {
         "title": "Zařízení Divoom",
