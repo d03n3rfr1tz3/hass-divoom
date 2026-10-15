@@ -90,6 +90,21 @@ def _adapter_selector(adapters: list[SelectOptionDict]) -> SelectSelector:
         ),
     )
 
+def _port_selector() -> vol.All:
+    return vol.All(
+        SelectSelector(
+            SelectSelectorConfig(
+                mode=SelectSelectorMode.DROPDOWN,
+                options=[SelectOptionDict(value="0", label="Auto")],
+                custom_value=True,
+                multiple=False,
+                translation_key="port",
+            ),
+        ),
+        vol.Coerce(int),
+        vol.Range(min=0, max=65535),
+    )
+
 class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     """Divoom Bluetooth config flow."""
     VERSION = 1
@@ -101,7 +116,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         self._device_host = None
         self._device_name = None
         self._device_mac = None
-        self._device_port = 1
+        self._device_port = 0
         self._device_type = None
 
     async def async_step_user(
@@ -162,7 +177,7 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                                 sort=True,
                             ),
                         ),
-                        vol.Optional(CONF_PORT, default=1): cv.port,
+                        vol.Optional(CONF_PORT, default="0"): _port_selector(),
                         **connection,
                     }
                 ),
@@ -250,24 +265,15 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
 
             return await self.async_step_device_type()
 
-        device_port = 1
-        device_name = self._device_name.lower()
-        if device_name.startswith("aurabox"):
-            device_port = 4
-        elif device_name.startswith("ditoomic") or device_name.startswith("ditoo-mic") or device_name.startswith("ditoo mic"):
-            device_port = 2
-        elif device_name.startswith("ditoo") or device_name.startswith("divoom-ditoo") or device_name.startswith("divoom ditoo"):
-            device_port = 2
-        elif device_name.startswith("timeboxmini") or device_name.startswith("timebox-mini") or device_name.startswith("timebox mini"):
-            device_port = 4
-        elif device_name.startswith("timoo"):
-            device_port = 2
+        device_port = "0"
+        if self._device_name.lower().startswith("aurabox"):
+            device_port = "4"
 
         return self.async_show_form(
             step_id="device_port",
             data_schema=vol.Schema(
                 {
-                    vol.Optional(CONF_PORT, default=device_port): cv.port
+                    vol.Optional(CONF_PORT, default=device_port): _port_selector()
                 }
             ),
         )
@@ -400,11 +406,11 @@ class DivoomBluetoothConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 vol.Schema(
                     {
                         **connection,
-                        vol.Required(CONF_PORT): cv.port,
+                        vol.Required(CONF_PORT): _port_selector(),
                         vol.Required(CONF_DEVICE_TYPE): _device_type_selector(),
                     }
                 ),
-                entry.data,
+                {**entry.data, CONF_PORT: str(entry.data[CONF_PORT])},
             ),
         )
 

@@ -5,6 +5,40 @@ from PIL import Image, ImageDraw, ImageFont
 
 TEMPERATURE_PATTERN = re.compile(r"^\s*(-?\d+(?:[.,]\d+)?)?\s*°?\s*([CF])?\s*$", re.IGNORECASE)
 
+def _sdp_rfcomm_channel(data):
+    """Returns the first RFCOMM channel found in SDP attribute lists, or None."""
+    def elements(data):
+        index = 0
+        while index < len(data):
+            kind, size = data[index] >> 3, data[index] & 7
+            index += 1
+            if kind == 0: size = 0
+            elif size < 5: size = 1 << size
+            else:
+                length = 1 << (size - 5)
+                if index + length > len(data): raise ValueError
+                size = int.from_bytes(data[index:index + length], "big")
+                index += length
+            if index + size > len(data): raise ValueError
+            yield kind, data[index:index + size]
+            index += size
+
+    def search(data):
+        items = list(elements(data))
+        for number, (kind, value) in enumerate(items):
+            # the protocol descriptor RFCOMM (uuid 0x0003) is followed by its channel as uint8
+            if kind == 3 and value == b"\x00\x03" and number + 1 < len(items) and items[number + 1][0] == 1 and len(items[number + 1][1]) == 1:
+                return items[number + 1][1][0]
+            if kind == 6 or kind == 7:
+                channel = search(value)
+                if channel != None: return channel
+        return None
+
+    try:
+        return search(bytes(data))
+    except ValueError:
+        return None
+
 class DivoomUnsupportedError(Exception):
     """Raised when a device cannot do what a mode asks of it."""
 
@@ -64,6 +98,7 @@ class Divoom:
     host = None
     mac = None
     port = 1
+    autoport = None
 
     def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.socket = None
@@ -129,11 +164,17 @@ class Divoom:
         if (self.socket == None):
             try:
                 if (self.host == None):
-                    self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
-                    self.socket.settimeout(timeout)
-                    if (self.adapter != None): self.socket.bind((self.adapter, 0))
-                    self.socket.connect((self.mac, self.port))
-                    time.sleep(0.5)
+                    sdp = None
+                    port = self.port or self.autoport
+                    if not port: sdp, port = self.discover_port(timeout)
+                    try:
+                        self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
+                        self.socket.settimeout(timeout)
+                        if (self.adapter != None): self.socket.bind((self.adapter, 0))
+                        self.socket.connect((self.mac, port or 1))
+                        time.sleep(0.5)
+                    finally:
+                        if (sdp != None): sdp.close()
                 else:
                     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
                     self.socket.settimeout(timeout)
@@ -149,12 +190,54 @@ class Divoom:
             time.sleep(0.5)
             conn = [0x69]
             conn += bytearray.fromhex(self.mac.replace(':', ''))
-            conn += [self.port]
+            port = self.port or self.autoport
+            if port: conn += [port]
             try:
                 self.socket.sendall(bytes(conn))
             except socket.error as error:
                 self.socket_errno = error.errno or errno.ETIMEDOUT
                 self.socket = None
+
+    def discover_port(self, timeout=10):
+        """Looks up the RFCOMM channel of the serial port service via SDP. Returns the still open SDP socket and the channel."""
+        sdp = None
+        channel = None
+        try:
+            sdp = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_SEQPACKET, socket.BTPROTO_L2CAP)
+            sdp.settimeout(timeout)
+            if (self.adapter != None): sdp.bind((self.adapter, 0))
+            sdp.connect((self.mac, 1))
+
+            # service search attribute request:
+            # serial port uuid 0x1101
+            # attribute 0x0004
+            # continuation state
+            data = b""
+            continuation = b"\x00"
+            for transaction in range(1, 17):
+                params = bytes([0x35, 0x03, 0x19, 0x11, 0x01, 0xff, 0xff, 0x35, 0x03, 0x09, 0x00, 0x04]) + continuation
+                sdp.sendall(bytes([0x06]) + transaction.to_bytes(2, "big") + len(params).to_bytes(2, "big") + params)
+
+                response = sdp.recv(65535)
+                if len(response) < 7 or response[0] != 0x07: break
+                count = int.from_bytes(response[5:7], "big")
+                data += response[7:7 + count]
+                continuation = response[7 + count:]
+                if not continuation or continuation[0] == 0: break
+
+            channel = _sdp_rfcomm_channel(data)
+        except socket.error as error:
+            if (sdp != None): sdp.close()
+            self.logger.warning("{0}: could not look up the port via SDP ({1}), using port 1.".format(self.type, error))
+            return None, None
+
+        if channel == None:
+            sdp.close()
+            self.logger.warning("{0}: no port found via SDP, using port 1.".format(self.type))
+            return None, None
+
+        self.logger.debug("{0}: found port {1} via SDP.".format(self.type, channel))
+        return sdp, channel
 
     def disconnect(self):
         """Closes the connection to the Divoom device."""

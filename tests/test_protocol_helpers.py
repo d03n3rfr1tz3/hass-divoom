@@ -17,7 +17,8 @@ from custom_components.divoom.devices.pixoo import Pixoo
 from custom_components.divoom.devices.pixoomax import PixooMax
 from custom_components.divoom.devices.timeboxmini import TimeboxMini
 from tests.cases import DEVICE_CLASSES
-from tests.support import FakeSocket, make_connected_device, solid_color, solid_gif
+from custom_components.divoom.devices.divoom import _sdp_rfcomm_channel
+from tests.support import FakeSocket, make_connected_device, sdp_attribute_lists, solid_color, solid_gif
 
 PIXELART_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), "..", "pixelart"))
 
@@ -165,6 +166,32 @@ def test_parse_frequency_above_100_mhz():
 def test_parse_frequency_accepts_string():
     device = make_pixoo()
     assert device._parse_frequency("101.3") == [13, 10]
+
+
+def test_sdp_rfcomm_channel_reads_the_serial_port_record():
+    assert _sdp_rfcomm_channel(sdp_attribute_lists(1)) == 1
+
+
+def test_sdp_rfcomm_channel_takes_the_first_of_several_records():
+    assert _sdp_rfcomm_channel(sdp_attribute_lists(2, 10)) == 2
+
+
+@pytest.mark.parametrize(
+    "data",
+    [b"", bytes([0x35, 0x00]), bytes([0x35, 0x05, 0x35, 0x03, 0x19, 0x01, 0x00])],
+    ids=["empty", "no-records", "no-rfcomm"],
+)
+def test_sdp_rfcomm_channel_without_a_channel_is_none(data):
+    assert _sdp_rfcomm_channel(data) is None
+
+
+@pytest.mark.parametrize(
+    "data",
+    [sdp_attribute_lists(1)[:-1], bytes([0x37, 0xff, 0xff, 0xff, 0xff]), bytes([0x35])],
+    ids=["truncated", "oversized", "missing-length"],
+)
+def test_sdp_rfcomm_channel_on_broken_data_is_none(data):
+    assert _sdp_rfcomm_channel(data) is None
 
 
 def test_escape_payload_disabled_is_passthrough():

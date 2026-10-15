@@ -812,6 +812,11 @@
     }
   },
   "selector": {
+    "port": {
+      "options": {
+        "0": "Automatisch"
+      }
+    },
     "weekday": {
       "options": {
         "mon": "Maandag",

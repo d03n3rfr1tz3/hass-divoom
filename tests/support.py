@@ -90,6 +90,32 @@ class FakeSocket:
         return [args[0] for name, *args in self.calls if name == "settimeout"]
 
 
+def _sdp_sequence(*items: bytes) -> bytes:
+    body = b"".join(items)
+    return bytes([0x35, len(body)]) + body
+
+
+def sdp_attribute_lists(*channels: int) -> bytes:
+    """SDP attribute lists with one serial port record per channel, each
+    holding only its protocol descriptor list (L2CAP, RFCOMM channel)."""
+    return _sdp_sequence(*(
+        _sdp_sequence(
+            bytes([0x09, 0x00, 0x04]),
+            _sdp_sequence(
+                _sdp_sequence(bytes([0x19, 0x01, 0x00])),
+                _sdp_sequence(bytes([0x19, 0x00, 0x03, 0x08, channel])),
+            ),
+        )
+        for channel in channels
+    ))
+
+
+def sdp_response(data: bytes, continuation: bytes = b"\x00", transaction: int = 1) -> bytes:
+    """A service search attribute response carrying data and the continuation state."""
+    params = len(data).to_bytes(2, "big") + data + continuation
+    return bytes([0x07]) + transaction.to_bytes(2, "big") + len(params).to_bytes(2, "big") + params
+
+
 def media_responder(data: bytes) -> bytes | None:
     """Answer a 0x8b start packet the way a 128x128 device does, with "send the
     animation"."""
