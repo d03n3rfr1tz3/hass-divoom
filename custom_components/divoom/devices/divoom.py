@@ -133,6 +133,7 @@ class Divoom:
                     self.socket.settimeout(timeout)
                     if (self.adapter != None): self.socket.bind((self.adapter, 0))
                     self.socket.connect((self.mac, self.port))
+                    time.sleep(0.5)
                 else:
                     self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
                     self.socket.settimeout(timeout)
@@ -182,7 +183,7 @@ class Divoom:
             try:
                 if fresh:
                     self.connect(10 if retries == 0 else 3)
-                    time.sleep(0.5)
+                    if (self.host != None): time.sleep(0.5)
 
                 if skipPing != True:
                     timeout = 0.2 if self.host == None else 10 if fresh else 2

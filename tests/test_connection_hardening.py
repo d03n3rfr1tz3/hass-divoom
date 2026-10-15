@@ -172,6 +172,7 @@ def test_connect_bounds_the_connect_itself(monkeypatch):
     """The timeout is set before connect(), so an unanswered bluetooth connect
     cannot hold the executor thread and the device lock indefinitely."""
     fake = _hands_out(monkeypatch, FakeSocket())
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
     device = Pixoo(mac="11:22:33:44:55:66")
     device.connect()
@@ -183,10 +184,37 @@ def test_connect_bounds_the_connect_itself(monkeypatch):
     ]
 
 
+def test_connect_settles_after_the_link_opens(monkeypatch):
+    """Some devices drop the first frame right after the link opens, so a
+    direct connect waits before anything is sent."""
+    slept = []
+    fake = _hands_out(monkeypatch, FakeSocket())
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+
+    device = Pixoo(mac="11:22:33:44:55:66")
+    device.connect()
+
+    assert device.socket is fake
+    assert slept == [0.5]
+
+
+def test_reconnect_settles_once_on_a_direct_link(monkeypatch):
+    """The settle of connect() is not doubled by reconnect()."""
+    slept = []
+    _hands_out(monkeypatch, FakeSocket())
+    monkeypatch.setattr(divoom_module.time, "sleep", slept.append)
+
+    device = Pixoo(mac="11:22:33:44:55:66")
+
+    assert device.reconnect(skipPing=True) is True
+    assert slept == [0.5]
+
+
 def test_connect_binds_to_the_configured_adapter(monkeypatch):
     """The socket binds to the configured adapter, so on a host with several
     adapters the connection goes out through the one the device is paired with."""
     fake = _hands_out(monkeypatch, FakeSocket())
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
     device = Pixoo(adapter="AA:BB:CC:DD:EE:FF", mac="11:22:33:44:55:66")
     device.connect()
@@ -202,6 +230,7 @@ def test_connect_binds_to_the_configured_adapter(monkeypatch):
 def test_connect_without_adapter_does_not_bind(monkeypatch):
     """Without a configured adapter, the kernel routes the connection."""
     fake = _hands_out(monkeypatch, FakeSocket())
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
     device = Pixoo(mac="11:22:33:44:55:66")
     device.connect()
@@ -313,8 +342,8 @@ def test_reconnect_waits_before_every_retry_and_stays_within_budget(monkeypatch)
     device = Pixoo(mac="11:22:33:44:55:66")
 
     assert device.reconnect(skipPing=True) is False
-    # 0.5 settles after each attempt, 1/2/3 back off before each retry
-    assert slept == [0.5, 1, 0.5, 2, 0.5, 3, 0.5]
+    # 1/2/3 back off before each retry, no settle without an open link
+    assert slept == [1, 2, 3]
     assert fake.timeouts() == [10, 3, 3, 3]
     assert sum(slept) + sum(fake.timeouts()) < 30
 
