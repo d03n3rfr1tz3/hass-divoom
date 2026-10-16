@@ -812,6 +812,11 @@
     }
   },
   "selector": {
+    "port": {
+      "options": {
+        "0": "Automaticky"
+      }
+    },
     "weekday": {
       "options": {
         "mon": "Pondělí",

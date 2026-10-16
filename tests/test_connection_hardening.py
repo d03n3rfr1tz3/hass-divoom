@@ -11,6 +11,7 @@ import threading
 import pytest
 
 from custom_components.divoom.devices import divoom as divoom_module
+from custom_components.divoom.devices.aurabox import Aurabox
 from custom_components.divoom.devices.divoom import Divoom
 from custom_components.divoom.devices.divoom128 import Divoom128
 from custom_components.divoom.devices.minitoo import MiniToo
@@ -23,6 +24,8 @@ from tests.support import (
     _serve_forever,
     make_connected_device,
     media_responder,
+    sdp_attribute_lists,
+    sdp_response,
 )
 
 
@@ -32,6 +35,8 @@ def _ensure_bluetooth_socket_constants(monkeypatch):
     bluetooth headers. socket.socket() is mocked here, so placeholders suffice."""
     monkeypatch.setattr(socket, "AF_BLUETOOTH", getattr(socket, "AF_BLUETOOTH", 31), raising=False)
     monkeypatch.setattr(socket, "BTPROTO_RFCOMM", getattr(socket, "BTPROTO_RFCOMM", 3), raising=False)
+    monkeypatch.setattr(socket, "BTPROTO_L2CAP", getattr(socket, "BTPROTO_L2CAP", 0), raising=False)
+    monkeypatch.setattr(socket, "SOCK_SEQPACKET", getattr(socket, "SOCK_SEQPACKET", 5), raising=False)
 
 
 # --- test doubles ---
@@ -56,6 +61,27 @@ def _hands_out(monkeypatch, fake):
     instance records the whole retry sequence."""
     monkeypatch.setattr(divoom_module.socket, "socket", lambda *_a, **_kw: fake)
     return fake
+
+
+class _SdpSocket(FakeSocket):
+    """SDP stand-in that answers each request with the next prepared response."""
+
+    def __init__(self, *responses, **errors):
+        super().__init__(**errors)
+        self._responses = list(responses)
+
+    def recv(self, *_args):
+        self._record("recv")
+        return self._responses.pop(0)
+
+
+def _hands_out_by_kind(monkeypatch, sdp, rfcomm):
+    """socket.socket() returns the SDP stand-in for SEQPACKET and the RFCOMM one
+    otherwise."""
+    monkeypatch.setattr(
+        divoom_module.socket, "socket",
+        lambda _family, kind, _proto: sdp if kind == socket.SOCK_SEQPACKET else rfcomm,
+    )
 
 
 # --- peer behaviour and probes ---
@@ -307,6 +333,117 @@ def test_connect_host_mode_handshake_failure_clears_socket(monkeypatch):
 
     assert device.socket is None
     assert device.socket_errno == errno.EPIPE
+
+
+# --- port 0 (auto) ---
+
+SDP_REQUEST = bytes.fromhex("060001000d3503191101ffff350309000400")
+
+
+def test_connect_auto_port_looks_up_the_channel_via_sdp(monkeypatch):
+    """Port 0 looks up the serial port channel via SDP and keeps the SDP link
+    open until the RFCOMM connect is through."""
+    sdp = _SdpSocket(sdp_response(sdp_attribute_lists(2)))
+    rfcomm = FakeSocket()
+    rfcomm.calls = sdp.calls
+    _hands_out_by_kind(monkeypatch, sdp, rfcomm)
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    device = Pixoo(mac="11:22:33:44:55:66", port=0)
+    device.connect()
+
+    assert device.socket is rfcomm
+    assert sdp.calls == [
+        ("settimeout", 10),
+        ("connect", ("11:22:33:44:55:66", 1)),
+        ("sendall", SDP_REQUEST),
+        ("recv",),
+        ("settimeout", 10),
+        ("connect", ("11:22:33:44:55:66", 2)),
+        ("close",),
+        ("settimeout", 3),
+    ]
+
+
+def test_connect_auto_port_follows_the_sdp_continuation(monkeypatch):
+    """A response split over several SDP responses is requested piece by piece."""
+    data = sdp_attribute_lists(3)
+    sdp = _SdpSocket(
+        sdp_response(data[:10], continuation=b"\x02\xab\xcd"),
+        sdp_response(data[10:], transaction=2),
+    )
+    rfcomm = FakeSocket()
+    _hands_out_by_kind(monkeypatch, sdp, rfcomm)
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    device = Pixoo(mac="11:22:33:44:55:66", port=0)
+    device.connect()
+
+    assert sdp.sent_messages == [
+        SDP_REQUEST,
+        bytes.fromhex("060002000f3503191101ffff3503090004") + b"\x02\xab\xcd",
+    ]
+    assert ("connect", ("11:22:33:44:55:66", 3)) in rfcomm.calls
+
+
+@pytest.mark.parametrize(
+    "sdp",
+    [
+        _SdpSocket(connect_error=OSError(errno.EHOSTDOWN, "host is down")),
+        _SdpSocket(sdp_response(b"\x35\x00")),
+    ],
+    ids=["sdp-fails", "no-record"],
+)
+def test_connect_auto_port_falls_back_to_port_1(monkeypatch, caplog, sdp):
+    """Without a channel from SDP, port 1 is used and the SDP link is closed."""
+    rfcomm = FakeSocket()
+    _hands_out_by_kind(monkeypatch, sdp, rfcomm)
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    device = Pixoo(mac="11:22:33:44:55:66", port=0)
+    with caplog.at_level(logging.WARNING):
+        device.connect()
+
+    assert device.socket is rfcomm
+    assert ("connect", ("11:22:33:44:55:66", 1)) in rfcomm.calls
+    assert sdp.calls[-1] == ("close",)
+    assert "using port 1" in caplog.text
+
+
+@pytest.mark.parametrize(
+    ("device_cls", "port", "expected"),
+    [(Pixoo, 2, 2), (Aurabox, 0, 4), (Aurabox, 1, 1)],
+    ids=["fixed-port", "aurabox-auto", "aurabox-fixed"],
+)
+def test_connect_without_sdp_uses_the_known_port(monkeypatch, device_cls, port, expected):
+    """A fixed port, or the Aurabox on port 0, connects without an SDP lookup."""
+    sdp = _SdpSocket()
+    rfcomm = FakeSocket()
+    _hands_out_by_kind(monkeypatch, sdp, rfcomm)
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    device = device_cls(mac="11:22:33:44:55:66", port=port)
+    device.connect()
+
+    assert sdp.calls == []
+    assert ("connect", ("11:22:33:44:55:66", expected)) in rfcomm.calls
+
+
+@pytest.mark.parametrize(
+    ("device_cls", "port", "suffix"),
+    [(Pixoo, 0, b""), (Aurabox, 0, b"\x04"), (Pixoo, 2, b"\x02")],
+    ids=["auto", "aurabox-auto", "fixed-port"],
+)
+def test_connect_host_mode_handshake_carries_the_port(monkeypatch, device_cls, port, suffix):
+    """Via the proxy, port 0 leaves the port out of the handshake, so the proxy
+    looks the channel up itself."""
+    fake = _hands_out(monkeypatch, FakeSocket())
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    device = device_cls(host="10.0.0.5", mac="11:22:33:44:55:66", port=port)
+    device.connect()
+
+    assert fake.sent_messages == [bytes([0x69, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66]) + suffix]
 
 
 # --- reconnect() ---

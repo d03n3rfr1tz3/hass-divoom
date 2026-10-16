@@ -7,6 +7,7 @@ from .divoom import Divoom
 class Aurabox(Divoom):
     """Class Aurabox encapsulates the Aurabox Bluetooth communication."""
     maxframes = 12
+    autoport = 4
 
     def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=True, logger=None):
         self.type = "Aurabox"

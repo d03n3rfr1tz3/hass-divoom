@@ -140,7 +140,8 @@ Second we need to enable/ configure the component. Again that can be done in two
 * If there is an auto-discovered entry, you are lucky and can skip two steps
 * Use `Add Integration` and Search for `Divoom`
 * Choose your Divoom device from the list of discovered Bluetooth devices
-* Choose a `port`. If you are unsure, first try `1`. If that doesn't work, try `2`, `4` or all the other digits.
+* Choose a `port`. Keep `Auto` to look up the Bluetooth channel of your device on every connect (the Aurabox always uses `4`). If that doesn't work, try `1`, `2`, `4` or all the other digits.
+  Via the [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom), `Auto` needs ESP32-Divoom v2.2.0 or newer.
 * Select your device type (e.g. `pixoo`, `ditoo` and such)
 * Click Send and then Finish
 
@@ -833,8 +834,8 @@ Examples for Tivoo: [devices/tivoo.txt](https://github.com/d03n3rfr1tz3/hass-div
 Make sure, that you at least paired your Home Assistant device once to your Divoom device. Also make sure, that you have the correct MAC address.
 Also make sure, that your Phone is not currently connected to your Divoom device, because some don't allow that many connections.
 
-If it seems to connect, but loses connection the moment you use any mode, you might have chosen the wrong port. On Pixoo and other non-audio
-devices, it's typically `port: 1`. But on audio devices, like the Timoo, Tivoo or Ditoo, it might be `port: 2`. Timebox Mini is also a special case with its `port: 4`.
+If it seems to connect, but loses connection the moment you use any mode, you might have chosen the wrong port. Try `Auto` first. If you set a
+fixed port: On Pixoo and other non-audio devices, it's typically `port: 1`. But on audio devices, like the Timoo, Tivoo or Ditoo, it might be `port: 2`. Timebox Mini is also a special case with its `port: 4`.
 
 ### GIF does not work
 

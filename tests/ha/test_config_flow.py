@@ -7,7 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from homeassistant import config_entries
-from homeassistant.data_entry_flow import FlowResultType
+from homeassistant.data_entry_flow import FlowResultType, InvalidData
 from homeassistant.helpers.service_info.zeroconf import ZeroconfServiceInfo
 from pytest_homeassistant_custom_component.common import MockConfigEntry
 
@@ -42,6 +42,10 @@ def make_zeroconf_info(properties: dict) -> ZeroconfServiceInfo:
     )
 
 
+def port_key(result):
+    return next(key for key in result["data_schema"].schema if key == CONF_PORT)
+
+
 async def choose(hass, result, next_step_id):
     """Pick an entry of the menu the flow currently shows."""
     assert result["type"] == FlowResultType.MENU
@@ -61,7 +65,7 @@ async def test_user_step_with_known_mac_creates_entry(hass):
     assert result["step_id"] == "direct"
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: 1}
+        result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: "1"}
     )
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "device_type"
@@ -90,7 +94,7 @@ async def test_user_step_with_adapter_stores_it_lowercased(hass):
     result = await choose(hass, result, "direct")
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: 1, CONF_ADAPTER: "AA:BB:CC:DD:EE:FF"},
+        {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: "1", CONF_ADAPTER: "AA:BB:CC:DD:EE:FF"},
     )
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_DEVICE_TYPE: "pixoo"}
@@ -115,7 +119,7 @@ async def test_user_step_via_proxy_stores_the_host(hass):
     assert CONF_ADAPTER not in result["data_schema"].schema
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: 1, CONF_HOST: "10.0.0.42"}
+        result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: "1", CONF_HOST: "10.0.0.42"}
     )
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_DEVICE_TYPE: "pixoo"}
@@ -136,7 +140,7 @@ async def test_an_undiscovered_device_is_named_after_its_type(hass):
     )
     result = await choose(hass, result, "proxy")
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: 1, CONF_HOST: "10.0.0.42"}
+        result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: "1", CONF_HOST: "10.0.0.42"}
     )
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_DEVICE_TYPE: "pixoomax"}
@@ -161,7 +165,7 @@ async def test_bluetooth_step_suggests_the_discovering_adapter(hass):
     assert result["step_id"] == "device_port"
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_PORT: 1}
+        result["flow_id"], {CONF_PORT: "1"}
     )
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_DEVICE_TYPE: "pixoo"}
@@ -182,7 +186,7 @@ async def test_bluetooth_step_ignores_a_remote_scanner_as_adapter(hass):
         data=make_bluetooth_info("11:11:11:11:11:11"),
     )
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_PORT: 1}
+        result["flow_id"], {CONF_PORT: "1"}
     )
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"], {CONF_DEVICE_TYPE: "pixoo"}
@@ -217,7 +221,7 @@ async def test_zeroconf_step_with_properties_creates_entry(hass, device_name, de
     assert result["step_id"] == "device_port"
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_PORT: 1}
+        result["flow_id"], {CONF_PORT: "1"}
     )
     assert result["type"] == FlowResultType.FORM
     assert result["step_id"] == "device_type"
@@ -260,6 +264,94 @@ async def test_zeroconf_step_missing_device_name_is_handled(hass):
     assert result["step_id"] == "device_port"
 
 
+@pytest.mark.parametrize("connection", ["direct", "proxy"])
+async def test_user_step_port_defaults_to_auto(hass, connection):
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await choose(hass, result, connection)
+
+    assert port_key(result).default() == "0"
+
+
+@pytest.mark.parametrize(
+    ("device_name", "expected"),
+    [("Pixoo-573A", "0"), ("Ditoo-Light", "0"), ("TimeBox-mini-light", "0"), ("Aurabox-light", "4")],
+)
+async def test_discovery_port_defaults_to_auto_except_for_the_aurabox(hass, device_name, expected):
+    """Auto looks the channel up, only the Aurabox keeps its fixed port."""
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_BLUETOOTH},
+        data=SimpleNamespace(name=device_name, address="11:22:33:44:55:66", source="11:11:11:11:11:11"),
+    )
+    assert result["step_id"] == "device_port"
+    assert port_key(result).default() == expected
+
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN,
+        context={"source": config_entries.SOURCE_ZEROCONF},
+        data=make_zeroconf_info({"device_mac": "11:22:33:44:55:77", "device_name": device_name}),
+    )
+    assert result["step_id"] == "device_port"
+    assert port_key(result).default() == expected
+
+
+@pytest.mark.parametrize(("port", "expected"), [("0", 0), ("2", 2)])
+async def test_port_is_stored_as_a_number(hass, port, expected):
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await choose(hass, result, "direct")
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: port}
+    )
+    result = await hass.config_entries.flow.async_configure(
+        result["flow_id"], {CONF_DEVICE_TYPE: "pixoo"}
+    )
+    result = await hass.config_entries.flow.async_configure(result["flow_id"], {})
+    assert result["type"] == FlowResultType.CREATE_ENTRY
+    assert result["data"][CONF_PORT] == expected
+
+    await hass.async_block_till_done()
+
+
+@pytest.mark.parametrize("port", ["abc", "-1", "70000"])
+async def test_port_rejects_anything_but_a_port_number(hass, port):
+    result = await hass.config_entries.flow.async_init(
+        DOMAIN, context={"source": config_entries.SOURCE_USER}
+    )
+    result = await choose(hass, result, "direct")
+
+    with pytest.raises(InvalidData):
+        await hass.config_entries.flow.async_configure(
+            result["flow_id"], {CONF_MAC: "11:22:33:44:55:AA", CONF_PORT: port}
+        )
+
+
+@pytest.mark.parametrize(("stored", "suggested"), [(0, "0"), (2, "2")])
+async def test_reconfigure_suggests_the_stored_port(hass, stored, suggested):
+    entry = MockConfigEntry(
+        domain=DOMAIN,
+        unique_id="11:22:33:44:55:66",
+        title="Divoom Pixoo",
+        data={
+            CONF_NAME: "Divoom Pixoo",
+            CONF_MAC: "11:22:33:44:55:66",
+            CONF_PORT: stored,
+            CONF_DEVICE_TYPE: "pixoo",
+            CONF_MEDIA_DIR: CONF_MEDIA_DIR_DEFAULT,
+            CONF_ESCAPE_PAYLOAD: None,
+        },
+    )
+    entry.add_to_hass(hass)
+
+    result = await entry.start_reconfigure_flow(hass)
+    result = await choose(hass, result, "reconfigure_direct")
+
+    assert port_key(result).description == {"suggested_value": suggested}
+
+
 async def test_reconfigure_updates_connection_and_keeps_identity(hass):
     """Reconfigure changes the connection, port and device type only. The MAC
     is the unique_id and the name is what the service names derive from.
@@ -286,7 +378,7 @@ async def test_reconfigure_updates_connection_and_keeps_identity(hass):
     assert result["step_id"] == "reconfigure_direct"
 
     result = await hass.config_entries.flow.async_configure(
-        result["flow_id"], {CONF_PORT: 2, CONF_DEVICE_TYPE: "ditoo"}
+        result["flow_id"], {CONF_PORT: "2", CONF_DEVICE_TYPE: "ditoo"}
     )
     assert result["type"] == FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
@@ -329,7 +421,7 @@ async def test_reconfigure_sets_and_clears_the_adapter(hass, adapter_input, expe
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_PORT: 1, CONF_DEVICE_TYPE: "pixoo", **adapter_input},
+        {CONF_PORT: "1", CONF_DEVICE_TYPE: "pixoo", **adapter_input},
     )
     assert result["type"] == FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
@@ -365,7 +457,7 @@ async def test_reconfigure_via_proxy_drops_the_adapter(hass):
 
     result = await hass.config_entries.flow.async_configure(
         result["flow_id"],
-        {CONF_HOST: "10.0.0.42", CONF_PORT: 1, CONF_DEVICE_TYPE: "pixoo"},
+        {CONF_HOST: "10.0.0.42", CONF_PORT: "1", CONF_DEVICE_TYPE: "pixoo"},
     )
     assert result["type"] == FlowResultType.ABORT
     assert result["reason"] == "reconfigure_successful"
