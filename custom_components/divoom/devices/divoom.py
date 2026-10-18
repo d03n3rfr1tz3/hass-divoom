@@ -99,6 +99,7 @@ class Divoom:
     mac = None
     port = 1
     autoport = None
+    fallbackport = 1
 
     def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.socket = None
@@ -171,7 +172,7 @@ class Divoom:
                         self.socket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
                         self.socket.settimeout(timeout)
                         if (self.adapter != None): self.socket.bind((self.adapter, 0))
-                        self.socket.connect((self.mac, port or 1))
+                        self.socket.connect((self.mac, port or self.fallbackport))
                         time.sleep(0.5)
                     finally:
                         if (sdp != None): sdp.close()
@@ -191,7 +192,7 @@ class Divoom:
             conn = [0x69]
             conn += bytearray.fromhex(self.mac.replace(':', ''))
             port = self.port or self.autoport
-            if port: conn += [port]
+            conn += [port] if port else [0x00, self.fallbackport]
             try:
                 self.socket.sendall(bytes(conn))
             except socket.error as error:
@@ -228,12 +229,12 @@ class Divoom:
             channel = _sdp_rfcomm_channel(data)
         except socket.error as error:
             if (sdp != None): sdp.close()
-            self.logger.warning("{0}: could not look up the port via SDP ({1}), using port 1.".format(self.type, error))
+            self.logger.warning("{0}: could not look up the port via SDP ({1}), using port {2}.".format(self.type, error, self.fallbackport))
             return None, None
 
         if channel == None:
             sdp.close()
-            self.logger.warning("{0}: no port found via SDP, using port 1.".format(self.type))
+            self.logger.warning("{0}: no port found via SDP, using port {1}.".format(self.type, self.fallbackport))
             return None, None
 
         self.logger.debug("{0}: found port {1} via SDP.".format(self.type, channel))

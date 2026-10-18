@@ -140,8 +140,8 @@ Second we need to enable/ configure the component. Again that can be done in two
 * If there is an auto-discovered entry, you are lucky and can skip two steps
 * Use `Add Integration` and Search for `Divoom`
 * Choose your Divoom device from the list of discovered Bluetooth devices
-* Choose a `port`. Keep `Auto` to look up the Bluetooth channel of your device on every connect (the Aurabox always uses `4`). If that doesn't work, try `1`, `2`, `4` or all the other digits.
-  Via the [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom), `Auto` needs ESP32-Divoom v2.2.0 or newer.
+* Choose a `port`. Keep `Auto` to look up the Bluetooth channel of your device on every connect (the Aurabox always uses `4`). If the lookup fails, the usual port of the device type is used. If that doesn't work, try `1`, `2`, `4` or all the other digits.
+  Via the [Bluetooth Proxy for ESP32](https://github.com/d03n3rfr1tz3/esp32-divoom), `Auto` needs ESP32-Divoom v2.2.1 or newer.
 * Select your device type (e.g. `pixoo`, `ditoo` and such)
 * Click Send and then Finish
 

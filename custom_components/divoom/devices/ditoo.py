@@ -4,6 +4,8 @@ from .divoom import Divoom
 
 class Ditoo(Divoom):
     """Class Ditoo encapsulates the Ditoo Bluetooth communication."""
+    fallbackport = 2
+
     def __init__(self, adapter=None, host=None, mac=None, port=1, escapePayload=False, logger=None):
         self.type = "Ditoo"
         self.screensize = 16

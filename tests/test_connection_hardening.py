@@ -12,10 +12,14 @@ import pytest
 
 from custom_components.divoom.devices import divoom as divoom_module
 from custom_components.divoom.devices.aurabox import Aurabox
+from custom_components.divoom.devices.ditoo import Ditoo
+from custom_components.divoom.devices.ditoomic import DitooMic
 from custom_components.divoom.devices.divoom import Divoom
 from custom_components.divoom.devices.divoom128 import Divoom128
 from custom_components.divoom.devices.minitoo import MiniToo
 from custom_components.divoom.devices.pixoo import Pixoo
+from custom_components.divoom.devices.timeboxmini import TimeboxMini
+from custom_components.divoom.devices.timoo import Timoo
 from tests.cases import PIXELART_DIR
 from tests.support import (
     ConnectedSocket,
@@ -411,6 +415,26 @@ def test_connect_auto_port_falls_back_to_port_1(monkeypatch, caplog, sdp):
 
 
 @pytest.mark.parametrize(
+    ("device_cls", "expected"),
+    [(Ditoo, 2), (DitooMic, 2), (Timoo, 2), (TimeboxMini, 4)],
+    ids=["ditoo", "ditoomic", "timoo", "timeboxmini"],
+)
+def test_connect_auto_port_falls_back_to_the_usual_port(monkeypatch, caplog, device_cls, expected):
+    """Without a channel from SDP, the usual port of the device type is used."""
+    sdp = _SdpSocket(connect_error=OSError(errno.EHOSTDOWN, "host is down"))
+    rfcomm = FakeSocket()
+    _hands_out_by_kind(monkeypatch, sdp, rfcomm)
+    monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
+
+    device = device_cls(mac="11:22:33:44:55:66", port=0)
+    with caplog.at_level(logging.WARNING):
+        device.connect()
+
+    assert ("connect", ("11:22:33:44:55:66", expected)) in rfcomm.calls
+    assert f"using port {expected}" in caplog.text
+
+
+@pytest.mark.parametrize(
     ("device_cls", "port", "expected"),
     [(Pixoo, 2, 2), (Aurabox, 0, 4), (Aurabox, 1, 1)],
     ids=["fixed-port", "aurabox-auto", "aurabox-fixed"],
@@ -431,12 +455,12 @@ def test_connect_without_sdp_uses_the_known_port(monkeypatch, device_cls, port, 
 
 @pytest.mark.parametrize(
     ("device_cls", "port", "suffix"),
-    [(Pixoo, 0, b""), (Aurabox, 0, b"\x04"), (Pixoo, 2, b"\x02")],
-    ids=["auto", "aurabox-auto", "fixed-port"],
+    [(Pixoo, 0, b"\x00\x01"), (Ditoo, 0, b"\x00\x02"), (Aurabox, 0, b"\x04"), (Pixoo, 2, b"\x02")],
+    ids=["auto", "ditoo-auto", "aurabox-auto", "fixed-port"],
 )
 def test_connect_host_mode_handshake_carries_the_port(monkeypatch, device_cls, port, suffix):
-    """Via the proxy, port 0 leaves the port out of the handshake, so the proxy
-    looks the channel up itself."""
+    """Via the proxy, port 0 sends port 0 followed by the usual port of the device
+    type, so the proxy looks the channel up itself and falls back to that port."""
     fake = _hands_out(monkeypatch, FakeSocket())
     monkeypatch.setattr(divoom_module.time, "sleep", lambda *_args: None)
 
